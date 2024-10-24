@@ -1,10 +1,10 @@
+import { Box, Heading } from "@chakra-ui/react";
+import NavBar from "@/components/NavBar";
 
 const Home = () => {
   
   return (
-    <div p={5}>
-      <text >Welcome to skyShare</text>
-    </div>
+    <NavBar />
   );
 };
 
