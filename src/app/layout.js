@@ -1,5 +1,8 @@
+
+// layout.js
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "@/styles/theme";
+import FileUpload from "@/components/FileUpload"; // Adjust the path as necessary
 
 export const metadata = {
   title: "skyShare",
@@ -10,8 +13,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ChakraProvider theme={theme}> 
-          {children}
+        <ChakraProvider theme={theme}>
+          <div>
+            {/* You can place the FileUpload component here */}
+            <FileUpload />
+            {/* Render children here to maintain existing content */}
+            {children}
+          </div>
         </ChakraProvider>
       </body>
     </html>
