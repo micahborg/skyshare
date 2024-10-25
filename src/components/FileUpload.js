@@ -1,5 +1,4 @@
-// components/FileUpload.js
-"use client"; // Ensure this is a client component
+"use client";
 import { useState } from 'react';
 import { Box, Text, useToast } from '@chakra-ui/react';
 
@@ -50,6 +49,10 @@ const FileUpload = () => {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       cursor="pointer"
+      width="100%"
+      maxWidth="500px"
+      height="200px"
+      mx="auto"
     >
       <Text fontSize="lg" mb={2}>
         Drag and drop your files here, or click to select files
@@ -57,13 +60,19 @@ const FileUpload = () => {
       <input
         type="file"
         onChange={handleFileInputChange}
-        style={{ display: 'none' }} // Hide the default file input
+        style={{ display: 'none' }}
         id="file-upload"
       />
       <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
         <Text color="blue.500">Click to select files</Text>
       </label>
-      {file && <Text mt={2}>Selected file: {file.name}</Text>}
+      
+      {/* Display the file name if a file is selected */}
+      {file && (
+        <Text mt={3} fontSize="md" fontWeight="medium" color="gray.600">
+          Selected file: {file.name}
+        </Text>
+      )}
     </Box>
   );
 };
