@@ -15,8 +15,6 @@ export default function RootLayout({ children }) {
       <body>
         <ChakraProvider theme={theme}>
           <div>
-            {/* You can place the FileUpload component here */}
-            <FileUpload />
             {/* Render children here to maintain existing content */}
             {children}
           </div>
