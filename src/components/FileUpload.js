@@ -50,6 +50,10 @@ const FileUpload = () => {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       cursor="pointer"
+      width="30%"  // Adjust the width (e.g., "100%", "400px")
+      maxWidth="500px" // Optional max width to limit size on larger screens
+      height="200px"   // Adjust the height (e.g., "200px", "300px")
+      mx="auto" // Centers the box horizontally
     >
       <Text fontSize="lg" mb={2}>
         Drag and drop your files here, or click to select files
