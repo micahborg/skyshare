@@ -19,8 +19,21 @@ const theme = extendTheme({
     skyBlue: "#97BDFF",
   },
   fonts: {
-    heading: "Arial, sans-serif",
-    body: "Arial, sans-serif",
+    heading: "Lexend Deca, sans-serif",
+    body: "Lexend Deca, sans-serif",
+  },
+  components: {
+    Heading: {
+      baseStyle: {
+        fontWeight: 500,
+      },
+    },
+    Card: {
+      baseStyle: {
+        bg: "sunnyYellow.100",       // Set the default background color
+        borderRadius: "50px",    // Set the default border radius (e.g., "lg" or a specific value like "16px")
+      },
+    },
   },
   styles: {
     global: {
