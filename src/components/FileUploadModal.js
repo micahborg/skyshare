@@ -9,7 +9,7 @@ const FileUploadModal = () => {
   return (
     <>
       {/* Button to trigger the modal */}
-      <Button colorScheme="sunnyYellow.100" onClick={onOpen}>
+      <Button colorScheme="skyBlue" onClick={onOpen}>
         Upload File
       </Button>
 
@@ -17,13 +17,13 @@ const FileUploadModal = () => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Upload Your File</ModalHeader>
+          <ModalHeader>Upload a File</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FileUpload />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="sunnyYellow.100" onClick={onClose}>
+            <Button colorScheme="skyBlue" onClick={onClose}>
               Close
             </Button>
           </ModalFooter>

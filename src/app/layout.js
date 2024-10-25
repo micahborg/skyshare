@@ -2,7 +2,7 @@
 // layout.js
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "@/styles/theme";
-import FileUpload from "@/components/FileUpload"; // Adjust the path as necessary
+import '@fontsource/lexend-deca';
 
 export const metadata = {
   title: "skyShare",
