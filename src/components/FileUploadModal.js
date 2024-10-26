@@ -3,17 +3,9 @@
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from "@chakra-ui/react";
 import FileUpload from "@/components/FileUpload";
 
-const FileUploadModal = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
+const FileUploadModal = ({ isOpen, onClose }) => {
   return (
     <>
-      {/* Button to trigger the modal */}
-      <Button colorScheme="skyBlue" onClick={onOpen}>
-        Upload File
-      </Button>
-
-      {/* Modal that contains the FileUpload component */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -22,11 +14,6 @@ const FileUploadModal = () => {
           <ModalBody>
             <FileUpload />
           </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="skyBlue" onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

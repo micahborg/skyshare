@@ -1,5 +1,6 @@
 "use client";
-import { extendTheme } from "@chakra-ui/react";
+import { background, border, extendTheme } from "@chakra-ui/react";
+import { m } from "framer-motion";
 
 const theme = extendTheme({
   colors: {
@@ -23,17 +24,64 @@ const theme = extendTheme({
     body: "Lexend Deca, sans-serif",
   },
   components: {
+    Button: {
+      variants: {
+        solid: {
+          bg: "darkYellow",
+          color: "black",
+          borderRadius: "full",
+          _hover: {
+            textDecoration: "underline",
+          },
+        },
+      },
+      defaultProps: {
+        variant: "solid",
+      },
+    },
     Heading: {
+      defaultProps: {
+        size: "lg",
+      },
       baseStyle: {
         fontWeight: 500,
       },
     },
     Card: {
       baseStyle: {
-        bg: "sunnyYellow.100",       // Set the default background color
-        borderRadius: "50px",    // Set the default border radius (e.g., "lg" or a specific value like "16px")
+        container: {
+          color: "black",
+          maxWidth: "75vw", 
+          backgroundColor: "sunnyYellow.100",  // Replace with your preferred color
+          borderRadius: "3xl",
+          alignItems: "center",
+          padding: 4,
+        },
       },
     },
+    Modal: {
+      baseStyle: {
+        overlay: {
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
+        },
+        dialog: {
+          padding: 5,
+          alignItems: "center",
+          color: "white",
+          backgroundColor: "darkYellow",
+          borderRadius: "3xl",
+          shadow: "none",
+        },
+        closeButton: {
+          padding: 5,
+          color: "white",
+          backgroundColor: "black",
+          borderRadius: "full",
+          marginTop: -5,
+          marginRight: -5,
+        },
+      },
+    }
   },
   styles: {
     global: {

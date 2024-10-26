@@ -1,21 +1,28 @@
-import { Box, Heading, Card } from "@chakra-ui/react";
+"use client";
+import { Box, Heading, Button, Card } from "@chakra-ui/react";
 import NavBar from "@/components/NavBar";
-import FileUpload from "@/components/FileUpload";
 import FileUploadModal from "@/components/FileUploadModal";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
+import { useDisclosure } from "@chakra-ui/react";
 
 const Home = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   
   return (
-    <Box>
+    <Box align="center">
       <NavBar />
-      <Box m={20}>
+      <Heading fontSize="7xl" m={10}>Welcome to skyShare!</Heading>
 
-      <Card bg="sunnyYellow.100"p={4} maxW="400px" mx="auto"> 
-        {/* <FileUploadModal /> */}
+      
+      <Card m={2}> 
+        <Button colorScheme="skyBlue" onClick={onOpen}>
+          Upload File
+        </Button>
         <QRCodeGenerator link="https://www.google.com" />
       </Card>
-      </Box>
+
+
+      <FileUploadModal isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 };
