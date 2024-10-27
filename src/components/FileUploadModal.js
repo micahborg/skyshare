@@ -1,9 +1,9 @@
 // components/FileUploadModal.js
 "use client"; // Ensures this component runs on the client side
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from "@chakra-ui/react";
-import FileUpload from "@/components/FileUpload";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from "@chakra-ui/react"; //importing different chakra components
+import FileUpload from "@/components/FileUpload"; //importing the file upload component
 
-const FileUploadModal = ({ isOpen, onClose }) => {
+const FileUploadModal = ({ isOpen, onClose }) => { 
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>

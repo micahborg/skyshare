@@ -2,7 +2,7 @@
 import React from "react";
 import { QRCodeSVG  } from "qrcode.react";
 
-function QRCodeGenerator({ link }) {
+function QRCodeGenerator({ link }) { //generate the qr code that will be used to connect two devices
     return (
         <div>
             {console.log(link)}

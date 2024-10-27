@@ -21,8 +21,8 @@ const FileUpload = () => {
     }
   };
 
-  const handleDragOver = (event) => {
-    event.preventDefault();
+  const handleDragOver = (event) => { //dragging over the drop box event
+    event.preventDefault(); //canceling the default event from occuring
   };
 
   const handleFileInputChange = (event) => {
