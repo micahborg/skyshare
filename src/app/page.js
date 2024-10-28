@@ -1,3 +1,8 @@
+/*Main page for skyShare.
+Description: This page displays the home page for skyShare where files can be dropped and a QR code is created. 
+Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
+Date Created: 10/22/2024
+*/
 "use client";
 import { Box, Heading, Button, Card } from "@chakra-ui/react";
 import NavBar from "@/components/NavBar";

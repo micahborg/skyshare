@@ -1,3 +1,8 @@
+/*QR Code Generator for skyShare.
+Description: A QR code is generated to connect and link two devices. 
+Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
+Date Created: 10/22/2024
+*/
 "use client";
 import React from "react";
 import { QRCodeSVG  } from "qrcode.react";

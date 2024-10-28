@@ -1,3 +1,8 @@
+/*File Upload component for skyShare.
+Description: This handles the file uploading by displaying a box for th file to be dropped in.  
+Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
+Date Created: 10/22/2024
+*/
 "use client";
 import { useState } from 'react';
 import { Box, Text, useToast } from '@chakra-ui/react';
