@@ -9,7 +9,7 @@ import NavBar from '@/components/NavBar';
 const VideoChat = () => {
   //const { pc, createCall, joinCall, endCall } = useContext(WebRtcContext);
 
-  window.onload = () => {
+  useEffect(() => {
     // Firebase configuration
     const firebaseConfig = {
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -155,7 +155,7 @@ const VideoChat = () => {
         });
       });
     };
-  };
+  }, []);
   // useEffect(() => {
   //   if (localStream && localVideoRef.current) {
   //     localVideoRef.current.srcObject = localStream;
