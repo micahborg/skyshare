@@ -1,6 +1,7 @@
 
 // layout.js
 import { ChakraProvider } from "@chakra-ui/react";
+import { WebRtcProvider } from "@/contexts/WebRtcContext";
 import theme from "@/styles/theme";
 import '@fontsource/lexend-deca';
 
@@ -14,10 +15,12 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <ChakraProvider theme={theme}>
+        <WebRtcProvider>
           <div>
             {/* Render children here to maintain existing content */}
             {children}
           </div>
+        </WebRtcProvider>
         </ChakraProvider>
       </body>
     </html>

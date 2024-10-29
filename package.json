@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.10.0",
+    "@chakra-ui/react": "2.10.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fontsource/lexend-deca": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "firebase": "^11.0.1",
     "framer-motion": "^11.11.9",
     "next": "^15.0.1",
     "qrcode.react": "^4.1.0",
