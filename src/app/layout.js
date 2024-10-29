@@ -2,6 +2,7 @@
 // layout.js
 import { ChakraProvider } from "@chakra-ui/react";
 import { WebRtcProvider } from "@/contexts/WebRtcContext";
+import '@/styles/globals.css';
 import theme from "@/styles/theme";
 import '@fontsource/lexend-deca';
 

@@ -7,12 +7,12 @@ Date Created: 10/22/2024
 import React from "react";
 import { QRCodeSVG  } from "qrcode.react";
 
-function QRCodeGenerator({ link }) { //generate the qr code that will be used to connect two devices
+function QRCodeGenerator({ data }) { //generate the qr code that will be used to connect two devices
     return (
         <div>
-            {console.log(link)}
+            {console.log(data)}
             <QRCodeSVG 
-                value={link} // the URL or text the QR code should encode
+                value={data} // the URL or text the QR code should encode
                 size="200px" // size of the QR code
                 bgColor="#ffffff" // background color
                 fgColor="#000000" // foreground color
