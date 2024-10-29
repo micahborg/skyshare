@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { Box, Card, Button } from '@chakra-ui/react';
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
-import WebRtcContext from '@/contexts/WebRtcContext';
+//import WebRtcContext from '@/contexts/WebRtcContext';
 import NavBar from '@/components/NavBar';
 
 const VideoChat = () => {
