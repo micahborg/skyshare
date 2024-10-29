@@ -89,7 +89,7 @@ const Chat = () => {
 
         <VStack align="start" w="100%" p={4} bg="white" borderRadius="md" maxHeight="400px" overflowY="auto">
           {messages.map((msg, index) => (
-            <Text color="black</VStack>" key={index} alignSelf={msg.sender === "local" ? "end" : "start"}>
+            <Text color="black" key={index} alignSelf={msg.sender === "local" ? "end" : "start"}>
               <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {msg.text}
             </Text>
           ))}
