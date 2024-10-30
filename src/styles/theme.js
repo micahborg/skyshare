@@ -42,7 +42,7 @@ const theme = extendTheme({
     },
     Heading: {
       defaultProps: {
-        size: "lg",
+        size: ["md", "lg", "lg"], // breakpoints for heading size (base, md, lg)
       },
       baseStyle: {
         fontWeight: 500,

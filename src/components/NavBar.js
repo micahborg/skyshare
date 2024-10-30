@@ -7,22 +7,19 @@ Date Created: 10/22/2024
 import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-ui/react";
 
 const NavBar = () => { // creating the navigation bar at the top of the site
-    // responsive font size for the headings
-    const headingSize = useBreakpointValue({ base: "lg", md: "2xl" });
-
     return (
         <HStack p={4} bg="sunnyYellow.100" color="black"> 
             <Flex ml={5} gap={10} flexDirection="row" w="70%">
                 <Link href="/">
-                    <Heading fontSize={headingSize}>Home</Heading>
+                    <Heading>Home</Heading>
                 </Link>
                 <Link href="/about">
-                    <Heading fontSize={headingSize}>About</Heading>
+                    <Heading>About</Heading>
                 </Link>
             </Flex>
             <Flex mr={5} w="30%" align="center" flexDirection="row-reverse">
                 <Image boxSize="50px" src="images/giraffetransparent.png" alt="skyShare logo" />
-                <Heading fontSize={headingSize}>skyShare</Heading>
+                <Heading>skyShare</Heading>
             </Flex>
         </HStack>
     );
