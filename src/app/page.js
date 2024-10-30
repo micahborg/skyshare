@@ -15,13 +15,13 @@ const Home = () => {
 
   // Responsive font sizes and margins
   const headingSize = useBreakpointValue({ base: "3xl", md: "5xl", lg: "7xl" });
-  const margin = useBreakpointValue({ base: 4, md: 6, lg: 10 });
-  const buttonFontSize = useBreakpointValue({ base: "sm", md: "md", lg: "lg" });
-  const cardWidth = useBreakpointValue({ base: "90%", md: "70%", lg: "50%" });
+  const margin = useBreakpointValue({ base: 4, md: 6 });
+  const buttonFontSize = useBreakpointValue({ base: "md", md: "lg" });
+  const cardWidth = useBreakpointValue({ base: "90%", md: "50%" });
   const qrCodeSize = useBreakpointValue({ base: 100, md: 150, lg: 200 });
 
   return (
-    <Box align="center" padding={margin}>
+    <Box align="center">
       <NavBar />
       
       {/* adjusted heading */}
@@ -36,7 +36,6 @@ const Home = () => {
 
       <Card m={margin} p={margin} width={cardWidth}>
         <Button
-          colorScheme="blue"
           onClick={onOpen}
           width="100%"
           fontSize={buttonFontSize}

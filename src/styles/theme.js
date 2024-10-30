@@ -31,6 +31,7 @@ const theme = extendTheme({
           color: "black",
           borderRadius: "full",
           _hover: {
+            bg: "darkYellow",
             textDecoration: "underline",
           },
         },

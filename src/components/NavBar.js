@@ -8,7 +8,7 @@ import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-
 
 const NavBar = () => { // creating the navigation bar at the top of the site
     // responsive font size for the headings
-    const headingSize = useBreakpointValue({ base: "md", md: "lg" });
+    const headingSize = useBreakpointValue({ base: "lg", md: "2xl" });
 
     return (
         <HStack p={4} bg="sunnyYellow.100" color="black"> 
