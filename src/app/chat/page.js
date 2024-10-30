@@ -59,7 +59,7 @@ const Chat = () => {
         <Button onClick={createStream}>Start a Chat</Button>
         {streamId && 
           <VStack>
-            <Text>Call ID: {streamId}</Text>
+            <Text>Stream ID: {streamId}</Text>
             <QRCodeGenerator data={JSON.stringify({"streamId": streamId})} />
           </VStack>
         }
