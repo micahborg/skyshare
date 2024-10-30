@@ -3,6 +3,7 @@ Description: There is a navigation bar at the top of the site so that the user c
 Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
 Date Created: 10/22/2024
 */
+"use client";
 import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-ui/react";
 
 const NavBar = () => { // creating the navigation bar at the top of the site
