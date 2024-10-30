@@ -6,7 +6,7 @@ Date Created: 10/29/2024
 
 "use client";
 import React from "react"; //import the react module
-import useGif from '../../public/images/giraffegif.gif' //grab the loading gif from the images folder
+import useGif from '../../public/images/transparentgiraffegif.gif' //grab the loading gif from the images folder
 const Load = () => { //create the load component
     return (
         <div style={styles.loads}> 
