@@ -27,12 +27,37 @@ const QRCodeScanner = ({ onScan, isActive, onClose }) => {
   if (!isActive) return null;
 
   return (
-    <Box position="relative" width="100%" height="100%">
-      <video ref={videoRef} width="100%" height="100%" />
-      <Box position="absolute" top="0" left="0" width="100%" height="100%" display="flex" alignItems="center" justifyContent="center">
-        <Image src="images/qr-frame.svg" alt="QR Frame" width={256} height={256} />
-      </Box>
+    <Box
+        position="relative"
+        width="100%"
+        height="100%"
+        overflow="hidden"
+    >
+    <video
+        ref={videoRef}
+        width="100%"
+        height="100%"
+        style={{
+            objectFit: "cover",
+            objectPosition: "center",
+            width: "100%",
+            height: "100%",
+        }}
+    />
+    <Box
+        position="absolute"
+        top="0"
+        left="0"
+        width="100%"
+        height="100%"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+    >
+        <Image src="images/qr-frame.svg" alt="QR Frame" width={156} height={156} />
     </Box>
+    </Box>
+
   );
 };
 

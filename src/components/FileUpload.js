@@ -10,6 +10,7 @@ import { useLoading } from '@/contexts/LoadingContext';
 import { Box, Text, useToast, VStack, Button } from '@chakra-ui/react';
 
 const FileUpload = () => {
+  const [isSent, setIsSent] = useState(false);
   const [file, setFile] = useState(null);
   const { uploadToIpfs } = useIpfs();
   const { setLoading } = useLoading();
@@ -46,12 +47,14 @@ const FileUpload = () => {
     }
     setLoading(true);
     const cid = await uploadToIpfs(file);
+    setIsSent(true);
     setLoading(false);
     return cid;
   };
 
   return (
     <VStack>
+      {!isSent && (
       <Box
         border="2px dashed"
         borderColor="gray.300"
@@ -85,11 +88,24 @@ const FileUpload = () => {
           </Text>
         )}
       </Box>
+      )}
+      {!isSent && (
       <Button
         onClick={handleSend}
       >
         Send
       </Button>
+      )}
+      {isSent && (
+        <VStack alignItems="center">
+          <Text fontSize="lg" color="green.500">
+            File sent successfully! 🎉
+          </Text>
+          <Text align="center" fontSize="lg" color="green.500">
+            Check the "Receive a File" tab on the other device.
+          </Text>
+        </VStack>
+      )}
     </VStack>
   );
 };

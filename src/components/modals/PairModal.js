@@ -1,20 +1,18 @@
-// components/FileUploadModal.js
 "use client"; // Ensures this component runs on the client side
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react"; //importing different chakra components
-import FileUpload from "@/components/FileUpload"; //importing the file upload component
 
-const FileUploadModal = ({ isOpen, onClose }) => { 
-  const size = useBreakpointValue({ base: "sm", md: "lg" }); //setting the size of the modal based on the screen size
+const PairModal = ({ isOpen, onClose }) => { 
+  const size = useBreakpointValue({ base: "xs", md: "lg" }); //setting the size of the modal based on the screen size
   
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} size={size}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Upload a File</ModalHeader>
+          <ModalHeader>Pair Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FileUpload />
+            Hello
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -22,4 +20,4 @@ const FileUploadModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default FileUploadModal;
+export default PairModal;

@@ -16,21 +16,23 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import NavBar from "@/components/NavBar";
-import FileUploadModal from "@/components/FileUploadModal";
+import FileUploadModal from "@/components/modals/FileUploadModal";
+import PairModal from "@/components/modals/PairModal";
+import ConnectModal from "@/components/modals/ConnectModal";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import { useDisclosure } from "@chakra-ui/react";
 import { useLoading } from "@/contexts/LoadingContext";
 
 const Home = () => {
   const { isOpen: isUploadOpen, onOpen: onUploadOpen, onClose: onUploadClose } = useDisclosure();
-  const { isOpen: isQRModalOpen, onOpen: onQROpen, onClose: onQRClose } = useDisclosure();
+  const { isOpen: isPairModalOpen, onOpen: onPairOpen, onClose: onPairClose } = useDisclosure();
+  const { isOpen: isConnectModalOpen, onOpen: onConnectOpen, onClose: onConnectClose } = useDisclosure();
   const { setLoading } = useLoading();
 
   // Responsive settings
   const margin = useBreakpointValue({ base: 4, md: 6 });
   const cardWidth = useBreakpointValue({ base: "70%", md: "55%", lg: "25%" });
   const cardHeight = useBreakpointValue({ base: "300px", md: "500px", lg: "500px" });
-  const qrCodeSize = useBreakpointValue({ base: 100, md: 150, lg: 200 });
 
   useEffect(() => {
     setLoading(false);
@@ -61,9 +63,14 @@ const Home = () => {
           <Flex direction="column" align="center" justify="center" height="100%">
             <VStack spacing={6} width="100%">
               <Button
-                onClick={onQROpen}
+                onClick={onPairOpen} // this button generates a pair ID and corresponding QR code
               >
-                Open QR Code
+                Start Pairing
+              </Button>
+              <Button
+                onClick={onConnectOpen} // this button opens the QR code scanner and prompts the user to scan or enter a pair ID
+              >
+                Connect to a Pair
               </Button>
               <Button>
                 My Devices
@@ -100,19 +107,9 @@ const Home = () => {
         </Card>
       </Flex>
 
-      {/* QR Code Modal */}
-      <Modal isOpen={isQRModalOpen} onClose={onQRClose} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>QR Code</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody align="center" py={6}>
-            <QRCodeGenerator link="https://www.google.com" size={qrCodeSize} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      {/* File upload modal */}
+      {/* Modals */}
+      <PairModal isOpen={isPairModalOpen} onClose={onPairClose} />
+      <ConnectModal isOpen={isConnectModalOpen} onClose={onConnectClose} />
       <FileUploadModal isOpen={isUploadOpen} onClose={onUploadClose} />
     </Box>
   );
