@@ -102,7 +102,7 @@ const FileUpload = () => {
             File sent successfully! 🎉
           </Text>
           <Text align="center" fontSize="lg" color="green.500">
-            Check the "Receive a File" tab on the other device.
+            Check the Receive a File tab on the other device.
           </Text>
         </VStack>
       )}
