@@ -7,6 +7,7 @@ const WebRtcContext = createContext();
 
 export const WebRtcProvider = ({ children }) => {
   const [pairId, setPairId] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState([]); // Store chat messages
   const pc = useRef(null);
   const dataChannel = useRef(null);
@@ -46,11 +47,13 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     return () => {
+      console.log("Closing connection...");
+      setIsConnected(false);
       pc.current.close();
     };
   }, []);
 
-  const createStream = async () => {
+  const beginPair = async () => {
     console.log("Creating stream...");
     const firestore = getFirestore();
     const callDoc = doc(collection(firestore, "calls"));
@@ -62,15 +65,19 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     const offerDescription = await pc.current.createOffer();
+    //const userAgent = navigator.userAgent;
     await pc.current.setLocalDescription(offerDescription);
 
     const offer = {
       sdp: offerDescription.sdp,
       type: offerDescription.type,
+      // pubKey: "senders public key, testing for now",
+      // deviceInfo: userAgent,
     };
 
     await setDoc(callDoc, { offer });
     setPairId(callDoc.id);
+    console.log("Pair ID:", callDoc.id);
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
@@ -88,9 +95,11 @@ export const WebRtcProvider = ({ children }) => {
         }
       });
     });
+
+    return callDoc.id;
   };
 
-  const answerStream = async (pairId) => {
+  const connectDevice = async (pairId) => {
     if (!pairId) {
         console.error("Invalid pairId provided.");
         return;
@@ -129,11 +138,14 @@ export const WebRtcProvider = ({ children }) => {
     }
 
     const answerDescription = await pc.current.createAnswer();
+    //const userAgent = navigator.userAgent;
     await pc.current.setLocalDescription(answerDescription);
 
     const answer = {
       type: answerDescription.type,
       sdp: answerDescription.sdp,
+      // pubKey: "receivers public key, testing for now",
+      // deviceInfo: userAgent,
     };
 
     await setDoc(callDoc, { answer });
@@ -146,6 +158,9 @@ export const WebRtcProvider = ({ children }) => {
         }
       });
     });
+
+    setPairId(callDoc.id);
+    setIsConnected(true);
     return callDoc.id;
   };
 
@@ -159,7 +174,7 @@ export const WebRtcProvider = ({ children }) => {
   };
 
   return (
-    <WebRtcContext.Provider value={{ createStream, answerStream, sendMessage, pairId, messages }}>
+    <WebRtcContext.Provider value={{ beginPair, connectDevice, sendMessage, isConnected, pairId, messages }}>
       {children}
     </WebRtcContext.Provider>
   );

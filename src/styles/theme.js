@@ -35,6 +35,16 @@ const theme = extendTheme({
             textDecoration: "underline",
           },
         },
+        light: {
+          bg: "darkYellow",
+          fontSize: ["lg", "xl", "xl"], // breakpoints for button size (base, md, lg)
+          color: "white",
+          borderRadius: "none",
+          _hover: {
+            bg: "sunnyYellow.100",
+            textDecoration: "underline",
+          },
+        },
       },
       defaultProps: {
         variant: "solid",

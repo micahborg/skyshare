@@ -8,9 +8,11 @@ import { useState } from 'react';
 import { useIpfs } from '@/contexts/IpfsContext';
 import { useLoading } from '@/contexts/LoadingContext';
 import { Box, Text, useToast, VStack, Button } from '@chakra-ui/react';
+import { useWebRtc } from '@/contexts/WebRtcContext';
 
 const FileUpload = () => {
   const [isSent, setIsSent] = useState(false);
+  const { isConnected, sendMessage } = useWebRtc();
   const [file, setFile] = useState(null);
   const { uploadToIpfs } = useIpfs();
   const { setLoading } = useLoading();
@@ -45,8 +47,22 @@ const FileUpload = () => {
       });
       return;
     }
+    if (!isConnected) {
+      toast({
+        title: "Not connected.",
+        description: "Please connect to a device first.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
     setLoading(true);
     const cid = await uploadToIpfs(file);
+    const message = { type: 'file', cid, name: file.name };
+    const cidMessage = JSON.stringify(message);
+    console.log("CID message: ", cidMessage);
+    sendMessage(cidMessage);
     setIsSent(true);
     setLoading(false);
     return cid;

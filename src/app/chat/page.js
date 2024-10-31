@@ -9,7 +9,7 @@ import QRCodeGenerator from "@/components/QRCodeGenerator";
 import QRCodeScanner from "@/components/QRCodeScanner";
 
 const Chat = () => {
-  const { createStream, answerStream, sendMessage, pairId, messages } = useWebRtc();
+  const { beginPair, connectDevice, isConnected, sendMessage, pairId, messages } = useWebRtc();
   const [message, setMessage] = useState("");
   const [isJoined, setIsJoined] = useState(false);
   const [streamInput, setStreamInput] = useState("");
@@ -21,11 +21,12 @@ const Chat = () => {
   }, []);
 
   const handleScan = async (result) => {
+    if (isConnected) return;
     console.log(result);
     try {
       const data = JSON.parse(result).pairId;
       setStreamInput(data); // Set the stream ID from the QR code
-      const response = await answerStream(data); // Join chat using the scanned stream ID
+      const response = await connectDevice(data); // Join chat using the scanned stream ID
       if (response) {
         setShowScanner(false);  // Hide the scanner after scanning
         setIsJoined(true);      // Set joined state
@@ -45,10 +46,10 @@ const Chat = () => {
     <Box>
       <NavBar />
       <VStack m={10}>
-        <Button onClick={createStream}>Start a Chat</Button>
+        <Button onClick={beginPair}>Start a Chat</Button>
         {pairId && (
           <VStack>
-            <Text>Stream ID: {pairId}</Text>
+            <Text>Pair ID: {pairId}</Text>
             <QRCodeGenerator data={JSON.stringify({ pairId })} />
           </VStack>
         )}
@@ -62,7 +63,7 @@ const Chat = () => {
             <Button onClick={() => setShowScanner((prev) => !prev)}>
               {showScanner ? "Stop Scanning" : "Scan QR to Join"}
             </Button>
-            <Button onClick={() => answerStream(streamInput)}>Join a Chat</Button>
+            <Button onClick={() => connectDevice(streamInput)}>Join a Chat</Button>
           </VStack>
         )}
 
