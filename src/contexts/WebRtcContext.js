@@ -8,8 +8,8 @@ const WebRtcContext = createContext();
 export const WebRtcProvider = ({ children }) => {
   const [pairId, setPairId] = useState("");
   const [messages, setMessages] = useState([]); // Store chat messages
-  const pcs = useRef([]); // Store multiple RTCPeerConnections
-  const dataChannels = useRef([]); // Store data channels for each peer
+  const pc = useRef(null);
+  const dataChannel = useRef(null);
 
   useEffect(() => {
     const firebaseConfig = {
@@ -24,10 +24,29 @@ export const WebRtcProvider = ({ children }) => {
     const app = initializeApp(firebaseConfig);
     const firestore = getFirestore(app);
 
-    pcs.current = []; // Reset peer connections
+    const servers = {
+      iceServers: [
+        { urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
+      ],
+      iceCandidatePoolSize: 10,
+    };
+
+    pc.current = new RTCPeerConnection(servers);
+
+    // Initialize the data channel
+    dataChannel.current = pc.current.createDataChannel("chat");
+    dataChannel.current.onmessage = (event) => {
+      setMessages((prev) => [...prev, { sender: "remote", text: event.data }]);
+    };
+
+    pc.current.ondatachannel = (event) => {
+      event.channel.onmessage = (e) => {
+        setMessages((prev) => [...prev, { sender: "remote", text: e.data }]);
+      };
+    };
 
     return () => {
-      pcs.current.forEach(pc => pc.close());
+      pc.current.close();
     };
   }, []);
 
@@ -38,15 +57,12 @@ export const WebRtcProvider = ({ children }) => {
     const offerCandidates = collection(callDoc, "offerCandidates");
     const answerCandidates = collection(callDoc, "answerCandidates");
 
-    const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun1.l.google.com:19302" }] });
-    pcs.current.push(pc); // Add the new peer connection to the array
-
-    pc.onicecandidate = (event) => {
+    pc.current.onicecandidate = (event) => {
       event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
     };
 
-    const offerDescription = await pc.createOffer();
-    await pc.setLocalDescription(offerDescription);
+    const offerDescription = await pc.current.createOffer();
+    await pc.current.setLocalDescription(offerDescription);
 
     const offer = {
       sdp: offerDescription.sdp,
@@ -58,9 +74,9 @@ export const WebRtcProvider = ({ children }) => {
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
-      if (!pc.currentRemoteDescription && data?.answer) {
+      if (!pc.current.currentRemoteDescription && data?.answer) {
         const answerDescription = new RTCSessionDescription(data.answer);
-        pc.setRemoteDescription(answerDescription);
+        pc.current.setRemoteDescription(answerDescription);
       }
     });
 
@@ -68,52 +84,52 @@ export const WebRtcProvider = ({ children }) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const candidate = new RTCIceCandidate(change.doc.data());
-          pc.addIceCandidate(candidate);
+          pc.current.addIceCandidate(candidate);
         }
       });
     });
-
-    // Initialize the data channel
-    const dataChannel = pc.createDataChannel("chat");
-    dataChannels.current.push(dataChannel); // Store the data channel
-
-    dataChannel.onmessage = (event) => {
-      setMessages((prev) => [...prev, { sender: "remote", text: event.data }]);
-    };
   };
 
   const answerStream = async (pairId) => {
     if (!pairId) {
-      console.error("Invalid pairId provided.");
-      return;
+        console.error("Invalid pairId provided.");
+        return;
     }
-
     const firestore = getFirestore();
     const callDoc = doc(firestore, "calls", pairId);
 
+    // Check if the document with the given pairId exists
     const callSnapshot = await getDoc(callDoc);
     if (!callSnapshot.exists()) {
-      console.error(`No call found with pairId: ${pairId}`);
-      return;
+        console.error(`No call found with pairId: ${pairId}`);
+        return;
     }
 
     const answerCandidates = collection(callDoc, "answerCandidates");
     const offerCandidates = collection(callDoc, "offerCandidates");
 
-    const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun1.l.google.com:19302" }] });
-    pcs.current.push(pc); // Add the new peer connection to the array
-
-    pc.onicecandidate = (event) => {
+    pc.current.onicecandidate = (event) => {
       event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
     };
 
     const callData = (await getDoc(callDoc)).data();
     const offerDescription = callData.offer;
+        
+    // Check if offerDescription is valid
+    if (!offerDescription || !offerDescription.type || !offerDescription.sdp) {
+        console.error("Invalid offer description received:", offerDescription);
+        return; // Exit if the offer description is invalid
+    }
 
-    await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
+    try {
+        await pc.current.setRemoteDescription(new RTCSessionDescription(offerDescription));
+    } catch (error) {
+        console.error("Failed to set remote description:", error);
+        return; // Handle the error accordingly
+    }
 
-    const answerDescription = await pc.createAnswer();
-    await pc.setLocalDescription(answerDescription);
+    const answerDescription = await pc.current.createAnswer();
+    await pc.current.setLocalDescription(answerDescription);
 
     const answer = {
       type: answerDescription.type,
@@ -126,31 +142,20 @@ export const WebRtcProvider = ({ children }) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const candidate = new RTCIceCandidate(change.doc.data());
-          pc.addIceCandidate(candidate);
+          pc.current.addIceCandidate(candidate);
         }
       });
     });
-
-    // Initialize the data channel
-    pc.ondatachannel = (event) => {
-      const dataChannel = event.channel;
-      dataChannels.current.push(dataChannel); // Store the data channel
-
-      dataChannel.onmessage = (e) => {
-        setMessages((prev) => [...prev, { sender: "remote", text: e.data }]);
-      };
-    };
+    return callDoc.id;
   };
 
   const sendMessage = (message) => {
-    dataChannels.current.forEach(channel => {
-      try {
-        channel.send(message); // Send message to all connected channels
-      } catch (error) {
+    try {
+        dataChannel.current.send(message);
+        setMessages((prev) => [...prev, { sender: "local", text: message }]);
+    } catch (error) {
         console.error("Error sending message:", error);
-      }
-    });
-    setMessages((prev) => [...prev, { sender: "local", text: message }]);
+    }
   };
 
   return (
