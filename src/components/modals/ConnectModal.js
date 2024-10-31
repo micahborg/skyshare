@@ -1,6 +1,6 @@
 "use client"; // Ensures this component runs on the client side
 import React, { useEffect, useState } from "react"; //importing react and useState
-import { Input, HStack, Button, Text, Heading, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react"; //importing different chakra components
+import { Input, Box, HStack, Button, Text, Heading, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react"; //importing different chakra components
 import QRCodeScanner from "@/components/QRCodeScanner"; //importing the QR code scanner component
 import { useLoading } from "@/contexts/LoadingContext"; //importing the loading context
 
@@ -18,21 +18,23 @@ const ConnectModal = ({ isOpen, onClose }) => {
       <Modal isOpen={isOpen} onClose={onClose} size={size}>
         <ModalOverlay />
         <ModalContent h="70vh">
-          <ModalHeader>Connect Modal</ModalHeader>
+          <ModalHeader>Connect to a Device</ModalHeader>
           <ModalCloseButton />
-          <ModalBody pb={10} mb={10}>
-          <Text 
-            position="absolute" 
-            zIndex="1" 
-            color="white"
-            bg="rgba(0, 0, 0, 0.5)"
-            p={2}
-            borderRadius="md"
-            >
-                Scan Pairing QR Code
-            </Text>
-            {/* QRCodeScanner */}
-            <QRCodeScanner onScan={handleScan} isActive={showScanner} />
+          <ModalBody pb={10} mb={6} overflow="hidden">
+          <Box height="92%">
+            <Text 
+              position="absolute" 
+              zIndex="1" 
+              color="white"
+              bg="rgba(0, 0, 0, 0.5)"
+              p={2}
+              borderRadius="full"
+              >
+                  Scan Pairing QR Code
+              </Text>
+              {/* QRCodeScanner */}
+              <QRCodeScanner onScan={handleScan} isActive={showScanner} />
+            </Box>
             <HStack>
                 <Input variant='outline' my={5} placeholder='Enter Pair ID' />
                 <Button>Connect</Button>
