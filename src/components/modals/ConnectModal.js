@@ -9,18 +9,6 @@ const ConnectModal = ({ isOpen, onClose }) => {
   const [ showScanner, setShowScanner ] = useState(true); //state to show the QR code scanner
   const { setLoading } = useLoading(); //loading context
 
-  useEffect(() => {
-    if (isOpen) {
-      console.log("Setting loading");
-      setLoading(true);
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 1200); 
-  
-      return () => clearTimeout(timer); // Clear the timer if the component unmounts or dependencies change
-      }
-  }, [isOpen]);
-
   const handleScan = async (result) => {
     console.log(result);
   };
