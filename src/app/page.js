@@ -59,11 +59,16 @@ const Home = () => {
             Pair Devices
           </Heading>
           <Flex direction="column" align="center" justify="center" height="100%">
-            <Button
-              onClick={onQROpen}
-            >
-              Open QR Code
-            </Button>
+            <VStack spacing={6} width="100%">
+              <Button
+                onClick={onQROpen}
+              >
+                Open QR Code
+              </Button>
+              <Button>
+                My Devices
+              </Button>
+            </VStack>
           </Flex>
         </Card>
 
@@ -83,12 +88,12 @@ const Home = () => {
                 onClick={onUploadOpen}
                 width="auto"
               >
-                Click here to send a file
+                Send a File
               </Button>
               <Button
                 width="auto"
               >
-                Click here to receive a file
+                Receive a File
               </Button>
             </VStack>
           </Flex>
