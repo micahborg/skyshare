@@ -1,40 +1,29 @@
+// Chat.js
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
-import { Flex, Image, Box, Button, Input, VStack, Text } from '@chakra-ui/react';
-import NavBar from '@/components/NavBar';
-import { useWebRtc } from '@/contexts/WebRtcContext';
-import QRCodeGenerator from '@/components/QRCodeGenerator';
-import QrScanner from 'qr-scanner'; // import qr-scanner
+import React, { useEffect, useState } from "react";
+import { Box, Button, Input, VStack, Text, Image } from "@chakra-ui/react";
+import NavBar from "@/components/NavBar";
+import { useWebRtc } from "@/contexts/WebRtcContext";
+import { useLoading } from "@/contexts/LoadingContext";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
+import QRCodeScanner from "@/components/QRCodeScanner";
 
 const Chat = () => {
-  const { createStream, answerStream, sendMessage, streamId, messages } = useWebRtc();
+  const { createStream, answerStream, sendMessage, pairId, messages } = useWebRtc();
   const [message, setMessage] = useState("");
   const [isJoined, setIsJoined] = useState(false);
   const [streamInput, setStreamInput] = useState("");
   const [showScanner, setShowScanner] = useState(false);
-  const videoRef = useRef(null); // Reference for video element
-  const qrScannerRef = useRef(null); // Reference for QrScanner instance
+  const { setLoading } = useLoading();
 
   useEffect(() => {
-    if (showScanner && videoRef.current) {
-      qrScannerRef.current = new QrScanner(videoRef.current, (result) => {
-        handleScan(result);
-      });
-      qrScannerRef.current.start(); // Start scanning
-    }
-
-    return () => {
-      if (qrScannerRef.current) {
-        qrScannerRef.current.stop(); // Cleanup on component unmount
-        qrScannerRef.current = null;
-      }
-    };
-  }, [showScanner]);
+    setLoading(false);
+  }, []);
 
   const handleScan = async (result) => {
     console.log(result);
     try {
-      const data = JSON.parse(result).streamId;
+      const data = JSON.parse(result).pairId;
       setStreamInput(data); // Set the stream ID from the QR code
       const response = await answerStream(data); // Join chat using the scanned stream ID
       if (response) {
@@ -57,35 +46,28 @@ const Chat = () => {
       <NavBar />
       <VStack m={10}>
         <Button onClick={createStream}>Start a Chat</Button>
-        {streamId && 
+        {pairId && (
           <VStack>
-            <Text>Stream ID: {streamId}</Text>
-            <QRCodeGenerator data={JSON.stringify({"streamId": streamId})} />
+            <Text>Stream ID: {pairId}</Text>
+            <QRCodeGenerator data={JSON.stringify({ pairId })} />
           </VStack>
-        }
-        {!isJoined &&
+        )}
+        {!isJoined && (
           <VStack>
             <Input
               placeholder="Enter call ID to join"
               value={streamInput}
               onChange={(e) => setStreamInput(e.target.value)}
             />
-            <Button onClick={() => setShowScanner(prev => !prev)}>
+            <Button onClick={() => setShowScanner((prev) => !prev)}>
               {showScanner ? "Stop Scanning" : "Scan QR to Join"}
             </Button>
             <Button onClick={() => answerStream(streamInput)}>Join a Chat</Button>
           </VStack>
-        }
-
-        {/* Video element for QRScanner */}
-        {showScanner && (
-          <div className="qr-reader">
-            <video ref={videoRef}></video>
-            <div className="qr-box">
-              <Image src="images/qr-frame.svg" alt="QR Frame" width={256} height={256} className="qr-frame" />
-            </div>
-          </div>
         )}
+
+        {/* QRCodeScanner */}
+        <QRCodeScanner onScan={handleScan} isActive={showScanner} />
 
         <VStack align="start" w="100%" p={4} bg="white" borderRadius="md" maxHeight="400px" overflowY="auto">
           {messages.map((msg, index) => (

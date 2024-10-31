@@ -6,7 +6,7 @@ import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, getDoc } fro
 const WebRtcContext = createContext();
 
 export const WebRtcProvider = ({ children }) => {
-  const [streamId, setStreamId] = useState("");
+  const [pairId, setPairId] = useState("");
   const [messages, setMessages] = useState([]); // Store chat messages
   const pc = useRef(null);
   const dataChannel = useRef(null);
@@ -51,6 +51,7 @@ export const WebRtcProvider = ({ children }) => {
   }, []);
 
   const createStream = async () => {
+    console.log("Creating stream...");
     const firestore = getFirestore();
     const callDoc = doc(collection(firestore, "calls"));
     const offerCandidates = collection(callDoc, "offerCandidates");
@@ -69,7 +70,7 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     await setDoc(callDoc, { offer });
-    setStreamId(callDoc.id);
+    setPairId(callDoc.id);
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
@@ -89,18 +90,18 @@ export const WebRtcProvider = ({ children }) => {
     });
   };
 
-  const answerStream = async (streamId) => {
-    if (!streamId) {
-        console.error("Invalid streamId provided.");
+  const answerStream = async (pairId) => {
+    if (!pairId) {
+        console.error("Invalid pairId provided.");
         return;
     }
     const firestore = getFirestore();
-    const callDoc = doc(firestore, "calls", streamId);
+    const callDoc = doc(firestore, "calls", pairId);
 
-    // Check if the document with the given streamId exists
+    // Check if the document with the given pairId exists
     const callSnapshot = await getDoc(callDoc);
     if (!callSnapshot.exists()) {
-        console.error(`No call found with streamId: ${streamId}`);
+        console.error(`No call found with pairId: ${pairId}`);
         return;
     }
 
@@ -158,7 +159,7 @@ export const WebRtcProvider = ({ children }) => {
   };
 
   return (
-    <WebRtcContext.Provider value={{ createStream, answerStream, sendMessage, streamId, messages }}>
+    <WebRtcContext.Provider value={{ createStream, answerStream, sendMessage, pairId, messages }}>
       {children}
     </WebRtcContext.Provider>
   );
