@@ -1,7 +1,7 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import {Heading, Card, Box, useBreakpointValue} from "@chakra-ui/react";
-
-import React from "react";
+import { useLoading } from "@/contexts/LoadingContext";
 import NavBar from "@/components/NavBar";
 import { useDisclosure } from "@chakra-ui/react";
 
@@ -10,6 +10,11 @@ function About() {
     const cardHeight = useBreakpointValue({ base: "300px", md: "400px", lg: "500px" });
     const headingSize = useBreakpointValue({ base: "3xl", md: "5xl", lg: "7xl" });
     const margin = useBreakpointValue({ base: 4, md: 6 });
+    const { setLoading } = useLoading();
+
+    useEffect(() => {
+        setLoading(false);
+    }, []);
 
     return (
         <div>

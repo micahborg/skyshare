@@ -1,4 +1,5 @@
 "use client";
+import React, { useEffect } from "react";
 import {
   Box,
   Heading,
@@ -18,48 +19,29 @@ import NavBar from "@/components/NavBar";
 import FileUploadModal from "@/components/FileUploadModal";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import { useDisclosure } from "@chakra-ui/react";
+import { useLoading } from "@/contexts/LoadingContext";
 
 const Home = () => {
-  const {
-    isOpen: isUploadOpen,
-    onOpen: onUploadOpen,
-    onClose: onUploadClose,
-  } = useDisclosure();
-  const {
-    isOpen: isQRModalOpen,
-    onOpen: onQROpen,
-    onClose: onQRClose,
-  } = useDisclosure();
+  const { isOpen: isUploadOpen, onOpen: onUploadOpen, onClose: onUploadClose } = useDisclosure();
+  const { isOpen: isQRModalOpen, onOpen: onQROpen, onClose: onQRClose } = useDisclosure();
+  const { setLoading } = useLoading();
 
   // Responsive settings
-  const headingSize = useBreakpointValue({ base: "3xl", md: "5xl", lg: "7xl" });
   const margin = useBreakpointValue({ base: 4, md: 6 });
-  const buttonFontSize = useBreakpointValue({ base: "lg", md: "xl" }); // Increased button font size
-  const buttonWidth = useBreakpointValue({
-    base: "100%",
-    md: "90%",
-    lg: "90%",
-  }); // Adjusted button width
-  const buttonPadding = useBreakpointValue({
-    base: "12px 24px", // Adjust padding for small screens
-    md: "14px 28px",  // Adjust padding for medium screens
-    lg: "30px 48px",  // Adjust padding for large screens
-  });
-  const cardWidth = useBreakpointValue({ base: "70%", md: "25%" });
-  const cardHeight = useBreakpointValue({
-    base: "300px",
-    md: "400px",
-    lg: "500px",
-  });
-
+  const cardWidth = useBreakpointValue({ base: "70%", md: "55%", lg: "25%" });
+  const cardHeight = useBreakpointValue({ base: "300px", md: "500px", lg: "500px" });
   const qrCodeSize = useBreakpointValue({ base: 100, md: 150, lg: 200 });
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
 
   return (
     <Box align="center">
       <NavBar />
 
       {/* Main heading */}
-      <Heading fontSize={headingSize} m={margin} mt={8} textAlign="center">
+      <Heading size="2xl" m={margin} mt={8} textAlign="center">
         Welcome to skyShare!
       </Heading>
 
@@ -79,11 +61,6 @@ const Home = () => {
           <Flex direction="column" align="center" justify="center" height="100%">
             <Button
               onClick={onQROpen}
-              fontSize={buttonFontSize}
-              bg="darkYellow"
-              color="white"
-              width={buttonWidth}
-              p={buttonPadding} // Added padding for bigger buttons
             >
               Open QR Code
             </Button>
@@ -96,7 +73,6 @@ const Home = () => {
           p={6}
           width={cardWidth}
           height={cardHeight}
-          align="center"
         >
           <Heading fontSize="2xl" mb={4}>
             Share Files
@@ -105,20 +81,12 @@ const Home = () => {
             <VStack spacing={6} width="100%"> {/* Increased spacing */}
               <Button
                 onClick={onUploadOpen}
-                fontSize={buttonFontSize}
-                bg="darkYellow"
-                color="white"
-                width={buttonWidth}
-                p={buttonPadding} // Added padding for bigger buttons
+                width="auto"
               >
                 Click here to send a file
               </Button>
               <Button
-                fontSize={buttonFontSize}
-                bg="darkYellow"
-                color="white"
-                width={buttonWidth}
-                p={buttonPadding} // Added padding for bigger buttons
+                width="auto"
               >
                 Click here to receive a file
               </Button>
