@@ -33,15 +33,21 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     pc.current = new RTCPeerConnection(servers);
+    console.log("Peer connection created:", pc.current);
 
     // Initialize the data channel
     dataChannel.current = pc.current.createDataChannel("chat");
+    console.log("Data channel created:", dataChannel.current);
+
     dataChannel.current.onmessage = (event) => {
+      console.log("Message received on data channel:", event.data);
       setMessages((prev) => [...prev, { sender: "remote", text: event.data }]);
     };
 
     pc.current.ondatachannel = (event) => {
+      console.log("Data channel received:", event.channel);
       event.channel.onmessage = (e) => {
+        console.log("Message received on data channel:", e.data);
         setMessages((prev) => [...prev, { sender: "remote", text: e.data }]);
       };
     };
@@ -61,6 +67,7 @@ export const WebRtcProvider = ({ children }) => {
     const answerCandidates = collection(callDoc, "answerCandidates");
 
     pc.current.onicecandidate = (event) => {
+      console.log("New ICE candidate:", event.candidate);
       event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
     };
 
@@ -118,6 +125,7 @@ export const WebRtcProvider = ({ children }) => {
     const offerCandidates = collection(callDoc, "offerCandidates");
 
     pc.current.onicecandidate = (event) => {
+      console.log("New ICE candidate:", event.candidate);
       event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
     };
 
@@ -153,6 +161,7 @@ export const WebRtcProvider = ({ children }) => {
     onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
+          console.log("New ICE candidate:", change.doc.data());
           const candidate = new RTCIceCandidate(change.doc.data());
           pc.current.addIceCandidate(candidate);
         }

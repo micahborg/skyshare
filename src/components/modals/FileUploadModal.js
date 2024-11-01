@@ -7,13 +7,6 @@ import { useLoading } from "@/contexts/LoadingContext";
 const FileUploadModal = ({ isOpen, onClose }) => { 
   const size = useBreakpointValue({ base: "xs", md: "lg" }); //setting the size of the modal based on the screen size
   const { setLoading } = useLoading();
-
-  useEffect(() => {
-    if (isOpen) {
-      console.log("Setting loading");
-      setLoading(false);
-      }
-  }, [isOpen]);
   
   return (
     <>
