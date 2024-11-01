@@ -99,6 +99,28 @@ export const WebRtcProvider = ({ children }) => {
     setPairId(callDoc.id);
     console.log("Pair ID:", callDoc.id);
 
+    // begin try something new ---
+    let candidatesComplete = false;
+
+    // Adding event listener for ICE gathering state change
+    pc.current.onicegatheringstatechange = () => {
+      console.log('iceGatheringState:', pc.current.iceGatheringState);
+      if (pc.current.iceGatheringState === 'complete') {
+        console.log('ICE gathering complete. Sending offer.');
+        candidatesComplete = true;
+      }
+    };
+
+    // Add a timeout to force sending the offer if candidates are not complete
+    setTimeout(() => {
+      if (!candidatesComplete) {
+        console.log('Candidates processing not ended. Ending it...');
+        ws.send('call/request', { to: userID, sdp: pc.current.localDescription });
+        candidatesComplete = true;
+      }
+    }, 3000); // 3 seconds timeout
+    // end try something new ---
+
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
       if (!pc.current.currentRemoteDescription && data?.answer) {
@@ -171,7 +193,29 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     await setDoc(callDoc, { answer });
+    
+    // begin try something new ---
+    // Use similar logic for ICE gathering state
+    let candidatesComplete = false;
 
+    // Adding event listener for ICE gathering state change
+    pc.current.onicegatheringstatechange = () => {
+      console.log('iceGatheringState:', pc.current.iceGatheringState);
+      if (pc.current.iceGatheringState === 'complete') {
+        console.log('ICE gathering complete.');
+        candidatesComplete = true;
+      }
+    };
+
+    // Add a timeout to force adding ICE candidates if not complete
+    setTimeout(() => {
+      if (!candidatesComplete) {
+        console.log('Candidates processing not ended.');
+        candidatesComplete = true;
+      }
+    }, 3000); // 3 seconds timeout
+    // end try something new ---
+    
     onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
