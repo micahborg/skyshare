@@ -1,6 +1,6 @@
 "use client"; // Ensures this component runs on the client side
 import React, { useEffect, useState } from "react"; // Importing React and useState
-import { Input, Box, HStack, SimpleGrid, Button, Text, Heading, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react"; // Importing different Chakra components
+import { Input, Box, VStack, SimpleGrid, Button, Text, Heading, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react"; // Importing different Chakra components
 import { useWebRtc } from "@/contexts/WebRtcContext";
 import { useIpfs } from "@/contexts/IpfsContext";
 import { useLoading } from "@/contexts/LoadingContext"; // Importing the loading context
