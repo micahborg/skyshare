@@ -24,8 +24,9 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
           if (message.sender === "local") continue; // Skip messages sent by the current user
           console.log("message:", message);
           const fileCid = JSON.parse(message.text).cid;
+          const fileName = JSON.parse(message.text).name;
           const fileUrl = await fetchFromIpfs(fileCid);
-          fetchedFiles.push(fileUrl);
+          fetchedFiles.push({fileUrl: fileUrl, fileName: fileName});
         }
 
         setFiles(fetchedFiles); // Set the state with the fetched file URLs
@@ -65,27 +66,27 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
           <ModalBody align="center" width="100%" pb={10} mb={6} overflow="hidden">
           {files.length > 0 ? (
             <Box>
-              <SimpleGrid width="100%" columns={[4, null, 2]} spacing={2}>
+              <VStack width="100%" spacing={2}>
                 {/* Map over files and display download buttons */}
-                {files.map((fileUrl, index) => (
+                {files.map((file, index) => (
                   <Box key={index} width="100%">
                     <Button 
                       variant="light"
-                      onClick={() => handleDownload(fileUrl)}
+                      onClick={() => handleDownload(file.fileUrl)}
                       display="flex" // Use flex to align icon/image and text
                       alignItems="center"
                       justifyContent="space-between"
                     >
-                      {isImageFile(fileUrl) ? (
-                        <img src={fileUrl} alt={fileUrl.split('/').pop()} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', marginRight: '8px' }} />
+                      {isImageFile(file.fileName) ? (
+                        <img src={file.fileUrl} alt={file.fileUrl.split('/').pop()} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', marginRight: '8px' }} />
                       ) : (
                         <FaFile style={{ marginRight: '8px' }} />
                       )}
-                      <Text>{fileUrl.split('/').pop()}</Text>
+                      <Text>{file.fileName}</Text>
                     </Button>
                   </Box>
                 ))}
-              </SimpleGrid>
+              </VStack>
             </Box>
             ) : (
                 <Text>No files received yet yet!</Text>
