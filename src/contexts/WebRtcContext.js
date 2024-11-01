@@ -115,7 +115,6 @@ export const WebRtcProvider = ({ children }) => {
     setTimeout(() => {
       if (!candidatesComplete) {
         console.log('Candidates processing not ended. Ending it...');
-        ws.send('call/request', { to: userID, sdp: pc.current.localDescription });
         candidatesComplete = true;
       }
     }, 3000); // 3 seconds timeout
