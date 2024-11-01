@@ -99,6 +99,7 @@ export const WebRtcProvider = ({ children }) => {
         if (change.type === "added") {
           const candidate = new RTCIceCandidate(change.doc.data());
           pc.current.addIceCandidate(candidate);
+          setIsConnected(true);
         }
       });
     });
@@ -164,12 +165,12 @@ export const WebRtcProvider = ({ children }) => {
           console.log("New ICE candidate:", change.doc.data());
           const candidate = new RTCIceCandidate(change.doc.data());
           pc.current.addIceCandidate(candidate);
+          setIsConnected(true);
         }
       });
     });
 
     setPairId(callDoc.id);
-    setIsConnected(true);
     return callDoc.id;
   };
 

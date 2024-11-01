@@ -63,6 +63,7 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
           <ModalHeader>Received Files</ModalHeader>
           <ModalCloseButton />
           <ModalBody align="center" width="100%" pb={10} mb={6} overflow="hidden">
+          {files.length > 0 ? (
             <Box>
               <SimpleGrid width="100%" columns={[4, null, 2]} spacing={2}>
                 {/* Map over files and display download buttons */}
@@ -86,6 +87,9 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
                 ))}
               </SimpleGrid>
             </Box>
+            ) : (
+                <Text>No files received yet yet!</Text>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

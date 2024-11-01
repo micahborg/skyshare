@@ -23,6 +23,7 @@ import ConnectModal from "@/components/modals/ConnectModal";
 import PairedDevices from "@/components/modals/PairedDevicesModal";
 import { useDisclosure } from "@chakra-ui/react";
 import { useLoading } from "@/contexts/LoadingContext";
+import { useWebRtc } from "@/contexts/WebRtcContext";
 
 const Home = () => {
   const { isOpen: isUploadOpen, onOpen: onUploadOpen, onClose: onUploadClose } = useDisclosure();
@@ -30,6 +31,7 @@ const Home = () => {
   const { isOpen: isPairedDevicesOpen, onOpen: onPairedDevicesOpen, onClose: onPairedDevicesClose } = useDisclosure();
   const { isOpen: isPairModalOpen, onOpen: onPairOpen, onClose: onPairClose } = useDisclosure();
   const { isOpen: isConnectModalOpen, onOpen: onConnectOpen, onClose: onConnectClose } = useDisclosure();
+  const { isConnected } = useWebRtc();
   const { setLoading } = useLoading();
 
   // Responsive settings
@@ -77,6 +79,8 @@ const Home = () => {
               </Button>
               <Button
                 onClick={onPairedDevicesOpen} // this button shows a list of paired devices
+                borderColor={isConnected ? "green.500" : "gray.500"}
+                borderWidth={isConnected ? "4px" : "0px"}
               >
                 Paired Devices
               </Button>

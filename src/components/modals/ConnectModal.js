@@ -56,7 +56,7 @@ const ConnectModal = ({ isOpen, onClose }) => {
             </HStack>
           </ModalBody>
           )}
-          {pairId && (
+          {pairId && isConnected && (
             <ModalBody>
               <Text fontSize="lg" color="green.500">Connected to Device</Text>
               <Text fontSize="lg" color="green.500">Pair ID: {pairId}</Text>
