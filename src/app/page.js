@@ -40,7 +40,11 @@ const Home = () => {
   const cardHeight = useBreakpointValue({ base: "300px", md: "500px", lg: "500px" });
 
   useEffect(() => {
-    setLoading(false);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 900);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
