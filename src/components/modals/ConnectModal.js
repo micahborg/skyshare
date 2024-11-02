@@ -10,6 +10,7 @@ const ConnectModal = ({ isOpen, onClose }) => {
   const { connectDevice, isConnected, pairId } = useWebRtc(); //webRTC context
   const [ showScanner, setShowScanner ] = useState(true); //state to show the QR code scanner
   const { setLoading } = useLoading(); //loading context
+  const [inputValue, setInputValue] = useState(""); //state to store the input value
 
   const handlePair = async (result) => {
     if (isConnected) return;
@@ -51,8 +52,17 @@ const ConnectModal = ({ isOpen, onClose }) => {
               <QRCodeScanner onScan={handlePair} isActive={showScanner} />
             </Box>
             <HStack>
-                <Input variant='outline' my={5} placeholder='Enter Pair ID' />
-                <Button>Connect</Button>
+                <Input 
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  variant='outline' 
+                  my={5} 
+                  placeholder='Enter Pair ID' />
+                <Button
+                  onClick={() => handlePair(JSON.stringify({ pairId: inputValue }))}
+                >
+                  Connect
+                </Button>
             </HStack>
           </ModalBody>
           )}

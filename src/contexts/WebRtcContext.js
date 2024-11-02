@@ -74,6 +74,7 @@ export const WebRtcProvider = ({ children }) => {
 
     dataChannel.current.onopen = () => {
         console.log("Data channel opened.");
+        setIsConnected(true);
     };
     
     dataChannel.current.onclose = () => {
@@ -153,7 +154,6 @@ export const WebRtcProvider = ({ children }) => {
         if (change.type === "added") {
           const candidate = new RTCIceCandidate(change.doc.data());
           pc.current.addIceCandidate(candidate);
-          setIsConnected(true);
         }
       });
     });
@@ -241,7 +241,6 @@ export const WebRtcProvider = ({ children }) => {
           console.log("New ICE candidate:", change.doc.data());
           const candidate = new RTCIceCandidate(change.doc.data());
           pc.current.addIceCandidate(candidate);
-          setIsConnected(true);
         }
       });
     });
