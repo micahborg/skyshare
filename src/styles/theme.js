@@ -1,6 +1,5 @@
 "use client";
 import { background, border, extendTheme } from "@chakra-ui/react";
-import { m } from "framer-motion";
 
 const theme = extendTheme({
   colors: {
@@ -27,11 +26,23 @@ const theme = extendTheme({
     Button: {
       variants: {
         solid: {
+          padding: [7, 7, 8], // breakpoints for button padding (base, md, lg)
           bg: "darkYellow",
-          color: "black",
+          fontSize: ["lg", "xl", "xl"], // breakpoints for button size (base, md, lg)
+          color: "white",
           borderRadius: "full",
           _hover: {
             bg: "darkYellow",
+            textDecoration: "underline",
+          },
+        },
+        light: {
+          bg: "darkYellow",
+          fontSize: ["lg", "xl", "xl"], // breakpoints for button size (base, md, lg)
+          color: "white",
+          borderRadius: "none",
+          _hover: {
+            bg: "sunnyYellow.100",
             textDecoration: "underline",
           },
         },

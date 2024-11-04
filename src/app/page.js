@@ -1,54 +1,132 @@
-/* Main page for skyShare.
-Description: This page displays the home page for skyShare where files can be dropped and a QR code is created. 
-Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
-Date Created: 10/22/2024
-*/
 "use client";
-import { Box, Heading, Button, Card, useBreakpointValue } from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import {
+  Box,
+  Heading,
+  Button,
+  Card,
+  Flex,
+  VStack,
+  useBreakpointValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+} from "@chakra-ui/react";
 import NavBar from "@/components/NavBar";
-import FileUploadModal from "@/components/FileUploadModal";
-import QRCodeGenerator from "@/components/QRCodeGenerator";
+import FileUploadModal from "@/components/modals/FileUploadModal";
+import FileReceiveModal from "@/components/modals/FileReceiveModal";
+import PairModal from "@/components/modals/PairModal";
+import ConnectModal from "@/components/modals/ConnectModal";
+import PairedDevices from "@/components/modals/PairedDevicesModal";
 import { useDisclosure } from "@chakra-ui/react";
+import { useLoading } from "@/contexts/LoadingContext";
+import { useWebRtc } from "@/contexts/WebRtcContext";
 
 const Home = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isUploadOpen, onOpen: onUploadOpen, onClose: onUploadClose } = useDisclosure();
+  const { isOpen: isReceiveOpen, onOpen: onReceiveOpen, onClose: onReceiveClose } = useDisclosure();
+  const { isOpen: isPairedDevicesOpen, onOpen: onPairedDevicesOpen, onClose: onPairedDevicesClose } = useDisclosure();
+  const { isOpen: isPairModalOpen, onOpen: onPairOpen, onClose: onPairClose } = useDisclosure();
+  const { isOpen: isConnectModalOpen, onOpen: onConnectOpen, onClose: onConnectClose } = useDisclosure();
+  const { isConnected } = useWebRtc();
+  const { setLoading } = useLoading();
 
-  // Responsive font sizes and margins
-  const headingSize = useBreakpointValue({ base: "3xl", md: "5xl", lg: "7xl" });
+  // Responsive settings
   const margin = useBreakpointValue({ base: 4, md: 6 });
-  const buttonFontSize = useBreakpointValue({ base: "md", md: "lg" });
-  const cardWidth = useBreakpointValue({ base: "90%", md: "50%" });
-  const qrCodeSize = useBreakpointValue({ base: 100, md: 150, lg: 200 });
+  const cardWidth = useBreakpointValue({ base: "70%", md: "55%", lg: "25%" });
+  const cardHeight = useBreakpointValue({ base: "300px", md: "500px", lg: "500px" });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 900);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <Box align="center">
       <NavBar />
-      
-      {/* adjusted heading */}
-      <Heading 
-        fontSize={headingSize} 
-        m={margin} 
-        mt={8} // increased top margin to separate from NavBar
-        textAlign="center"
-      >
+
+      {/* Main heading */}
+      <Heading size="2xl" m={margin} mt={8} textAlign="center">
         Welcome to skyShare!
       </Heading>
 
-      <Card m={margin} p={margin} width={cardWidth}>
-        <Button
-          onClick={onOpen}
-          width="100%"
-          fontSize={buttonFontSize}
+      {/* Flex container for two cards side by side */}
+      <Flex justify="center" gap={50} mt={8} wrap="wrap">
+        {/* Left Card - Pair Devices */}
+        <Card
+          bg="sunnyYellow.100"
+          p={6}
+          width={cardWidth}
+          height={cardHeight}
+          align="center"
         >
-          Upload File
-        </Button>
+          <Heading fontSize="2xl" mb={4}>
+            Pair Devices
+          </Heading>
+          <Flex direction="column" align="center" justify="center" height="100%">
+            <VStack spacing={6} width="100%">
+              <Button
+                onClick={onPairOpen} // this button generates a pair ID and corresponding QR code
+              >
+                Start Pairing
+              </Button>
+              <Button
+                onClick={onConnectOpen} // this button opens the QR code scanner and prompts the user to scan or enter a pair ID
+              >
+                Connect to a Pair
+              </Button>
+              <Button
+                onClick={onPairedDevicesOpen} // this button shows a list of paired devices
+                borderColor={isConnected ? "green.500" : "gray.500"}
+                borderWidth={isConnected ? "4px" : "0px"}
+              >
+                Paired Devices
+              </Button>
+            </VStack>
+          </Flex>
+        </Card>
 
-        <Box mt={4} align="center">
-          <QRCodeGenerator link="https://www.google.com" size={qrCodeSize} />
-        </Box>
-      </Card>
+        {/* Right Card - Share Files */}
+        <Card
+          bg="sunnyYellow.100"
+          p={6}
+          width={cardWidth}
+          height={cardHeight}
+        >
+          <Heading fontSize="2xl" mb={4}>
+            Share Files
+          </Heading>
+          <Flex direction="column" align="center" justify="center" height="100%">
+            <VStack spacing={6} width="100%"> {/* Increased spacing */}
+              <Button
+                onClick={onUploadOpen}
+                width="auto"
+              >
+                Send a File
+              </Button>
+              <Button
+                onClick={onReceiveOpen}
+                width="auto"
+              >
+                Receive a File
+              </Button>
+            </VStack>
+          </Flex>
+        </Card>
+      </Flex>
 
-      <FileUploadModal isOpen={isOpen} onClose={onClose} />
+      {/* Modals */}
+      <FileReceiveModal isOpen={isReceiveOpen} onClose={onReceiveClose} />
+      <PairModal isOpen={isPairModalOpen} onClose={onPairClose} />
+      <PairedDevices isOpen={isPairedDevicesOpen} onClose={onPairedDevicesClose} />
+      <ConnectModal isOpen={isConnectModalOpen} onClose={onConnectClose} />
+      <FileUploadModal isOpen={isUploadOpen} onClose={onUploadClose} />
     </Box>
   );
 };
