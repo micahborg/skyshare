@@ -3,6 +3,7 @@ Description: This is to generate keys using the ECDH key exchange
 Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
 Date Created: 10/28/2024
 */
+"use client";
 
 // TO DO: Comments
 import React, { createContext, useEffect, useState } from 'react';
