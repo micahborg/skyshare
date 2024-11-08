@@ -72,6 +72,16 @@ export const WebRtcProvider = ({ children }) => {
       };
     };
 
+    if (pc.current.connectionState === 'failed') {
+      console.log("Connection state failed. Restarting ICE...");
+      pc.current.restartIce()
+    }
+
+    if (pc.current.iceconnectionState === 'failed') {
+      console.log("ICE connection state failed. Restarting ICE...");
+      pc.current.restartIce()
+    }
+
     dataChannel.current.onopen = () => {
         console.log("Data channel opened.");
         setIsConnected(true);
@@ -190,6 +200,7 @@ export const WebRtcProvider = ({ children }) => {
     // Check if offerDescription is valid
     if (!offerDescription || !offerDescription.type || !offerDescription.sdp) {
         console.error("Invalid offer description received:", offerDescription);
+        // TO DO: throw a Chakra UI Toast error notification
         return; // Exit if the offer description is invalid
     }
 
