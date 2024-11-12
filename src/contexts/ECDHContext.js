@@ -3,98 +3,80 @@ Description: This is to generate keys using the ECDH key exchange
 Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
 Date Created: 10/28/2024
 */
+
 "use client";
+import { useState } from "react";
 
-// TO DO: Comments
-import React, { createContext, useEffect, useState } from 'react';
+// ECDH Key exchange class
+export const ECDH = () => {
+  const [publicKey, setPublicKey] = useState(null);
+  const [sharedSecret, setSharedSecret] = useState(null);
 
-// Create a context for ECDH
-export const ECDHContext = createContext();
+  // Initialize the ECDH key pair
+  const generateKeyPair = async () => { 
+    try {
+    // Generate the ECDH key pair 
+      const ecdhKeyPair = await crypto.subtle.generateKey(
+        {
+          name: "ECDH",
+          namedCurve: "P-256", // P-256 curve
+        },
+        true, // whether the key is extractable
+        ["deriveKey", "deriveBits"] // key usage
+      );
 
-const ECDHProvider = ({ children }) => {
-    const [publicKey, setPublicKey] = useState(null);
+      // Export public key to JWK (JSON Web Key) format so it can be shared with a remote peer
+      const publicKeyJwk = await crypto.subtle.exportKey("jwk", ecdhKeyPair.publicKey);
+      setPublicKey(publicKeyJwk);
+      return ecdhKeyPair;
+    } catch (error) {
+      console.error("Error generating ECDH key pair:", error);
+    }
+  };
 
-    // Function to generate a key pair
-    const generateKeyPair = async () => {
-        return await window.crypto.subtle.generateKey(
-            {
-                name: "ECDH",
-                namedCurve: "P-256"
-            },
-            true, // Extractable
-            ["deriveKey", "deriveBits"]
-        );
-    };
+  // Derive shared secret from private key and the remote party's public key
+  // Shared secret will be used later used for encryption/decryption
+  const deriveSharedSecret = async (privateKey, remotePublicKey) => {
+    try {
+      const remoteKey = await crypto.subtle.importKey(
+        "jwk",
+        remotePublicKey,
+        {
+          name: "ECDH",
+          namedCurve: "P-256",
+        },
+        false,
+        [] // no key usages required for this import
+      );
 
-    // Function to export the public key to Base64 string
-    const exportPublicKey = async (key) => {
-        const exported = await window.crypto.subtle.exportKey("spki", key);
-        return btoa(String.fromCharCode(...new Uint8Array(exported)));
-    };
+      const secret = await crypto.subtle.deriveBits(
+        {
+          name: "ECDH",
+          public: remoteKey,
+        },
+        privateKey,
+        256 // length of the derived secret in bits
+      );
 
-    // Function to store the public key in local storage
-    const storePublicKey = (key) => {
-        localStorage.setItem("publicKey", key);
-    };
+      setSharedSecret(secret);
+      return secret;
+    } catch (error) {
+      console.error("Error deriving shared secret:", error);
+    }
+  };
 
-    // Function to retrieve the public key from local storage
-    const getPublicKey = () => {
-        return localStorage.getItem("publicKey");
-    };
+  // Export the shared secret as a buffer (e.g., to be used for encryption/decryption)
+  const getSharedSecretBuffer = () => {
+    // Returns derived shared secret
+    // The returned buffer can be used later for encrypting/decrypting WebRTC messages
+    return sharedSecret;
+  };
 
-    // Function to initialize the key exchange
-    const initKeyExchange = async () => {
-        let storedKey = getPublicKey();
-
-        if (!storedKey) {
-            const keyPair = await generateKeyPair();
-            const exportedKey = await exportPublicKey(keyPair.publicKey);
-            storePublicKey(exportedKey);
-            setPublicKey(exportedKey);
-            console.log("Generated and stored new public key:", exportedKey);
-        } else {
-            setPublicKey(storedKey);
-            console.log("Using existing public key:", storedKey);
-        }
-
-        // Listen for incoming public keys
-        listenForOtherPublicKeys();
-    };
-
-    // Function to listen for incoming public keys (using WebRTC)
-    const listenForOtherPublicKeys = () => {
-        // Replace with your actual WebRTC implementation to receive public keys
-        window.addEventListener("message", (event) => {
-            if (event.data.type === "PUBLIC_KEY") {
-                console.log("Received public key from another peer:", event.data.key);
-                // Implement key exchange logic here
-            }
-        });
-    };
-
-    useEffect(() => {
-        initKeyExchange().catch(console.error);
-    }, []);
-
-    return (
-        <ECDHContext.Provider value={{ publicKey }}>
-            {children}
-        </ECDHContext.Provider>
-    );
+  return {
+    generateKeyPair,
+    deriveSharedSecret,
+    publicKey,
+    sharedSecret,
+    getSharedSecretBuffer,
+  };
 };
-
-export default ECDHProvider;
-
-// To use in our application (from ChatGPT)
-// Need to double check where this is placed?
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import App from './App';  // Your main app component
-// import ECDHProvider from './ECDHContext'; // Import the ECDHProvider
-
-// ReactDOM.render(
-//     <ECDHProvider>
-//         <App />
-//     </ECDHProvider>,
-//     document.getElementById('root')
-// );
