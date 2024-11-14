@@ -83,16 +83,18 @@ export const WebRtcProvider = ({ children }) => {
     }
 
     dataChannel.current.onopen = () => {
-        console.log("Data channel opened.");
-        setIsConnected(true);
+      setIsConnected(true);
+      console.log("Data channel opened.")
     };
     
     dataChannel.current.onclose = () => {
-        console.log("Data channel closed.");
+      setIsConnected(false);
+      console.log("Data channel closed.");
     };
     
     dataChannel.current.onerror = (error) => {
-        console.error("Data channel error:", error);
+      setIsConnected(false);
+      console.error("Data channel error:", error);
     };
   
 

@@ -13,7 +13,7 @@ import { useWebRtc } from '@/contexts/WebRtcContext';
 const FileUpload = () => {
   const [isSent, setIsSent] = useState(false);
   const { isConnected, sendMessage } = useWebRtc();
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const { uploadToIpfs } = useIpfs();
   const { setLoading } = useLoading();
   const toast = useToast();
@@ -23,23 +23,26 @@ const FileUpload = () => {
   };
 
   const handleFileInputChange = async (event) => {
-    const files = event.target.files;
-    if (files.length > 0) {
-      setFile(files[0]);
-      toast({
-        title: "File uploaded.",
-        description: `${files[0].name} has been uploaded successfully.`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+    const newFiles = Array.from(event.target.files);
+    console.log("New File: ", newFiles);
+    if (newFiles.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+      for (const file of newFiles) {
+        toast({
+          title: "File uploaded.",
+          description: `${file.name} has been uploaded successfully.`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   };
 
   const handleSend = async () => {
-    if (file === null) {
+    if (files.length === 0) {
       toast({
-        title: "No file selected.",
+        title: "No files selected.",
         description: "Please select a file to upload.",
         status: "error",
         duration: 3000,
@@ -58,14 +61,16 @@ const FileUpload = () => {
       return;
     }
     setLoading(true);
-    const cid = await uploadToIpfs(file);
-    const message = { type: 'file', cid, name: file.name };
-    const cidMessage = JSON.stringify(message);
-    console.log("CID message: ", cidMessage);
-    sendMessage(cidMessage);
+    for (const file of files) {
+      const cid = await uploadToIpfs(file);
+      const message = { type: 'file', cid, name: file.name };
+      const cidMessage = JSON.stringify(message);
+      console.log("CID message: ", cidMessage);
+      sendMessage(cidMessage);
+    }
     setIsSent(true);
     setLoading(false);
-    return cid;
+    return true;
   };
 
   return (
@@ -98,9 +103,14 @@ const FileUpload = () => {
         </label>
         
         {/* Display the file name if a file is selected */}
-        {file && (
+        {files.length > 0 && (
           <Text mt={3} fontSize="md" fontWeight="medium" color="gray.600">
-            Selected file: {file.name}
+            Selected files: &nbsp;
+          {Array.from(files).map((file, index) => (
+            <span key={index}>
+              {file.name}{index < files.length - 1 ? ', ' : ''}
+            </span>
+          ))}
           </Text>
         )}
       </Box>
