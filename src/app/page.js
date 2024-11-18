@@ -20,7 +20,6 @@ import FileUploadModal from "@/components/modals/FileUploadModal";
 import FileReceiveModal from "@/components/modals/FileReceiveModal";
 import PairModal from "@/components/modals/PairModal";
 import ConnectModal from "@/components/modals/ConnectModal";
-import PairedDevices from "@/components/modals/PairedDevicesModal";
 import { useDisclosure } from "@chakra-ui/react";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useWebRtc } from "@/contexts/WebRtcContext";
@@ -28,7 +27,6 @@ import { useWebRtc } from "@/contexts/WebRtcContext";
 const Home = () => {
   const { isOpen: isUploadOpen, onOpen: onUploadOpen, onClose: onUploadClose } = useDisclosure();
   const { isOpen: isReceiveOpen, onOpen: onReceiveOpen, onClose: onReceiveClose } = useDisclosure();
-  const { isOpen: isPairedDevicesOpen, onOpen: onPairedDevicesOpen, onClose: onPairedDevicesClose } = useDisclosure();
   const { isOpen: isPairModalOpen, onOpen: onPairOpen, onClose: onPairClose } = useDisclosure();
   const { isOpen: isConnectModalOpen, onOpen: onConnectOpen, onClose: onConnectClose } = useDisclosure();
   const { isConnected } = useWebRtc();
@@ -82,11 +80,9 @@ const Home = () => {
                 Connect to a Pair
               </Button>
               <Button
-                onClick={onPairedDevicesOpen} // this button shows a list of paired devices
-                borderColor={isConnected ? "green.500" : "gray.500"}
-                borderWidth={isConnected ? "4px" : "0px"}
+                bg={isConnected ? "green.500" : "gray.500"}
               >
-                Paired Devices
+                {isConnected ? "Connected" : "Not Connected"}
               </Button>
             </VStack>
           </Flex>
@@ -124,7 +120,6 @@ const Home = () => {
       {/* Modals */}
       <FileReceiveModal isOpen={isReceiveOpen} onClose={onReceiveClose} />
       <PairModal isOpen={isPairModalOpen} onClose={onPairClose} />
-      <PairedDevices isOpen={isPairedDevicesOpen} onClose={onPairedDevicesClose} />
       <ConnectModal isOpen={isConnectModalOpen} onClose={onConnectClose} />
       <FileUploadModal isOpen={isUploadOpen} onClose={onUploadClose} />
     </Box>
