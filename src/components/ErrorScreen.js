@@ -10,7 +10,6 @@ const Errors = () => { //create the error component
     return (
         <div style={styles.loads}> 
             <img src="/images/sadgiraffe.png" alt={"ERROR!"} style={styles.gif} />
-            <p>ERROR!</p>
         </div>
     )
 };
@@ -20,12 +19,12 @@ const styles = { //style the error and use the correct image
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh'
+        justifyContent: 'flex-start',
+        height: '50vh'
     },
     gif: {
-        width: '200px',
-        height: '200px',
+        width: '400px',
+        height: '400px',
     },
 };
 
