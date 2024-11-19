@@ -16,15 +16,15 @@ const Errors = () => { //create the error component
 
 const styles = { //style the error and use the correct image
     loads: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        height: '50vh'
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        height: "50vh"
     },
     gif: {
-        width: '400px',
-        height: '400px',
+        width: "400px",
+        height: "400px",
     },
 };
 
