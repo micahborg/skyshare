@@ -50,6 +50,7 @@ function About() {
                     <Heading as="h3" size="md" mb={2} mt={10}>
                     Who We Are
                     </Heading>
+                    skyShare was created by Micah Borghese, Brynn Hare, Nora Manolescu, Kyle Johnson, and Katelyn Accola.
                 </Card>
                 <Heading fontSize={headingSize} m={margin} mt={7} textAlign="center">
         Testimonials
