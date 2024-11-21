@@ -7,7 +7,7 @@ Edit Dates: 11/17 (Testimonials), 11/20 (About content/mobile resizing)
 
 "use client";
 import React, { useEffect, useState } from "react";
-import { Heading, Card, Box, useBreakpointValue, Flex, Image, Text } from "@chakra-ui/react";
+import { Link, Heading, Card, Box, useBreakpointValue, Flex, Image, Text } from "@chakra-ui/react";
 import { useLoading } from "@/contexts/LoadingContext";
 import NavBar from "@/components/NavBar";
 import { useDisclosure } from "@chakra-ui/react";
@@ -51,7 +51,55 @@ function About() {
                     <Heading as="h3" size="md" mb={2} mt={10}>
                         Who We Are
                     </Heading>
-                    skyShare was created by Micah Borghese, Brynn Hare, Nora Manolescu, Kyle Johnson, and Katelyn Accola.
+                    <p>
+                        skyShare was created by{" "}
+                        <Link 
+                            href="https://www.linkedin.com/in/micah-borghese/" 
+                            isExternal 
+                            color="blue.500" // Link color
+                            textDecoration="none" // Remove underline by default
+                            _hover={{ textDecoration: 'underline' }} // Add underline on hover
+                        >
+                            Micah Borghese
+                        </Link>,{" "}
+                        <Link 
+                            href="https://www.linkedin.com/in/brynnhare/" 
+                            isExternal 
+                            color="blue.500"
+                            textDecoration="none"
+                            _hover={{ textDecoration: 'underline' }}
+                        >
+                            Brynn Hare
+                        </Link>,{" "}
+                        <Link 
+                            href="https://www.linkedin.com/in/nora-manolescu/" 
+                            isExternal 
+                            color="blue.500"
+                            textDecoration="none"
+                            _hover={{ textDecoration: 'underline' }}
+                        >
+                            Nora Manolescu
+                        </Link>,{" "}
+                        <Link 
+                            href="https://www.linkedin.com/in/kylejk0/" 
+                            isExternal 
+                            color="blue.500"
+                            textDecoration="none"
+                            _hover={{ textDecoration: 'underline' }}
+                        >
+                            Kyle Johnson
+                        </Link>,{" "}
+                        and{" "}
+                        <Link 
+                            href="https://www.linkedin.com/in/katelyn-accola/" 
+                            isExternal 
+                            color="blue.500"
+                            textDecoration="none"
+                            _hover={{ textDecoration: 'underline' }}
+                        >
+                            Katelyn Accola
+                        </Link>.
+                    </p>
                 </Card>
 
                 <Heading fontSize={headingSize} m={margin} mt={7} textAlign="center">
