@@ -164,7 +164,7 @@ function About() {
                 Madeleine Ryan
             </Heading>
             <Text fontSize="sm" >
-                skyShare is a game changer. Submitting assignments and sharing photos no longer involves serveral step, and all of my files upload just as high resolution as I sent them. It is a must for the non Apple user. 
+                skyShare is a game changer. Submitting assignments and sharing photos no longer involves several steps, and all of my files upload just as high resolution as I sent them. It is a must for the non Apple user. 
             </Text>
         </Box>
     </Flex>
