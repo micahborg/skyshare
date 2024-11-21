@@ -13,6 +13,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fontsource/lexend-deca": "^5.1.0",
+    "canvas-confetti": "^1.9.3",
     "dotenv": "^16.4.5",
     "firebase": "^11.0.1",
     "framer-motion": "^11.11.9",
