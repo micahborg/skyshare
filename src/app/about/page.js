@@ -39,7 +39,6 @@ function About() {
                     p={10} 
                     width={cardWidth} 
                     mx="auto" 
-                    maxWidth="65%" 
                     px={{ base: 4, md: 20 }}
                 >
                     skyShare was created to provide a simple, fast, and seamless way to transfer files across devices, no matter the brand. We understand that in the digital world of today, the need to share photos, documents, and more between different platforms is essential—and we believe it should be effortless.
