@@ -90,9 +90,9 @@ function About() {
         {/* Left: Image */}
         <Box flexShrink={0} mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
             <Image 
-                src="/images/sadgiraffe.png" 
+                src="/images/testimonial2.jpg" 
                 alt="Image of the person giving the testimonial" 
-                boxSize={{ base: "100px", md: "150px", lg: "200px" }} 
+                boxSize={{ base: "100px", md: "100px", lg: "150px" }} 
                 objectFit="cover" 
                 borderRadius="md" 
             />
@@ -101,10 +101,10 @@ function About() {
         {/* Right: Text */}
         <Box textAlign="left">
             <Heading as="h3" size="md" mb={2}>
-                Testimonial Person Name 2
+                Madeleine Ryan
             </Heading>
             <Text fontSize="sm" >
-                The content of the testimonial. blah blah blah blah blah blah blah blah blah blah blah
+                skyShare is a game changer. Submitting assignments and sharing photos no longer involves serveral step, and all of my files upload just as high resolution as I sent them. It is a must for the non Apple user. 
             </Text>
         </Box>
     </Flex>
