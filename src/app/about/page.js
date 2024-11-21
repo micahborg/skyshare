@@ -34,11 +34,12 @@ function About() {
       </Heading>
                 <Card 
                     bg="sunnyYellow.100" 
-                    p={6} 
+                    p={10} 
                     width={cardWidth} 
                     height={cardHeight} 
                     mx="auto" // Center the card horizontally
                     maxWidth="65%"
+                    px={{ base: 4, md: 20 }} // Add padding to left/right for spacing
                 >
                     {/* Content inside the card */}
                     skyShare was created to provide a simple, fast, and seamless way to transfer files across devices, no matter the brand. We understand that in the digital world of today, the need to share photos, documents, and more between different platforms is essential—and we believe it should be effortless.
@@ -46,6 +47,9 @@ function About() {
                     Our Mission
                     </Heading>
                     We are committed to making your digital life easier. Our goal is to provide a fast and user-friendly file transfer solution that allows you to stay connected across all your devices. With skyShare, transferring files becomes as simple as a tap, ensuring your data is always just a few steps away—no matter the device you are using.
+                    <Heading as="h3" size="md" mb={2} mt={10}>
+                    Who We Are
+                    </Heading>
                 </Card>
                 <Heading fontSize={headingSize} m={margin} mt={7} textAlign="center">
         Testimonials
