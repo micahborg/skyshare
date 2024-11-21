@@ -115,27 +115,27 @@ function About() {
                     mb={6}
                 >
                     <Flex direction={{ base: "column", md: "row" }} align="center" height="auto">
-                        {/* Left: Image */}
-                        <Box flexShrink={0} mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
-                            <Image 
-                                src="/images/sadgiraffe.png" 
-                                alt="Image of the person giving the testimonial" 
-                                boxSize={{ base: "100px", md: "150px", lg: "200px" }} 
-                                objectFit="cover" 
-                                borderRadius="md" 
-                            />
-                        </Box> 
-
-                        {/* Right: Text */}
-                        <Box textAlign="left">
-                            <Heading as="h3" size="md" mb={2}>
-                                Testimonial Person Name 1
-                            </Heading>
-                            <Text fontSize="sm">
-                                The content of the testimonial. blah blah blah blah blah blah blah blah blah blah blah
-                            </Text>
-                        </Box>
-                    </Flex>
+        {/* Left: Image */}
+        <Box flexShrink={0} mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
+            <Image 
+                src="/images/testimonial1.jpg" 
+                alt="Image of the person giving the testimonial" 
+                boxSize={{ base: "100px", md: "100px", lg: "150px" }} 
+                objectFit="cover" 
+                borderRadius="md" 
+            />
+        </Box> 
+        
+        {/* Right: Text */}
+        <Box textAlign="left">
+            <Heading as="h3" size="md" mb={2}>
+                Mara Manolescu
+            </Heading>
+            <Text fontSize="sm" >
+                What a great tool and innovative idea! I appreciate how easy this makes sharing files and how inclusive across devices it is! 
+            </Text>
+        </Box>
+    </Flex>
                 </Card>
 
                 {/* Testimonial Card 2 */}
