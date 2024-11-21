@@ -9,6 +9,8 @@ import { useIpfs } from '@/contexts/IpfsContext';
 import { useLoading } from '@/contexts/LoadingContext';
 import { Box, Text, useToast, VStack, Button } from '@chakra-ui/react';
 import { useWebRtc } from '@/contexts/WebRtcContext';
+import confetti from "canvas-confetti";
+
 
 const FileUpload = () => {
   const [isSent, setIsSent] = useState(false);
@@ -18,6 +20,8 @@ const FileUpload = () => {
   const { setLoading } = useLoading();
   const toast = useToast();
 
+
+  const uploadSuccessSound = new Audio('/sounds/success.mp3'); // Replace with your audio file
   const handleDragOver = (event) => { //dragging over the drop box event
     event.preventDefault(); //canceling the default event from occuring
   };
@@ -37,6 +41,46 @@ const FileUpload = () => {
         });
       }
     }
+  };
+
+  const triggerConfetti = () => {
+    const duration = 2000; // Duration of the confetti effect
+    const animationEnd = Date.now() + duration;
+    const defaults = {
+      startVelocity: 20,
+      spread: 360,
+      ticks: 60,
+      zIndex: 1000,
+      scalar: 5, // Size scaling for the particles
+    };
+  
+    const emoji1 = '🌿'; // Use an emoji as the confetti shape
+    const emojiShape1 = confetti.shapeFromText(emoji1); // Create confetti shape from emoji
+
+    const emoji2 = '🍃'; // Use an emoji as the confetti shape
+    const emojiShape2 = confetti.shapeFromText(emoji2); // Create confetti shape from emoji
+    
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+  
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        return;
+      }
+  
+      const particleCount = 80 * (timeLeft / duration); // Gradually reduce particles over time
+  
+      // Trigger confetti with the emoji as the shape
+      confetti({
+        ...defaults,
+        particleCount,
+        shapes: [emojiShape1, emojiShape2], // Set the emoji shape
+        origin: {
+          x: Math.random(), // Random horizontal position
+          y: Math.random() * 0.5, // Confetti starts in the upper half
+        },
+      });
+    }, 250);
   };
 
   const handleSend = async () => {
@@ -124,6 +168,12 @@ const FileUpload = () => {
       )}
       {isSent && (
         <VStack alignItems="center">
+          {(() => {
+            // Trigger confetti when this block is rendered
+            triggerConfetti();
+            uploadSuccessSound.play(); // Play the success sound
+            return null; // Ensure this function does not render any additional content
+          })()}
           <Text fontSize="lg" color="green.500">
             File sent successfully! 🎉
           </Text>

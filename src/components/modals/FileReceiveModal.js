@@ -41,10 +41,10 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
   }, [isOpen, messages, fetchFromIpfs, setLoading]);
   
   // Function to handle file downloads
-  const handleDownload = (url) => {
+  const handleDownload = (url, name) => {
     const a = document.createElement('a');
     a.href = url;
-    a.download = url.split('/').pop(); // Set the download attribute to the file name
+    a.download = name; // Use the provided file name for the download
     document.body.appendChild(a); // Append the anchor to the body
     a.click(); // Trigger the download
     document.body.removeChild(a); // Remove the anchor from the document
@@ -72,7 +72,7 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
                   <Box key={index} width="100%">
                     <Button 
                       variant="light"
-                      onClick={() => handleDownload(file.fileUrl)}
+                      onClick={() => handleDownload(file.fileUrl, file.fileName)}
                       display="flex" // Use flex to align icon/image and text
                       alignItems="center"
                       justifyContent="space-between"
