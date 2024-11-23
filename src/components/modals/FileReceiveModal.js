@@ -89,7 +89,7 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
               </VStack>
             </Box>
             ) : (
-                <Text>No files received yet yet!</Text>
+                <Text>No files received yet!</Text>
             )}
           </ModalBody>
         </ModalContent>

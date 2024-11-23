@@ -81,6 +81,7 @@ const Home = () => {
               </Button>
               <Button
                 bg={isConnected ? "green.500" : "gray.500"}
+                _hover={{ bg: isConnected ? "green.600" : "gray.600", cursor: "help" }}
               >
                 {isConnected ? "Connected" : "Not Connected"}
               </Button>

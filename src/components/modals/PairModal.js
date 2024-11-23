@@ -41,7 +41,7 @@ const PairModal = ({ isOpen, onClose }) => {
               <Text>Pair ID: {pairId}</Text>
               <QRCodeGenerator data={JSON.stringify({ pairId })} />
               <Button onClick={onClose}>
-                See Paired Devices
+                Start Sharing!
               </Button>
             </VStack>
           )}
