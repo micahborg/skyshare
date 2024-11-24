@@ -17,7 +17,7 @@ export default function NotFound() {
     const headingSize = useBreakpointValue({ base: "3xl", md: "5xl", lg: "7xl" });
     const margin = useBreakpointValue({ base: 4, md: 6 });
     const cardWidth = useBreakpointValue({ base: "100%", md: "85%" });
-    const cardHeight = useBreakpointValue({ base: "100px", md: "750px", lg: "100px" });
+    const cardHeight = useBreakpointValue({ base: "200px", md: "750px", lg: "150px" });
 
 
     useEffect(() => {

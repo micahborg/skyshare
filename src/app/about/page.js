@@ -179,31 +179,32 @@ function About() {
                     mb={6}
                 >
                     <Flex direction={{ base: "column", md: "row" }} align="center" height="auto">
-                        {/* Left: Image */}
-                        <Box flexShrink={0} mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
-                            <Image 
-                                src="/images/sadgiraffe.png" 
-                                alt="Image of the person giving the testimonial" 
-                                boxSize={{ base: "100px", md: "150px", lg: "200px" }} 
-                                objectFit="cover" 
-                                borderRadius="md" 
-                            />
-                        </Box> 
-
-                        {/* Right: Text */}
-                        <Box textAlign="left">
-                            <Heading as="h3" size="md" mb={2}>
-                                Testimonial Person Name 3
-                            </Heading>
-                            <Text fontSize="sm">
-                                The content of the testimonial. blah blah blah blah blah blah blah blah blah blah blah
-                            </Text>
-                        </Box>
-                    </Flex>
+        {/* Left: Image */}
+        <Box flexShrink={0} mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
+            <Image 
+                src="/images/testimonial3.jpg" 
+                alt="Image of the person giving the testimonial" 
+                boxSize={{ base: "100px", md: "100px", lg: "150px" }} 
+                objectFit="cover" 
+                borderRadius="md" 
+            />
+        </Box> 
+        
+        {/* Right: Text */}
+        <Box textAlign="left">
+            <Heading as="h3" size="md" mb={2}>
+                Megan Schalley
+            </Heading>
+            <Text fontSize="sm" >
+            skyShare has made file sharing so much simpler. I love how fast and seamless it is to upload and share without worrying about compatibility. It's the perfect solution for anyone looking for an easy, reliable way to connect across devices!                            
+            </Text>
+        </Box>
+    </Flex>
                 </Card>
             </Box>
         </div>
     );
 }
+
 
 export default About;
