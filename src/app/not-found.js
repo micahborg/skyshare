@@ -51,9 +51,7 @@ export default function NotFound() {
           textAlign="center"
         >
           <Text>
-            Nothing to see here! Return to your previous page by clicking the
-            back arrow, or use the navigation bar to visit the Home or About
-            pages.
+            Nothing to see here! Return to your previous page by clicking the back arrow. Return to the home page or about page by clicking the buttons on the navigation bar.
           </Text>
         </Card>
       </Flex>
