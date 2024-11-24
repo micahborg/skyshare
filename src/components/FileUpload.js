@@ -1,5 +1,5 @@
-/*File Upload component for skyShare.
-Description: This handles the file uploading by displaying a box for th file to be dropped in.  
+/* File Upload component for skyShare.
+Description: This handles the file uploading by displaying a box for the file to be dropped in.  
 Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
 Date Created: 10/22/2024
 */
@@ -11,7 +11,6 @@ import { Box, Text, useToast, VStack, Button } from '@chakra-ui/react';
 import { useWebRtc } from '@/contexts/WebRtcContext';
 import confetti from "canvas-confetti";
 
-
 const FileUpload = () => {
   const [isSent, setIsSent] = useState(false);
   const { isConnected, sendMessage } = useWebRtc();
@@ -20,6 +19,7 @@ const FileUpload = () => {
   const { setLoading } = useLoading();
   const toast = useToast();
 
+  const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB in bytes
 
   const uploadSuccessSound = new Audio('/sounds/success.mp3'); // Replace with your audio file
   const handleDragOver = (event) => { //dragging over the drop box event
@@ -29,6 +29,22 @@ const FileUpload = () => {
   const handleFileInputChange = async (event) => {
     const newFiles = Array.from(event.target.files);
     console.log("New File: ", newFiles);
+
+    // Check if any file exceeds the maximum allowed size
+    const oversizedFiles = newFiles.filter(file => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      oversizedFiles.forEach(file => {
+        toast({
+          title: "File too large.",
+          description: `${file.name} exceeds the 500MB limit. Please select a smaller file.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      });
+      return;
+    }
+
     if (newFiles.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
       for (const file of newFiles) {
