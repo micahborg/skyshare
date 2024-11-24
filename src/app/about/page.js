@@ -196,7 +196,7 @@ function About() {
                 Megan Schalley
             </Heading>
             <Text fontSize="sm" >
-            skyShare has made file sharing so much simpler. I love how fast and seamless it is to upload and share without worrying about compatibility. It's the perfect solution for anyone looking for an easy, reliable way to connect across devices!                            
+            skyShare has made file sharing so much simpler. I love how fast and seamless it is to upload and share without worrying about compatibility. It is the perfect solution for anyone looking for an easy, reliable way to connect across devices!                            
             </Text>
         </Box>
     </Flex>
