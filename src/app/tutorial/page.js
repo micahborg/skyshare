@@ -1,8 +1,8 @@
-/*About page for skyShare.
-Description: This page has the about discription of our site as well as user testimonials.   
+/*Tutorial page for skyShare.
+Description: This page has a tutorial on how to use skyShare. 
 Programmers: Micah Borghese, Katelyn Accola, Brynn Hare, Nora Manolescu, and Kyle Johnson
-Date Created: 10/29/2024
-Edit Dates: 11/17 (Testimonials), 11/20 (About content/mobile resizing)
+Date Created: 11/25/2024
+Edit Dates: 
 */
 
 "use client";
