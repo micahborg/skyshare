@@ -57,7 +57,11 @@ const Home = () => {
       </Heading>
 
       {/* Flex container for two cards side by side */}
-      <Flex justify="center" gap={50} mt={8} wrap="wrap">
+      <Flex 
+        justify="center" 
+        gap={50} mt={8} 
+        mb={useBreakpointValue({ base: 40, md: 30, lg: 0 })}
+        wrap="wrap">
         {/* Left Card - Pair Devices */}
         <Card
           bg="sunnyYellow.100"

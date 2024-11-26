@@ -65,7 +65,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
         bg="skyBlue"
       >
         <DrawerCloseButton />
-        <DrawerHeader>Private Chat</DrawerHeader>
+        <DrawerHeader>Peer-to-Peer Chat</DrawerHeader>
 
         <DrawerBody>
           {isConnected ? (
