@@ -126,7 +126,7 @@ const FileUpload = () => {
       const message = { type: 'file', cid, name: file.name };
       const cidMessage = JSON.stringify(message);
       console.log("CID message: ", cidMessage);
-      sendMessage(cidMessage);
+      sendMessage(cidMessage, "file");
     }
     setIsSent(true);
     setLoading(false);

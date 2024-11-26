@@ -61,14 +61,14 @@ export const WebRtcProvider = ({ children }) => {
 
     dataChannel.current.onmessage = (event) => {
       console.log("Message received on data channel:", event.data);
-      setMessages((prev) => [...prev, { sender: "remote", text: event.data }]);
+      setMessages((prev) => [...prev, { sender: "remote", data: event.data }]);
     };
 
     pc.current.ondatachannel = (event) => {
       console.log("Data channel received:", event.channel);
       event.channel.onmessage = (e) => {
         console.log("Message received on data channel:", e.data);
-        setMessages((prev) => [...prev, { sender: "remote", text: e.data }]);
+        setMessages((prev) => [...prev, { sender: "remote", data: e.data }]);
       };
     };
 
@@ -265,7 +265,7 @@ export const WebRtcProvider = ({ children }) => {
   const sendMessage = (message) => {
     try {
         dataChannel.current.send(message);
-        setMessages((prev) => [...prev, { sender: "local", text: message }]);
+        setMessages((prev) => [...prev, { sender: "local", data: message }]);
     } catch (error) {
         console.error("Error sending message:", error);
     }

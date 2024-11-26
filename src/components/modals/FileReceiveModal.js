@@ -22,9 +22,10 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
         // Get CIDs from messages, fetch files from IPFS, turn into downloadable objects
         for (const message of messages) {
           if (message.sender === "local") continue; // Skip messages sent by the current user
+          if (JSON.parse(message.data).type !== "file") continue; // Skip messages that are not files
           console.log("message:", message);
-          const fileCid = JSON.parse(message.text).cid;
-          const fileName = JSON.parse(message.text).name;
+          const fileCid = JSON.parse(message.data).cid;
+          const fileName = JSON.parse(message.data).name;
           const fileUrl = await fetchFromIpfs(fileCid);
           fetchedFiles.push({fileUrl: fileUrl, fileName: fileName});
         }
@@ -32,7 +33,7 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
         setFiles(fetchedFiles); // Set the state with the fetched file URLs
         setLoading(false);
       } else {
-        console.log("no messages");
+        console.log("no files");
         setFiles([]); // Clear files if no messages
       }
     };

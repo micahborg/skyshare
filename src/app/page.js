@@ -20,6 +20,7 @@ import FileUploadModal from "@/components/modals/FileUploadModal";
 import FileReceiveModal from "@/components/modals/FileReceiveModal";
 import PairModal from "@/components/modals/PairModal";
 import ConnectModal from "@/components/modals/ConnectModal";
+import ChatDrawer from "@/components/drawers/ChatDrawer";
 import { useDisclosure } from "@chakra-ui/react";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useWebRtc } from "@/contexts/WebRtcContext";
@@ -29,6 +30,7 @@ const Home = () => {
   const { isOpen: isReceiveOpen, onOpen: onReceiveOpen, onClose: onReceiveClose } = useDisclosure();
   const { isOpen: isPairModalOpen, onOpen: onPairOpen, onClose: onPairClose } = useDisclosure();
   const { isOpen: isConnectModalOpen, onOpen: onConnectOpen, onClose: onConnectClose } = useDisclosure();
+  const { isOpen: isChatOpen, onOpen: onChatOpen, onClose: onChatClose } = useDisclosure();
   const { isConnected } = useWebRtc();
   const { setLoading } = useLoading();
 
@@ -113,6 +115,12 @@ const Home = () => {
               >
                 Receive a File
               </Button>
+              <Button
+                onClick={onChatOpen}
+                width="auto"
+              >
+                Send a Chat
+              </Button>
             </VStack>
           </Flex>
         </Card>
@@ -123,7 +131,8 @@ const Home = () => {
       <PairModal isOpen={isPairModalOpen} onClose={onPairClose} />
       <ConnectModal isOpen={isConnectModalOpen} onClose={onConnectClose} />
       <FileUploadModal isOpen={isUploadOpen} onClose={onUploadClose} />
-    </Box>
+      <ChatDrawer isOpen={isChatOpen} onClose={onChatClose} />
+    </Box>  
   );
 };
 
