@@ -45,7 +45,7 @@ function Tutorials() {
             <NavBar />
             <Box textAlign="center" mt={8}>
                 <Heading fontSize={headingSize} m={margin} mt={8} textAlign="center">
-                    Tutorial
+                    How to Use skyShare
                 </Heading>           
 
                 {steps.map((step, index) => (
