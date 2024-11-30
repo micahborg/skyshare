@@ -39,7 +39,7 @@ const NavBar = () => {
                 w={{ base: "auto", md: "70%" }} // On mobile, take only necessary width, on desktop take 70%
                 justify="flex-start" // Align links to the left
                 align="center"
-                wrap="nowrap" // Prevent wrapping on mobile
+                wrap="nowrap" // Prevent wrapping on mobile so they are still in one line
             >
                 <Link href="/">
                     <Heading fontSize={headingFontSize}>Home</Heading>
@@ -52,9 +52,9 @@ const NavBar = () => {
                 </Link>
             </Flex>
 
-            {/* Logo section with reduced gap between logo and text */}
+            {/* Logo section */}
             <Flex
-                gap={0} // Even smaller gap between logo and text for better alignment
+                gap={0} // Smaller gap between logo and text like in Canva design 
                 w="auto"
                 justify="flex-end" // Align the logo to the right on both mobile and desktop
                 align="center"
