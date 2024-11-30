@@ -24,11 +24,17 @@ const NavBar = () => {
         md: "xl",   // Larger font size for medium and up
     });
 
+    // Adjust the gap between navigation links for mobile
+    const navLinkGap = useBreakpointValue({
+        base: 4,   // Smaller gap between links on mobile
+        md: 6,     // Default gap on desktop
+    });
+
     return (
         <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="space-between" spacing={4}>
             {/* Navigation links section */}
             <Flex
-                gap={6} // Increased gap between links
+                gap={navLinkGap} // Reduced gap between links on mobile
                 flexDirection="row" // Keep links in a row on both mobile and desktop
                 w={{ base: "auto", md: "70%" }} // On mobile, take only necessary width, on desktop take 70%
                 justify="flex-start" // Align links to the left
@@ -48,7 +54,7 @@ const NavBar = () => {
 
             {/* Logo section with reduced gap between logo and text */}
             <Flex
-                gap={0} // Reduced space between logo and text for better alignment
+                gap={0} // Even smaller gap between logo and text for better alignment
                 w="auto"
                 justify="flex-end" // Align the logo to the right on both mobile and desktop
                 align="center"
