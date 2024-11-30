@@ -33,7 +33,7 @@ const NavBar = () => {
                 w={{ base: "auto", md: "70%" }} // On mobile, take only necessary width, on desktop take 70%
                 justify="flex-start" // Align links to the left
                 align="center"
-                wrap="wrap" // Allow wrapping if space is tight on mobile
+                wrap="nowrap" // Prevent wrapping on mobile
             >
                 <Link href="/">
                     <Heading fontSize={headingFontSize}>Home</Heading>
