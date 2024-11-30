@@ -11,11 +11,11 @@ const NavBar = () => {
     // Adjust image size based on screen size
     const imageSize = useBreakpointValue({ base: "40px", md: "50px" }); // Adjust image size for mobile
 
-    // Adjust the font size for headers based on screen size
+    // Adjust the font size for headers based on screen size (smaller font size for mobile)
     const headingFontSize = useBreakpointValue({
-        base: "sm", // Smaller font size on mobile
-        sm: "md",   // Medium font size for small screens
-        md: "lg",   // Larger font size for medium and up
+        base: "xs",  // Extra small font size on mobile for better spacing
+        sm: "sm",    // Small font size for small screens
+        md: "lg",    // Larger font size for medium and up
     });
 
     // Adjust the font size for skyShare logo section
@@ -48,7 +48,7 @@ const NavBar = () => {
 
             {/* Logo section with reduced gap between logo and text */}
             <Flex
-                gap={0} // Closer space between logo and text
+                gap={0} // Reduced space between logo and text for better alignment
                 w="auto"
                 justify="flex-end" // Align the logo to the right on both mobile and desktop
                 align="center"
