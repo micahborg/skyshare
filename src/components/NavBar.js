@@ -13,9 +13,15 @@ const NavBar = () => {
     const imageSize = useBreakpointValue({ base: "40px", md: "50px" }); // Adjust image size for mobile
 
     return (
-        <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="space-between">
+        <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="center">
             {/* Navigation links section */}
-            <Flex ml={5} gap={10} flexDirection={flexDirection} w="70%" justify="flex-start">
+            <Flex
+                gap={10}
+                flexDirection={flexDirection}
+                w={{ base: "100%", md: "70%" }} // Ensure it takes full width on mobile
+                justify={flexDirection === "column" ? "center" : "flex-start"} // Center links on mobile, align left on desktop
+                align="center"
+            >
                 <Link href="/">
                     <Heading size="md">Home</Heading>
                 </Link>
@@ -27,7 +33,7 @@ const NavBar = () => {
                 </Link>
             </Flex>
             {/* Logo section */}
-            <Flex mr={5} w="30%" align="center" flexDirection="row-reverse" justify="flex-start">
+            <Flex mr={5} w="auto" align="center" flexDirection="row-reverse" justify="flex-start">
                 <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
                 <Heading size="lg">skyShare</Heading>
             </Flex>
