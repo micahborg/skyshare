@@ -7,35 +7,23 @@ Modified Date: 11/29
 "use client";
 import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-ui/react";
 
-const NavBar = () => {
-    // Adjust layout based on screen size
-    const flexDirection = useBreakpointValue({ base: "column", md: "row" }); // Stack vertically on mobile
-    const imageSize = useBreakpointValue({ base: "40px", md: "50px" }); // Adjust image size for mobile
-
+const NavBar = () => { // creating the navigation bar at the top of the site
     return (
-        <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="center">
-            {/* Navigation links section */}
-            <Flex
-                gap={10}
-                flexDirection={flexDirection}
-                w={{ base: "100%", md: "70%" }} // Ensure it takes full width on mobile
-                justify={flexDirection === "column" ? "center" : "flex-start"} // Center links on mobile, align left on desktop
-                align="center"
-            >
+        <HStack p={4} bg="sunnyYellow.100" color="black"> 
+            <Flex ml={5} gap={10} flexDirection="row" w="70%">
                 <Link href="/">
-                    <Heading size="md">Home</Heading>
+                    <Heading>Home</Heading>
                 </Link>
                 <Link href="/about">
-                    <Heading size="md">About</Heading>
+                    <Heading>About</Heading>
                 </Link>
                 <Link href="/tutorial">
-                    <Heading size="md">Tutorial</Heading>
+                    <Heading>Tutorial</Heading>
                 </Link>
             </Flex>
-            {/* Logo section */}
-            <Flex mr={5} w="auto" align="center" flexDirection="row-reverse" justify="flex-start">
-                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
-                <Heading size="lg">skyShare</Heading>
+            <Flex mr={5} w="30%" align="center" flexDirection="row-reverse">
+                <Image boxSize="50px" src="images/giraffetransparent.png" alt="skyShare logo" />
+                <Heading>skyShare</Heading>
             </Flex>
         </HStack>
     );
