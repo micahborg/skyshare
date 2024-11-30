@@ -46,15 +46,16 @@ const NavBar = () => {
                 </Link>
             </Flex>
 
-            {/* Logo section aligned to the right */}
+            {/* Logo section with reduced gap between logo and text */}
             <Flex
-                gap={4} // Adjust space between logo and text
+                gap={0} // Closer space between logo and text
                 w="auto"
                 justify="flex-end" // Align the logo to the right on both mobile and desktop
                 align="center"
+                flexDirection="row" // Align logo (image) to the right of the text
             >
-                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
                 <Heading fontSize={logoFontSize}>skyShare</Heading>
+                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
             </Flex>
         </HStack>
     );
