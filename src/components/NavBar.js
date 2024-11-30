@@ -7,23 +7,29 @@ Modified Date: 11/29
 "use client";
 import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-ui/react";
 
-const NavBar = () => { // creating the navigation bar at the top of the site
+const NavBar = () => {
+    // Adjust layout based on screen size
+    const flexDirection = useBreakpointValue({ base: "column", md: "row" }); // Stack vertically on mobile
+    const imageSize = useBreakpointValue({ base: "40px", md: "50px" }); // Adjust image size for mobile
+
     return (
-        <HStack p={4} bg="sunnyYellow.100" color="black"> 
-            <Flex ml={5} gap={10} flexDirection="row" w="70%">
+        <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="space-between">
+            {/* Navigation links section */}
+            <Flex ml={5} gap={10} flexDirection={flexDirection} w="70%" justify="flex-start">
                 <Link href="/">
-                    <Heading>Home</Heading>
+                    <Heading size="md">Home</Heading>
                 </Link>
                 <Link href="/about">
-                    <Heading>About</Heading>
+                    <Heading size="md">About</Heading>
                 </Link>
                 <Link href="/tutorial">
-                    <Heading>Tutorial</Heading>
+                    <Heading size="md">Tutorial</Heading>
                 </Link>
             </Flex>
-            <Flex mr={5} w="30%" align="center" flexDirection="row-reverse">
-                <Image boxSize="50px" src="images/giraffetransparent.png" alt="skyShare logo" />
-                <Heading>skyShare</Heading>
+            {/* Logo section */}
+            <Flex mr={5} w="30%" align="center" flexDirection="row-reverse" justify="flex-start">
+                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
+                <Heading size="lg">skyShare</Heading>
             </Flex>
         </HStack>
     );
