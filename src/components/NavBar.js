@@ -7,23 +7,54 @@ Modified Date: 11/29
 "use client";
 import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-ui/react";
 
-const NavBar = () => { // creating the navigation bar at the top of the site
+const NavBar = () => { 
+    // Adjust image size based on screen size
+    const imageSize = useBreakpointValue({ base: "40px", md: "50px" }); // Adjust image size for mobile
+
+    // Adjust the font size for headers based on screen size
+    const headingFontSize = useBreakpointValue({
+        base: "sm", // Smaller font size on mobile
+        sm: "md",   // Medium font size for small screens
+        md: "lg",   // Larger font size for medium and up
+    });
+
+    // Adjust the font size for skyShare logo section
+    const logoFontSize = useBreakpointValue({
+        base: "lg", // Small font size for mobile
+        md: "xl",   // Larger font size for medium and up
+    });
+
     return (
-        <HStack p={4} bg="sunnyYellow.100" color="black"> 
-            <Flex ml={5} gap={10} flexDirection="row" w="70%">
+        <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="space-between" spacing={4}>
+            {/* Navigation links section */}
+            <Flex
+                gap={6} // Increased gap between links
+                flexDirection="row" // Keep links in a row on both mobile and desktop
+                w={{ base: "auto", md: "70%" }} // On mobile, take only necessary width, on desktop take 70%
+                justify="flex-start" // Align links to the left
+                align="center"
+                wrap="wrap" // Allow wrapping if space is tight on mobile
+            >
                 <Link href="/">
-                    <Heading>Home</Heading>
+                    <Heading fontSize={headingFontSize}>Home</Heading>
                 </Link>
                 <Link href="/about">
-                    <Heading>About</Heading>
+                    <Heading fontSize={headingFontSize}>About</Heading>
                 </Link>
                 <Link href="/tutorial">
-                    <Heading>Tutorial</Heading>
+                    <Heading fontSize={headingFontSize}>Tutorial</Heading>
                 </Link>
             </Flex>
-            <Flex mr={5} w="30%" align="center" flexDirection="row-reverse">
-                <Image boxSize="50px" src="images/giraffetransparent.png" alt="skyShare logo" />
-                <Heading>skyShare</Heading>
+
+            {/* Logo section aligned to the right */}
+            <Flex
+                gap={4} // Adjust space between logo and text
+                w="auto"
+                justify="flex-end" // Align the logo to the right on both mobile and desktop
+                align="center"
+            >
+                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
+                <Heading fontSize={logoFontSize}>skyShare</Heading>
             </Flex>
         </HStack>
     );
