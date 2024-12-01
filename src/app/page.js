@@ -14,7 +14,9 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
+  IconButton,
 } from "@chakra-ui/react";
+import { QuestionOutlineIcon } from '@chakra-ui/icons'
 import NavBar from "@/components/NavBar";
 import FileUploadModal from "@/components/modals/FileUploadModal";
 import FileReceiveModal from "@/components/modals/FileReceiveModal";
@@ -71,7 +73,20 @@ const Home = () => {
           align="center"
         >
           <Heading fontSize="2xl" mb={4}>
-            Pair Devices
+            Pair Devices 
+            <IconButton 
+              bg="0"
+              padding={0}
+              ml={1}
+              style={{ 
+                color: "black",
+              }} 
+              aria-label='pair tutorial' 
+              size="sm" 
+              icon={
+                <QuestionOutlineIcon />
+              } 
+            />
           </Heading>
           <Flex direction="column" align="center" justify="center" height="100%">
             <VStack spacing={6} width="100%">
@@ -104,6 +119,19 @@ const Home = () => {
         >
           <Heading fontSize="2xl" mb={4}>
             Share Files
+            <IconButton 
+              bg="0"
+              padding={0}
+              ml={1}
+              style={{ 
+                color: "black",
+              }} 
+              aria-label='share tutorial' 
+              size="sm" 
+              icon={
+                <QuestionOutlineIcon />
+              } 
+            />
           </Heading>
           <Flex direction="column" align="center" justify="center" height="100%">
             <VStack spacing={6} width="100%"> {/* Increased spacing */}
