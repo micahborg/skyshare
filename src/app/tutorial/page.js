@@ -20,19 +20,19 @@ function Tutorials() {
 
     const steps = [
         {
-            step_num: "put the step number here",
+            step_num: "Pairing Devices",
             image: "/images/giraffetransparent.png",
-            text: "description of the step that is shown in the picture above"
+            text: "instructions."
         },
         {
-            step_num: "",
+            step_num: "Transferring a File",
             image: "/images/testimonial1.jpg",
-            text: "What a great tool and innovative idea! I appreciate how easy this makes sharing files and how inclusive across devices it is!"
+            text: "instructions"
         },
         {
-            step_num: "",
+            step_num: "Using the Chat",
             image: "/images/testimonial3.jpg",
-            text: "skyShare has made file sharing so much simpler. I love how fast and seamless it is to upload and share without worrying about compatibility. It is the perfect solution for anyone looking for an easy, reliable way to connect across devices!"
+            text: "instructions"
         }
     ];
 
