@@ -22,7 +22,7 @@ function Tutorials() {
         {
             step_num: "Pairing Devices",
             image: "/images/giraffetransparent.png",
-            text: "instructions."
+            text: "instructions"
         },
         {
             step_num: "Transferring a File",
@@ -51,7 +51,7 @@ function Tutorials() {
                 {steps.map((step, index) => (
                 <Card 
                     bg="sunnyYellow.100" 
-                    p={6} 
+                    p={9} 
                     width="100%"
                     mx="auto" 
                     mb={6}
