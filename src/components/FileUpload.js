@@ -22,14 +22,23 @@ const FileUpload = () => {
   const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB in bytes
 
   const uploadSuccessSound = new Audio('/sounds/success.mp3'); // Replace with your audio file
-  const handleDragOver = (event) => { //dragging over the drop box event
-    event.preventDefault(); //canceling the default event from occuring
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
   };
 
-  const handleFileInputChange = async (event) => {
-    const newFiles = Array.from(event.target.files);
-    console.log("New File: ", newFiles);
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const newFiles = Array.from(event.dataTransfer.files);
+    handleFiles(newFiles);
+  };
 
+  const handleFileInputChange = (event) => {
+    const newFiles = Array.from(event.target.files);
+    handleFiles(newFiles);
+  };
+
+  const handleFiles = (newFiles) => {
     // Check if any file exceeds the maximum allowed size
     const oversizedFiles = newFiles.filter(file => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
@@ -143,6 +152,7 @@ const FileUpload = () => {
         p={4}
         textAlign="center"
         onDragOver={handleDragOver}
+        onDrop={handleDrop}
         cursor="pointer"
         width="100%"
         maxWidth="500px"
