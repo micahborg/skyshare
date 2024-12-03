@@ -15,6 +15,8 @@ const FileUpload = () => {
   const toast = useToast();
 
   const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB in bytes
+  const uploadSuccessSound = new Audio('/sounds/success.mp3'); // Replace with your audio file
+
 
   useEffect(() => {
     // Load file history from localStorage on component mount
@@ -88,7 +90,14 @@ const FileUpload = () => {
       spread: 360,
       ticks: 60,
       zIndex: 1000,
+      scalar: 5, // Size scaling for the particles
     };
+  
+    const emoji1 = '🌿'; // Use an emoji as the confetti shape
+    const emojiShape1 = confetti.shapeFromText(emoji1); // Create confetti shape from emoji
+
+    const emoji2 = '🍃'; // Use an emoji as the confetti shape
+    const emojiShape2 = confetti.shapeFromText(emoji2); // Create confetti shape from emoji
 
     const interval = setInterval(() => {
       const timeLeft = animationEnd - Date.now();
@@ -97,9 +106,18 @@ const FileUpload = () => {
         clearInterval(interval);
         return;
       }
-
+      const particleCount = 80 * (timeLeft / duration); // Gradually reduce particles over time
+  
+  
       confetti({
         ...defaults,
+        particleCount,
+        shapes: [emojiShape1, emojiShape2], // Set the emoji shape
+        origin: {
+          x: Math.random(), // Random horizontal position
+          y: Math.random() * 0.5, // Confetti starts in the upper half
+        },
+
         particleCount: 80 * (timeLeft / duration),
         origin: { x: Math.random(), y: Math.random() - 0.2 },
       });
@@ -132,6 +150,8 @@ const FileUpload = () => {
       const cid = await uploadToIpfs(file);
       const message = { type: "file", cid, name: file.name };
       const cidMessage = JSON.stringify(message);
+      console.log("CID message: ", cidMessage);
+
       sendMessage(cidMessage, "file");
       updateFileHistory(file, "Sent");
     }
@@ -186,6 +206,7 @@ const FileUpload = () => {
         <VStack alignItems="center">
           {(() => {
             triggerConfetti();
+            uploadSuccessSound.play(); // Play the success sound
             return null;
           })()}
           <Text fontSize="lg" color="green.500">
