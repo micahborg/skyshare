@@ -36,8 +36,7 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
           const fileUrl = await fetchFromIpfs(fileCid);
           const file = { fileUrl, fileName };
           fetchedFiles.push(file);
-          updateReceivedFileHistory(file); // Add to received file history
-
+          await updateReceivedFileHistory(file); // Add to received file history
         }
 
         setFiles(fetchedFiles); // Set the state with the fetched file URLs
@@ -50,27 +49,80 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
 
     fetchFiles();
   }, [isOpen, messages, fetchFromIpfs, setLoading]);
-
-  const updateReceivedFileHistory = (file) => {
-    const newEntry = {
-      name: file.fileName,
-      url: file.fileUrl,
-      timestamp: new Date().toISOString(),
-    };
-    const updatedHistory = [newEntry, ...receivedFileHistory];
-    setReceivedFileHistory(updatedHistory);
-    localStorage.setItem("receivedFileHistory", JSON.stringify(updatedHistory));
+  
+  const updateReceivedFileHistory = async (file) => {
+    try {
+      // Fetch the file content from the original URL
+      const response = await fetch(file.fileUrl);
+  
+      if (!response.ok) {
+        console.error("Failed to fetch file:", response.statusText);
+        return;
+      }
+  
+      // Open the cache
+      const cache = await caches.open("received-files");
+  
+      // Generate a unique cache key using the file name and timestamp
+      const cacheKey = `${window.location.origin}/cache/${file.fileName}-${Date.now()}`;
+  
+      // Create a new Request object with the generated cache key
+      const request = new Request(cacheKey);
+  
+      // Put the response into the cache with the generated request key
+      await cache.put(request, response.clone());
+  
+      // Add the file details to received file history
+      const newEntry = {
+        name: file.fileName,
+        url: cacheKey, // Use the cache key as the URL
+        timestamp: new Date().toISOString(),
+      };
+  
+      const updatedHistory = [newEntry, ...receivedFileHistory];
+      setReceivedFileHistory(updatedHistory);
+  
+      // Store the updated history in localStorage
+      localStorage.setItem("receivedFileHistory", JSON.stringify(updatedHistory));
+  
+      console.log("File cached successfully and history updated:", updatedHistory);
+    } catch (error) {
+      console.error("Error updating received file history:", error);
+    }
   };
   
+
   // Function to handle file downloads
-  const handleDownload = (url, name) => {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name; // Use the provided file name for the download
-    document.body.appendChild(a); // Append the anchor to the body
-    a.click(); // Trigger the download
-    document.body.removeChild(a); // Remove the anchor from the document
+  const handleDownload = async (url, name) => {
+    try {
+      const cache = await caches.open("received-files");
+      const cachedResponse = await cache.match(url);
+  
+      if (cachedResponse) {
+        const blob = await cachedResponse.blob();
+        const objectUrl = URL.createObjectURL(blob);
+  
+        const a = document.createElement("a");
+        a.href = objectUrl;
+        a.download = name; // Use the provided file name for the download
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+  
+        // Free memory
+        URL.revokeObjectURL(objectUrl);
+      } else {
+        const a = document.createElement("a");
+        a.href = url;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
   };
+  
 
   // Utility function to check if the file is an image
   const isImageFile = (url) => {
@@ -86,32 +138,32 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
           <ModalHeader>Received Files</ModalHeader>
           <ModalCloseButton />
           <ModalBody align="center" width="100%" pb={10} mb={6} overflow="hidden">
-          {files.length > 0 ? (
-            <Box>
-              <VStack width="100%" spacing={2}>
-                {/* Map over files and display download buttons */}
-                {files.map((file, index) => (
-                  <Box key={index} width="100%">
-                    <Button 
-                      variant="light"
-                      onClick={() => handleDownload(file.fileUrl, file.fileName)}
-                      display="flex" // Use flex to align icon/image and text
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      {isImageFile(file.fileName) ? (
-                        <img src={file.fileUrl} alt={file.fileUrl.split('/').pop()} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', marginRight: '8px' }} />
-                      ) : (
-                        <FaFile style={{ marginRight: '8px' }} />
-                      )}
-                      <Text>{file.fileName}</Text>
-                    </Button>
-                  </Box>
-                ))}
-              </VStack>
-            </Box>
+            {files.length > 0 ? (
+              <Box>
+                <VStack width="100%" spacing={2}>
+                  {/* Map over files and display download buttons */}
+                  {files.map((file, index) => (
+                    <Box key={index} width="100%">
+                      <Button 
+                        variant="light"
+                        onClick={() => handleDownload(file.fileUrl, file.fileName)}
+                        display="flex" // Use flex to align icon/image and text
+                        alignItems="center"
+                        justifyContent="space-between"
+                      >
+                        {isImageFile(file.fileName) ? (
+                          <img src={file.fileUrl} alt={file.fileUrl.split('/').pop()} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', marginRight: '8px' }} />
+                        ) : (
+                          <FaFile style={{ marginRight: '8px' }} />
+                        )}
+                        <Text>{file.fileName}</Text>
+                      </Button>
+                    </Box>
+                  ))}
+                </VStack>
+              </Box>
             ) : (
-                <Text>No files received yet!</Text>
+              <Text>No files received yet!</Text>
             )}
             <Divider mt={4} mb={4} />
             <Heading size="md" alignSelf="flex-start">
@@ -132,6 +184,9 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
                     <Text fontSize="md">
                       📥 {entry.name}
                     </Text>
+                    <Button variant="link" onClick={() => handleDownload(entry.url, entry.name)}>
+                      Open
+                    </Button>
                     <Text fontSize="sm" color="gray.500">
                       {new Date(entry.timestamp).toLocaleString()}
                     </Text>
