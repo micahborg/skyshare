@@ -46,7 +46,7 @@ function Tutorials() {
     const fileTransferSteps = [
         {
             stepTitle: "Ensure Devices are Connected",
-            description: "Make sure both devices are connected and paired via skyShare.",
+            description: "Make sure both devices are connected via skyShare.",
             image: "/images/mobile_connected.png" // Example image for device connection
         },
         {
