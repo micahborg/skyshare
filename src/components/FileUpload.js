@@ -1,27 +1,68 @@
-/* File Upload component for skyShare.
-Description: This handles the file uploading by displaying a box for the file to be dropped in.  
-Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Johnson
-Date Created: 10/22/2024
-*/
-"use client";
-import { useState } from 'react';
-import { useIpfs } from '@/contexts/IpfsContext';
-import { useLoading } from '@/contexts/LoadingContext';
-import { Box, Text, useToast, VStack, Button } from '@chakra-ui/react';
-import { useWebRtc } from '@/contexts/WebRtcContext';
+import { useState, useEffect } from "react";
+import { useIpfs } from "@/contexts/IpfsContext";
+import { useLoading } from "@/contexts/LoadingContext";
+import { Box, Text, useToast, VStack, Button, Divider, HStack, Heading } from "@chakra-ui/react";
+import { useWebRtc } from "@/contexts/WebRtcContext";
 import confetti from "canvas-confetti";
 
 const FileUpload = () => {
   const [isSent, setIsSent] = useState(false);
   const { isConnected, sendMessage } = useWebRtc();
   const [files, setFiles] = useState([]);
+  const [fileHistory, setFileHistory] = useState([]);
   const { uploadToIpfs } = useIpfs();
   const { setLoading } = useLoading();
   const toast = useToast();
 
   const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB in bytes
-
   const uploadSuccessSound = new Audio('/sounds/success.mp3'); // Replace with your audio file
+
+  useEffect(() => {
+    // Load file history from localStorage on component mount
+    const storedHistory = JSON.parse(localStorage.getItem("fileHistory")) || [];
+    const sentHistory = storedHistory.filter((entry) => entry.type === "Sent");
+
+    // Load uploaded file history from localStorage on component mount
+    const storedUploadedHistory = JSON.parse(localStorage.getItem("uploadedFileHistory")) || [];
+    
+    // Merge the histories
+    const combinedHistory = [...sentHistory, ...storedUploadedHistory];
+    setFileHistory(combinedHistory);
+  }, []);
+
+  const updateFileHistory = (file, type) => {
+    const newEntry = {
+      name: file.name,
+      size: file.size,
+      type,
+      timestamp: new Date().toISOString(),
+    };
+    const updatedHistory = [newEntry, ...fileHistory];
+    setFileHistory(updatedHistory);
+    localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
+  };
+
+  const cacheUploadedFile = async (file) => {
+    try {
+      const cache = await caches.open('uploaded-files');
+      const response = new Response(file);
+      const cacheKey = `${window.location.origin}/cache/${file.name}-${Date.now()}`;
+      const request = new Request(cacheKey);
+      await cache.put(request, response);
+
+      const newEntry = {
+        name: file.name,
+        url: cacheKey,
+        timestamp: new Date().toISOString(),
+      };
+      const updatedHistory = [newEntry, ...fileHistory];
+      setFileHistory(updatedHistory);
+      localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
+      console.log("File cached successfully and history updated:", updatedHistory);
+    } catch (error) {
+      console.error("Error caching uploaded file:", error);
+    }
+  };
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -39,10 +80,9 @@ const FileUpload = () => {
   };
 
   const handleFiles = (newFiles) => {
-    // Check if any file exceeds the maximum allowed size
-    const oversizedFiles = newFiles.filter(file => file.size > MAX_FILE_SIZE);
+    const oversizedFiles = newFiles.filter((file) => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
-      oversizedFiles.forEach(file => {
+      oversizedFiles.forEach((file) => {
         toast({
           title: "File too large.",
           description: `${file.name} exceeds the 500MB limit. Please select a smaller file.`,
@@ -53,10 +93,9 @@ const FileUpload = () => {
       });
       return;
     }
-
     if (newFiles.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-      for (const file of newFiles) {
+      newFiles.forEach((file) => {
         toast({
           title: "File uploaded.",
           description: `${file.name} has been uploaded successfully.`,
@@ -64,12 +103,12 @@ const FileUpload = () => {
           duration: 3000,
           isClosable: true,
         });
-      }
+      });
     }
   };
 
   const triggerConfetti = () => {
-    const duration = 2000; // Duration of the confetti effect
+    const duration = 2000;
     const animationEnd = Date.now() + duration;
     const defaults = {
       startVelocity: 20,
@@ -84,18 +123,17 @@ const FileUpload = () => {
 
     const emoji2 = '🍃'; // Use an emoji as the confetti shape
     const emojiShape2 = confetti.shapeFromText(emoji2); // Create confetti shape from emoji
-    
+
     const interval = setInterval(() => {
       const timeLeft = animationEnd - Date.now();
-  
+
       if (timeLeft <= 0) {
         clearInterval(interval);
         return;
       }
-  
       const particleCount = 80 * (timeLeft / duration); // Gradually reduce particles over time
   
-      // Trigger confetti with the emoji as the shape
+  
       confetti({
         ...defaults,
         particleCount,
@@ -104,6 +142,9 @@ const FileUpload = () => {
           x: Math.random(), // Random horizontal position
           y: Math.random() * 0.5, // Confetti starts in the upper half
         },
+
+        particleCount: 80 * (timeLeft / duration),
+        origin: { x: Math.random(), y: Math.random() - 0.2 },
       });
     }, 250);
   };
@@ -132,73 +173,90 @@ const FileUpload = () => {
     setLoading(true);
     for (const file of files) {
       const cid = await uploadToIpfs(file);
-      const message = { type: 'file', cid, name: file.name };
+      const message = { type: "file", cid, name: file.name };
       const cidMessage = JSON.stringify(message);
       console.log("CID message: ", cidMessage);
+
       sendMessage(cidMessage, "file");
+      updateFileHistory(file, "Sent");
+      await cacheUploadedFile(file); // Cache the uploaded file
     }
     setIsSent(true);
     setLoading(false);
-    return true;
+  };
+
+  const handleDownload = async (url, name) => {
+    try {
+      const cache = await caches.open('uploaded-files');
+      const cachedResponse = await cache.match(url);
+
+      if (cachedResponse) {
+        const blob = await cachedResponse.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = name; // Use the provided file name for the download
+        document.body.appendChild(a); // Append the anchor to the body
+        a.click(); // Trigger the download
+        document.body.removeChild(a); // Remove the anchor from the document
+        URL.revokeObjectURL(objectUrl); // Revoke the object URL to free up memory
+      } else {
+        console.error('File not found in cache');
+      }
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
   };
 
   return (
-    <VStack>
+    <VStack spacing={4} width="100%" maxWidth="600px" mx="auto">
       {!isSent && (
-      <Box
-        border="2px dashed"
-        borderColor="gray.300"
-        borderRadius="md"
-        p={4}
-        textAlign="center"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        cursor="pointer"
-        width="100%"
-        maxWidth="500px"
-        height="200px"
-        mx="auto"
-      >
-        <Text fontSize="lg" mb={2}>
-          Drag and drop your files here, or click to select files
-        </Text>
-        <input
-          type="file"
-          onChange={handleFileInputChange}
-          style={{ display: 'none' }}
-          id="file-upload"
-        />
-        <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-          <Text color="blue.500">Click to select files</Text>
-        </label>
-        
-        {/* Display the file name if a file is selected */}
-        {files.length > 0 && (
-          <Text mt={3} fontSize="md" fontWeight="medium" color="gray.600">
-            Selected files: &nbsp;
-          {Array.from(files).map((file, index) => (
-            <span key={index}>
-              {file.name}{index < files.length - 1 ? ', ' : ''}
-            </span>
-          ))}
-          </Text>
-        )}
-      </Box>
-      )}
-      {!isSent && (
-      <Button
-        onClick={handleSend}
-      >
-        Send
-      </Button>
+        <>
+          <Box
+            border="2px dashed"
+            borderColor="gray.300"
+            borderRadius="md"
+            p={4}
+            textAlign="center"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            cursor="pointer"
+            width="100%"
+            height="200px"
+          >
+            <Text fontSize="lg" mb={2}>
+              Drag and drop your files here, or click to select files
+            </Text>
+            <input
+              type="file"
+              onChange={handleFileInputChange}
+              style={{ display: "none" }}
+              id="file-upload"
+            />
+            <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
+              <Text color="blue.500">Click to select files</Text>
+            </label>
+            {files.length > 0 && (
+              <Text mt={3} fontSize="md" fontWeight="medium" color="gray.600">
+                Selected files:{" "}
+                {files.map((file, index) => (
+                  <span key={index}>
+                    {file.name}
+                    {index < files.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </Text>
+            )}
+          </Box>
+          <Button onClick={handleSend}>Send</Button>
+        </>
       )}
       {isSent && (
         <VStack alignItems="center">
           {(() => {
-            // Trigger confetti when this block is rendered
             triggerConfetti();
             uploadSuccessSound.play(); // Play the success sound
-            return null; // Ensure this function does not render any additional content
+            return null;
           })()}
           <Text fontSize="lg" color="green.500">
             File sent successfully! 🎉
@@ -208,6 +266,39 @@ const FileUpload = () => {
           </Text>
         </VStack>
       )}
+      <Divider />
+      <Heading size="md" alignSelf="flex-start">
+        Sent File History
+      </Heading>
+      <Box width="100%">
+        {fileHistory.length > 0 ? (
+          fileHistory.map((entry, index) => (
+            <HStack
+              key={index}
+              justifyContent="space-between"
+              p={3}
+              borderWidth={1}
+              borderColor="gray.300"
+              borderRadius="md"
+              mb={2}
+            >
+              <Text fontSize="md">
+                📤 {entry.name}
+              </Text>
+              <Button variant="link" onClick={() => handleDownload(entry.url, entry.name)}>
+                Open
+              </Button>
+              <Text fontSize="sm" color="gray.500">
+                {entry.type} - {new Date(entry.timestamp).toLocaleString()}
+              </Text>
+            </HStack>
+          ))
+        ) : (
+          <Text fontSize="sm" color="gray.500" mt={2}>
+            No file history yet.
+          </Text>
+        )}
+      </Box>
     </VStack>
   );
 };
