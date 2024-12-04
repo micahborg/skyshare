@@ -6,11 +6,10 @@ Edit Dates: 11/29
 */
 
 "use client";
-import React, { useEffect, useState } from "react";
-import { Link, Heading, Card, Box, useBreakpointValue, Flex, Image, Text } from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import { Heading, Card, Box, useBreakpointValue, Flex, Image, Text } from "@chakra-ui/react";
 import { useLoading } from "@/contexts/LoadingContext";
 import NavBar from "@/components/NavBar";
-import { useDisclosure } from "@chakra-ui/react";
 
 function Tutorials() {
     const cardWidth = useBreakpointValue({ base: "100%", md: "85%" });
@@ -18,21 +17,45 @@ function Tutorials() {
     const margin = useBreakpointValue({ base: 4, md: 6 });
     const { setLoading } = useLoading();
 
+    // Steps for Pairing Devices
+    const pairingSteps = [
+        {
+            stepTitle: "On Device 1:",
+            description: "Click Start Pairing. A QR code will appear.",
+            image: "/images/mobileqr.png" // Optional image for the step
+        },
+        {
+            stepTitle: "On Device 2:",
+            description: "Click Connect. This will open the camera.",
+            image: "/images/mobile_camera.png" // Optional image for the step
+        },
+        {
+            stepTitle: "Scan QR Code:",
+            description: (
+                <>
+                    Use Device 2’s camera to scan the QR code from Device 1.
+                    <br />
+                    Once paired, the connection status button will update.
+                </>
+            ),
+            image: "/images/mobile_connected.png" // Optional image for the combined step
+        }
+    ];
+
     const steps = [
         {
-            step_num: "Pairing Devices",
-            image: "/images/giraffetransparent.png",
-            text: "instructions"
+            step_num: "How to Pair Devices",
+            pairingSteps: pairingSteps // The steps will now be passed here
         },
         {
             step_num: "Transferring a File",
             image: "/images/testimonial1.jpg",
-            text: "instructions"
+            caption: "File Transfer Process"
         },
         {
             step_num: "Using the Chat",
             image: "/images/testimonial3.jpg",
-            text: "instructions"
+            caption: "Chat Feature"
         }
     ];
 
@@ -46,49 +69,80 @@ function Tutorials() {
             <Box textAlign="center" mt={8}>
                 <Heading fontSize={headingSize} m={margin} mt={8} textAlign="center">
                     How to Use skyShare
-                </Heading>           
+                </Heading>
 
                 {steps.map((step, index) => (
-                <Card 
-                    bg="sunnyYellow.100" 
-                    p={9} 
-                    width="100%"
-                    mx="auto" 
-                    mb={6}
-                    key={index} // Always include a unique `key` when mapping
-                >
-                    <Flex direction="column" width="100%" align="center" height="auto">
-                    {/* Left: Image */}
-                    <Box textAlign="center">
-                        <Heading as="h3" size="md" mb={2}>
-                        {step.step_num} {/* Use `step.name` */}
-                        </Heading>
-                    </Box>
-                    <Box flexShrink={0} mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
-                        <Image 
-                        src={step.image} // Use `step.image`
-                        alt="Image of the skyShare step" 
-                        boxSize={{ base: "100px", md: "100px", lg: "150px" }} 
-                        objectFit="cover" 
-                        borderRadius="md" 
-                        align="center"
-                        />
-                    </Box> 
+                    <Card 
+                        bg="sunnyYellow.100" 
+                        p={9} 
+                        width="100%"
+                        mx="auto" 
+                        mb={6}
+                        key={index}
+                    >
+                        <Flex direction="column" width="100%" align="center" height="auto">
+                            {/* Step Title */}
+                            <Box textAlign="center" mb={4}>
+                                <Heading as="h3" size="md">
+                                    {step.step_num}
+                                </Heading>
+                            </Box>
 
-                    {/* Right: Text */}
-                    <Box textAlign="center">
-                        <Text fontSize="sm">
-                        {step.text} {/* Use `step.text` */}
-                        </Text>
-                    </Box>
-                    </Flex>
-                </Card>
+                            {/* Pairing Devices - Display text-based steps */}
+                            {step.step_num === "How to Pair Devices" ? (
+                                <Flex direction={{ base: "column", md: "row" }} align="center" gap={6} wrap="wrap" justify="center">
+                                    {step.pairingSteps.map((pairingStep, pairingIndex) => (
+                                        <Box 
+                                            key={pairingIndex} 
+                                            textAlign="left" 
+                                            mt={6} 
+                                            width={{ base: "100%", md: "48%" }} 
+                                            mx="auto"
+                                            display="flex"
+                                            flexDirection="column"
+                                            alignItems="center" // Center the content horizontally
+                                        >
+                                            <Text fontSize="lg" fontWeight="bold" textAlign="center">{pairingStep.stepTitle}</Text>
+                                            <Text fontSize="md" mt={2} textAlign="center">{pairingStep.description}</Text>
+                                            {pairingStep.image && (
+                                                <Image
+                                                    src={pairingStep.image}
+                                                    alt={`Step ${pairingIndex + 1} Image`}
+                                                    width={{ base: "70%", md: "60%" }}  // Reduce width but keep aspect ratio intact
+                                                    objectFit="contain"
+                                                    borderRadius="md"
+                                                    mt={4}
+                                                    boxShadow="lg"  // Add shadow effect
+                                                    mx="auto" // Center the image horizontally
+                                                />
+                                            )}
+                                        </Box>
+                                    ))}
+                                </Flex>
+                            ) : (
+                                // For other steps (Transferring a File, Using the Chat)
+                                <Box textAlign="center" mt={10}>
+                                    <Image 
+                                        src={step.image}
+                                        alt={`Image for ${step.step_num}`}
+                                        width={{ base: "70%", md: "60%" }}  // Reduce width but keep aspect ratio intact
+                                        objectFit="contain"
+                                        borderRadius="md"
+                                        boxShadow="lg"  // Add shadow effect
+                                        mx="auto" // Center the image horizontally
+                                    />
+                                    {/* Caption for the single image */}
+                                    <Text fontSize="sm" mt={4}>{step.caption}</Text>
+                                </Box>
+                            )}
+                        </Flex>
+                    </Card>
                 ))}
-
             </Box>
         </div>
     );
 }
 
-
 export default Tutorials;
+
+
