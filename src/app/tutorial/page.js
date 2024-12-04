@@ -42,20 +42,56 @@ function Tutorials() {
         }
     ];
 
+    // Steps for File Transfer
+    const fileTransferSteps = [
+        {
+            stepTitle: "Ensure Devices are Connected",
+            description: "Make sure both devices are connected and paired via skyShare.",
+            image: "/images/mobile_connected.png" // Example image for device connection
+        },
+        {
+            stepTitle: "On Device 1:",
+            description: "Click Send a File. A pop-up will appear to upload files.",
+            image: "/images/mobile_upload.png" // Image showing the 'Send a File' option on Device 1
+        },
+        {
+            stepTitle: "Upload Files:",
+            description: "Select and upload the files you want to send. Once done, click Send.",
+            image: "/images/mobile_select.png" // Image showing file upload interface
+        },
+        {
+            stepTitle: "Confirmation:",
+            description: "A screen will confirm that your files were sent.",
+            image: "/images/mobile_sent.png" // Image showing confirmation of file sent
+        },
+        {
+            stepTitle: "On Device 2:",
+            description: "Click Receive a File. You’ll see the received files, including the file upload history!",
+            image: "/images/mobile_received.png" // Image showing the 'Receive a File' option on Device 2
+        }
+    ];
+
+    // Steps for Using the Chat
+    const chatSteps = [
+        {
+            stepTitle: "Sending a Chat",
+            description: "It’s simple and fun! Once they're connected, just click the Send a Chat button to send messages between Device 1 and Device 2!",
+            image: "/images/desktop_chat.png" // Optional image showing the 'Send a Chat' button or chat interface
+        }
+    ];
+
     const steps = [
         {
             step_num: "How to Pair Devices",
-            pairingSteps: pairingSteps // The steps will now be passed here
+            pairingSteps: pairingSteps // The steps for pairing devices
         },
         {
-            step_num: "Transferring a File",
-            image: "/images/testimonial1.jpg",
-            caption: "File Transfer Process"
+            step_num: "How to Transfer a File",
+            fileTransferSteps: fileTransferSteps // The steps for file transfer
         },
         {
-            step_num: "Using the Chat",
-            image: "/images/testimonial3.jpg",
-            caption: "Chat Feature"
+            step_num: "How to Use the Chat",
+            chatSteps: chatSteps // The steps for using the chat
         }
     ];
 
@@ -88,7 +124,7 @@ function Tutorials() {
                                 </Heading>
                             </Box>
 
-                            {/* Pairing Devices - Display text-based steps */}
+                            {/* How to Pair Devices */}
                             {step.step_num === "How to Pair Devices" ? (
                                 <Flex direction={{ base: "column", md: "row" }} align="center" gap={6} wrap="wrap" justify="center">
                                     {step.pairingSteps.map((pairingStep, pairingIndex) => (
@@ -100,7 +136,7 @@ function Tutorials() {
                                             mx="auto"
                                             display="flex"
                                             flexDirection="column"
-                                            alignItems="center" // Center the content horizontally
+                                            alignItems="center"
                                         >
                                             <Text fontSize="lg" fontWeight="bold" textAlign="center">{pairingStep.stepTitle}</Text>
                                             <Text fontSize="md" mt={2} textAlign="center">{pairingStep.description}</Text>
@@ -108,30 +144,78 @@ function Tutorials() {
                                                 <Image
                                                     src={pairingStep.image}
                                                     alt={`Step ${pairingIndex + 1} Image`}
-                                                    width={{ base: "70%", md: "60%" }}  // Reduce width but keep aspect ratio intact
+                                                    width={{ base: "70%", md: "60%" }}  // Adjust width for uniform size
                                                     objectFit="contain"
                                                     borderRadius="md"
                                                     mt={4}
-                                                    boxShadow="lg"  // Add shadow effect
+                                                    boxShadow="lg"
                                                     mx="auto" // Center the image horizontally
                                                 />
                                             )}
                                         </Box>
                                     ))}
                                 </Flex>
+                            ) : step.step_num === "How to Transfer a File" ? (
+                                // How to Transfer a File steps
+                                <Flex direction={{ base: "column", md: "row" }} align="center" gap={6} wrap="wrap" justify="center">
+                                    {step.fileTransferSteps.map((fileTransferStep, fileIndex) => (
+                                        <Box 
+                                            key={fileIndex} 
+                                            textAlign="left" 
+                                            mt={6} 
+                                            width={{ base: "100%", md: "48%" }} 
+                                            mx="auto"
+                                            display="flex"
+                                            flexDirection="column"
+                                            alignItems="center"
+                                        >
+                                            <Text fontSize="lg" fontWeight="bold" textAlign="center">{fileTransferStep.stepTitle}</Text>
+                                            <Text fontSize="md" mt={2} textAlign="center">{fileTransferStep.description}</Text>
+                                            {fileTransferStep.image && (
+                                                <Image
+                                                    src={fileTransferStep.image}
+                                                    alt={`Step ${fileIndex + 1} Image`}
+                                                    width={{ base: "70%", md: "60%" }}  // Same width for uniform size
+                                                    objectFit="contain"
+                                                    borderRadius="md"
+                                                    mt={4}
+                                                    boxShadow="lg"
+                                                    mx="auto" // Center the image horizontally
+                                                />
+                                            )}
+                                        </Box>
+                                    ))}
+                                </Flex>
+                            ) : step.step_num === "How to Use the Chat" ? (
+                                // How to Use Chat step
+                                <Box textAlign="center" mt={10}>
+                                    <Text fontSize="lg" fontWeight="bold">{step.chatSteps[0].stepTitle}</Text>
+                                    <Text fontSize="md" mt={2}>{step.chatSteps[0].description}</Text>
+                                    {step.chatSteps[0].image && (
+                                        <Image
+                                            src={step.chatSteps[0].image}
+                                            alt="How to Use Chat"
+                                            width={{ base: "70%", md: "60%" }}  // Same width for uniform size
+                                            objectFit="contain"
+                                            borderRadius="md"
+                                            mt={4}
+                                            boxShadow="lg"
+                                            mx="auto" // Center the image horizontally
+                                        />
+                                    )}
+                                </Box>
                             ) : (
-                                // For other steps (Transferring a File, Using the Chat)
+                                // For other steps
                                 <Box textAlign="center" mt={10}>
                                     <Image 
                                         src={step.image}
                                         alt={`Image for ${step.step_num}`}
-                                        width={{ base: "70%", md: "60%" }}  // Reduce width but keep aspect ratio intact
+                                        width={{ base: "70%", md: "60%" }}  // Same width for uniform size
                                         objectFit="contain"
                                         borderRadius="md"
-                                        boxShadow="lg"  // Add shadow effect
+                                        boxShadow="lg"
                                         mx="auto" // Center the image horizontally
                                     />
-                                    {/* Caption for the single image */}
                                     <Text fontSize="sm" mt={4}>{step.caption}</Text>
                                 </Box>
                             )}
@@ -144,5 +228,3 @@ function Tutorials() {
 }
 
 export default Tutorials;
-
-
