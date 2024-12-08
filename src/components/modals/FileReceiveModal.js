@@ -15,12 +15,6 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
   const [receivedFileHistory, setReceivedFileHistory] = useState([]); // State to store received file history
 
   useEffect(() => {
-    // Load received file history from localStorage on component mount
-    const storedHistory = JSON.parse(localStorage.getItem("receivedFileHistory")) || [];
-    setReceivedFileHistory(storedHistory);
-  }, []);
-
-  useEffect(() => {
     const fetchFiles = async () => {
       if (isOpen && messages.length > 0) {
         setLoading(true);
@@ -36,7 +30,8 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
           const fileUrl = await fetchFromIpfs(fileCid);
           const file = { fileUrl, fileName };
           fetchedFiles.push(file);
-          await updateReceivedFileHistory(file); // Add to received file history
+          const timestamp = Date.now();
+          setFileAsCookie(fileCid, fileName, timestamp); // Add to received file history
         }
 
         setFiles(fetchedFiles); // Set the state with the fetched file URLs
@@ -47,85 +42,156 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
       }
     };
 
+    const getReceivedFileHistory = () => {
+      const cookieName = "userFiles";
+
+      // Helper to get a cookie by name
+      function getCookie(name) {
+        const nameEQ = name + "=";
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.indexOf(nameEQ) === 0) {
+                return decodeURIComponent(cookie.substring(nameEQ.length));
+            }
+        }
+        return null;
+      }
+
+      // Get the cookie value and parse it into an array
+      const cookieValue = getCookie(cookieName);
+      if (cookieValue) {
+        try {
+          const parsedCIDs = JSON.parse(cookieValue);
+          if (Array.isArray(parsedCIDs)) {
+              return parsedCIDs; // Return the list of CIDs
+          }
+        } catch (error) {
+          console.error("Error parsing file history cookie:", error);
+        }
+      }
+      return []; // Return an empty array if no cookie exists or parsing fails
+    };
+
+    // Fetch the file history and set it in state
+    const history = getReceivedFileHistory();
+    console.log("Received file history:", history);
+    setReceivedFileHistory(history);
+
     fetchFiles();
   }, [isOpen, messages, fetchFromIpfs, setLoading]);
-  
-  const updateReceivedFileHistory = async (file) => {
-    try {
-      // Fetch the file content from the original URL
-      const response = await fetch(file.fileUrl);
-  
-      if (!response.ok) {
-        console.error("Failed to fetch file:", response.statusText);
-        return;
+
+  function setFileAsCookie(cid, name, timestamp, days = 7) {
+    const cookieName = "userFiles";
+
+    // Helper to get an existing cookie by name
+    function getCookie(cookieName) {
+      const nameEQ = cookieName + "=";
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          let cookie = cookies[i].trim();
+          if (cookie.indexOf(nameEQ) === 0) {
+              return decodeURIComponent(cookie.substring(nameEQ.length));
+          }
       }
-  
-      // Open the cache
-      const cache = await caches.open("received-files");
-  
-      // Generate a unique cache key using the file name and timestamp
-      const cacheKey = `${window.location.origin}/cache/${file.fileName}-${Date.now()}`;
-  
-      // Create a new Request object with the generated cache key
-      const request = new Request(cacheKey);
-  
-      // Put the response into the cache with the generated request key
-      await cache.put(request, response.clone());
-  
-      // Add the file details to received file history
-      const newEntry = {
-        name: file.fileName,
-        url: cacheKey, // Use the cache key as the URL
-        timestamp: new Date().toISOString(),
-      };
-  
-      const updatedHistory = [newEntry, ...receivedFileHistory];
-      setReceivedFileHistory(updatedHistory);
-  
-      // Store the updated history in localStorage
-      localStorage.setItem("receivedFileHistory", JSON.stringify(updatedHistory));
-  
-      console.log("File cached successfully and history updated:", updatedHistory);
-    } catch (error) {
-      console.error("Error updating received file history:", error);
+      return null;
     }
-  };
+
+    // Helper to set a cookie
+    function setCookie(cookieName, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Expiration date
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = `${cookieName}=${encodeURIComponent(value)}; ${expires}; path=/`;
+    }
+
+    // Get the current JSON object from the cookie, or initialize it as an empty array
+    let currentData = [];
+    const existingCookie = getCookie(cookieName);
+    if (existingCookie) {
+        try {
+            currentData = JSON.parse(existingCookie);
+        } catch (error) {
+            console.error("Failed to parse cookie JSON:", error);
+        }
+    }
+
+    // Add the new CID to the list (prevent duplicates if needed)
+    if (!currentData.includes(cid)) {
+        currentData.push({cid, name, timestamp});
+    }
+
+    // Save the updated JSON object back to the cookie
+    setCookie(cookieName, JSON.stringify(currentData), days);
+  }
+  
+  // const updateReceivedFileHistory = async (file) => {
+  //   try {
+  //     // Fetch the file content from the original URL
+  //     const response = await fetch(file.fileUrl);
+  
+  //     if (!response.ok) {
+  //       console.error("Failed to fetch file:", response.statusText);
+  //       return;
+  //     }
+  
+  //     // Open the cache
+  //     const cache = await caches.open("received-files");
+  
+  //     // Generate a unique cache key using the file name and timestamp
+  //     const cacheKey = `${window.location.origin}/cache/${file.fileName}-${Date.now()}`;
+  
+  //     // Create a new Request object with the generated cache key
+  //     const request = new Request(cacheKey);
+  
+  //     // Put the response into the cache with the generated request key
+  //     await cache.put(request, response.clone());
+  
+  //     // Add the file details to received file history
+  //     const newEntry = {
+  //       name: file.fileName,
+  //       url: cacheKey, // Use the cache key as the URL
+  //       timestamp: new Date().toISOString(),
+  //     };
+  
+  //     const updatedHistory = [newEntry, ...receivedFileHistory];
+  //     setReceivedFileHistory(updatedHistory);
+  
+  //     // Store the updated history in localStorage
+  //     localStorage.setItem("receivedFileHistory", JSON.stringify(updatedHistory));
+  
+  //     console.log("File cached successfully and history updated:", updatedHistory);
+  //   } catch (error) {
+  //     console.error("Error updating received file history:", error);
+  //   }
+  // };
   
 
   // Function to handle file downloads
-  const handleDownload = async (url, name) => {
-    try {
-      const cache = await caches.open("received-files");
-      const cachedResponse = await cache.match(url);
-  
-      if (cachedResponse) {
-        const blob = await cachedResponse.blob();
-        const objectUrl = URL.createObjectURL(blob);
-  
-        const a = document.createElement("a");
-        a.href = objectUrl;
-        a.download = name; // Use the provided file name for the download
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-  
-        // Free memory
-        URL.revokeObjectURL(objectUrl);
-      } else {
-        const a = document.createElement("a");
-        a.href = url;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-    } catch (error) {
-      console.error("Error downloading file:", error);
-    }
+  const handleDownload = (url, name) => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name; // Use the provided file name for the download
+    document.body.appendChild(a); // Append the anchor to the body
+    a.click(); // Trigger the download
+    document.body.removeChild(a); // Remove the anchor from the document
+  };
+
+  // Function to handle file downloads
+  const handleDownloadFromHistory = async (cid, name) => {
+    const url = await fetchFromIpfs(cid);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name; // Use the provided file name for the download
+    document.body.appendChild(a); // Append the anchor to the body
+    a.click(); // Trigger the download
+    document.body.removeChild(a); // Remove the anchor from the document
   };
   
 
   // Utility function to check if the file is an image
-  const isImageFile = (url) => {
+  function isImageFile(url) {
+    console.log("url:", url);
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'];
     return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
   };
@@ -180,12 +246,12 @@ const FileReceiveModal = ({ isOpen, onClose }) => {
                     borderColor="gray.300"
                     borderRadius="md"
                     mb={2}
-                  >
+                  > 
                     <Text fontSize="md">
                       📥 {entry.name}
                     </Text>
-                    <Button variant="link" onClick={() => handleDownload(entry.url, entry.name)}>
-                      Open
+                    <Button variant="link" onClick={async () => handleDownloadFromHistory(entry.url, entry.name)}>
+                      Download
                     </Button>
                     <Text fontSize="sm" color="gray.500">
                       {new Date(entry.timestamp).toLocaleString()}
