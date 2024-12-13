@@ -1,9 +1,5 @@
 # skyShare
 
-<div align="left">
-<table style="border: none; border-collapse: collapse; width: 100%;">
-    <tr>
-    <td>
 A *peer-to-peer*  sharing app
 
 ## Key Features
@@ -14,13 +10,6 @@ A *peer-to-peer*  sharing app
     - Chat
 - Secure Pairing Process (no sign-in)
 - Files are not stored permanently
-    </td>
-    <td>
-![giraffetransparent](https://github.com/user-attachments/assets/451635b7-86c5-4d72-9df7-f56b89a2ca50)
-    </td>
-    </tr>
-</table>
-</div>
 
 ## Why skyShare is unlike anything else
 
@@ -35,7 +24,7 @@ A *peer-to-peer*  sharing app
 
 ## Technical Implementation
 
-- ***WebRTC for Peer-to-Peer Sharing***:
+- <u>***WebRTC for Peer-to-Peer Sharing***</u>:
     - Establishes direct connections using RTCPeerConnection and RTCDataChannel
     - Transfers data efficiently without intermediate servers
 - ***IPFS File Content Identifiers (CIDs)***:
