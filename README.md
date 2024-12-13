@@ -1,41 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# skyShare
 
-# skyshare
-🌥️🦒🌥️
+---
 
-## Getting Started
+<div align="left">
+<table >
+    <tr>
+    <td>
+A *peer-to-peer*  sharing app
 
-First, install dependencies:
+## Key Features
 
-```bash
-yarn
-```
+- Cross-Platform File Transfer
+- Peer-to-Peer Communication
+    - File transfer
+    - Chat
+- Secure Pairing Process (no sign-in)
+- Files are not stored permanently
+    </td>
+    <td>
+![giraffetransparent.png](giraffetransparent.png)
+    </td>
+    </tr>
+</table>
+</div>
 
-Then, run the development server:
+## Why skyShare is unlike anything else
 
-```bash
-yarn dev
-```
+- ***Real-Time Connection (WebRTC)***:
+    - P2P connection over the internet, allowing users to connect from anywhere without needing to be on the same local network.
+- ***No Sign-In Needed***:
+    - Direct connection between devices via P2P technologies.
+- ***Scalability and Accessibility***:
+    - Leverages IPFS to make files available even after the sender disconnects, as other IPFS nodes can continue to serve the file.
+- ***No Centralized Control***:
+    - Entirely decentralized, with no single point of control over file distribution, whereas similar software might be a proprietary application with centralized management of the app’s functionality and updates, and sometimes file storage.
 
-It's important to NOT use `npm` for any command!
+## Technical Implementation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- ***WebRTC for Peer-to-Peer Sharing***:
+    - Establishes direct connections using RTCPeerConnection and RTCDataChannel
+    - Transfers data efficiently without intermediate servers
+- ***IPFS File Content Identifiers (CIDs)***:
+    - Each time a file is uploaded, its content is hashed and shared through IPFS
+    - Utilizing IPFS allows for the assurance of delivery, and saves space when files are not downloaded
+    - Since IPFS is a worldwide protocol, it is not in skyShare’s use case to share sensitive data
+- ***QR Code Pairing***:
+    - One device generates a QR code, and the other scans it to initiate pairing
+    - Provides secure and intuitive device connections
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Made with 🌥️🦒🌥️ by Team 14
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[https://skyshare-pi.vercel.app/about](https://skyshare-pi.vercel.app/about)
