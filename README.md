@@ -24,7 +24,7 @@ A *peer-to-peer*  sharing app
 
 ## Technical Implementation
 
-- <u>***WebRTC for Peer-to-Peer Sharing***</u>:
+- __***WebRTC for Peer-to-Peer Sharing***__:
     - Establishes direct connections using RTCPeerConnection and RTCDataChannel
     - Transfers data efficiently without intermediate servers
 - ***IPFS File Content Identifiers (CIDs)***:
