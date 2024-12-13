@@ -1,7 +1,5 @@
 # skyShare
 
----
-
 <div align="left">
 <table >
     <tr>
