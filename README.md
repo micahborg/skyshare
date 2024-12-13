@@ -1,4 +1,4 @@
-# skyShare
+# skyShare 🌥️🦒🌥️
 
 A *peer-to-peer*  sharing app
 
@@ -35,6 +35,6 @@ A *peer-to-peer*  sharing app
     - One device generates a QR code, and the other scans it to initiate pairing
     - Provides secure and intuitive device connections
 
-Made with 🌥️🦒🌥️ by Team 14
+Made with 🦒 by Team 14!
 
 [https://skyshare-pi.vercel.app/about](https://skyshare-pi.vercel.app/about)
