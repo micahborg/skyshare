@@ -1,7 +1,7 @@
 # skyShare
 
 <div align="left">
-<table >
+<table style="border: none; border-collapse: collapse; width: 100%;">
     <tr>
     <td>
 A *peer-to-peer*  sharing app
