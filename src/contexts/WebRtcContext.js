@@ -8,9 +8,16 @@ const WebRtcContext = createContext();
 export const WebRtcProvider = ({ children }) => {
   const [pairId, setPairId] = useState("");
   const [isConnected, setIsConnected] = useState(false);
-  const [messages, setMessages] = useState([]); // Store chat messages
+  const [chats, setChats] = useState([]); // Store chat messages
+  const [files, setFiles] = useState([])
   const pc = useRef(null);
   const dataChannel = useRef(null);
+  
+  // Variables to track the file transfer state
+  let fileChunks = [];
+  let receivedFileSize = 0;
+  let expectedFileSize = 0;
+  let fileName = '';
 
   useEffect(() => {
     const firebaseConfig = {
@@ -61,15 +68,53 @@ export const WebRtcProvider = ({ children }) => {
 
     dataChannel.current.onmessage = (event) => {
       console.log("Message received on data channel:", event.data);
-      setMessages((prev) => [...prev, { sender: "remote", data: event.data }]);
+      const dataType = typeof event.data;
+      console.log("Data type received:", dataType);
+      if (typeof event.data === "string") {
+        console.log("Received string message:", event.data);
+        if (event.data.type === "text") {
+          setChats((prev) => [...prev, { sender: "remote", data: event.data }]);
+        } else {
+          try {
+            const metadata = JSON.parse(event.data);
+            fileName = metadata.name; // Store the file name
+            expectedFileSize = metadata.size;  // Store the expected file size
+            console.log("Received file metadata:", metadata);
+          } catch (error) {
+            console.error("Failed to parse metadata:", error);
+          }
+        }
+      } else {
+        console.log("handling file chunk...");
+        handleFileChunk(event.data);
+      }
     };
 
     pc.current.ondatachannel = (event) => {
       console.log("Data channel received:", event.channel);
       event.channel.onmessage = (e) => {
         console.log("Message received on data channel:", e.data);
-        setMessages((prev) => [...prev, { sender: "remote", data: e.data }]);
+        const dataType = typeof e.data;
+        console.log("Data type received:", dataType);
+        if (typeof e.data === "string") {
+          if (e.data.type === "text") {
+            setChats((prev) => [...prev, { sender: "remote", data: e.data }]);
+          } else {
+            try {
+              const metadata = JSON.parse(e.data);
+              fileName = metadata.name; // Store the file name
+              expectedFileSize = metadata.size;  // Store the expected file size
+              console.log("Received file metadata:", metadata);
+            } catch (error) {
+              console.error("Failed to parse metadata:", error);
+            }
+          }
+        } else {
+          console.log("handling file chunk...");
+          handleFileChunk(e.data);
+        }
       };
+
     };
 
     if (pc.current.connectionState === 'failed') {
@@ -265,14 +310,41 @@ export const WebRtcProvider = ({ children }) => {
   const sendMessage = (message) => {
     try {
         dataChannel.current.send(message);
-        setMessages((prev) => [...prev, { sender: "local", data: message }]);
+        if (message.type === "text") {
+          setChats((prev) => [...prev, { sender: "local", data: message }]);
+        }
     } catch (error) {
         console.error("Error sending message:", error);
     }
   };
 
+  function handleFileChunk(chunk) {
+    console.log("Adding file chunk:", chunk);
+    fileChunks.push(chunk);  // Add the incoming chunk to the array
+    console.log("File chunks:", fileChunks);
+    receivedFileSize += chunk.byteLength;
+    console.log("Received file chunk:", receivedFileSize, "bytes", "Expected:", expectedFileSize, "bytes", "File name:", fileName, "Chunk size:", chunk.byteLength + "bytes");
+  
+    if (receivedFileSize === expectedFileSize) {
+      // Once all chunks are received, reassemble the file
+      const receivedBlob = new Blob(fileChunks);
+  
+      // Create a download link
+      const fileUrl = URL.createObjectURL(receivedBlob);
+  
+      // Display the file with its metadata (e.g., file name)
+      console.log("File received:", fileUrl);
+      setFiles((prev) => [...prev, { sender: "remote", data: fileUrl, fileName: fileName }]);
+  
+      // Optionally, clear the fileChunks array for the next file transfer
+      fileChunks = [];
+      receivedFileSize = 0;
+      fileName = '';
+    }
+  }
+
   return (
-    <WebRtcContext.Provider value={{ beginPair, connectDevice, sendMessage, isConnected, pairId, messages }}>
+    <WebRtcContext.Provider value={{ beginPair, connectDevice, sendMessage, isConnected, pairId, files, chats }}>
       {children}
     </WebRtcContext.Provider>
   );

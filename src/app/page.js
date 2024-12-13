@@ -8,12 +8,6 @@ import {
   Flex,
   VStack,
   useBreakpointValue,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
 } from "@chakra-ui/react";
 import NavBar from "@/components/NavBar";
 import FileUploadModal from "@/components/modals/FileUploadModal";

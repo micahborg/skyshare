@@ -59,7 +59,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+    <Drawer size="md" isOpen={isOpen} placement="right" onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent
         bg="skyBlue"
