@@ -16,7 +16,7 @@ A *peer-to-peer*  sharing app
 - Files are not stored permanently
     </td>
     <td>
-![giraffetransparent.png](giraffetransparent.png)
+![giraffetransparent](https://github.com/user-attachments/assets/451635b7-86c5-4d72-9df7-f56b89a2ca50)
     </td>
     </tr>
 </table>
