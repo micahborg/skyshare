@@ -21,7 +21,7 @@
   "content_scripts": [
     {
       "matches": ["https://*/*", "http://*/*"],
-      "js": ["inject.js"]
+      "js": ["inject.js", "contentScript.js"]
     }
   ]
 }

@@ -1,1 +1,2 @@
-console.log("Message from inject.js")
+// background.js
+console.log("Background script loaded!");
