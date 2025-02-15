@@ -23,6 +23,10 @@ const Landing = () => {
     navigate("/home");
   };
 
+  const goNotes = () => {
+    navigate("/notes");
+  };
+
   return (
     <Box
       width={theme.views.default.width}
@@ -57,6 +61,12 @@ const Landing = () => {
             onClick={goHome}
           >
             Go to Home
+          </Button>
+
+          <Button
+            onClick={goNotes}
+          >
+            Go to Notes Page
           </Button>
         </HStack>
 
