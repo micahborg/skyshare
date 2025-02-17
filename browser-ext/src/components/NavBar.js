@@ -82,12 +82,20 @@ const NavBar = () => {
                 <Button
                     onClick={goNotes}
                     color="black"
+                    size="sm" 
+                    fontSize="xs" 
+                    px={3} 
+                    py={2}
                 >
                     Notes
                 </Button>                
                 <Button
                     onClick={goHome2}
                     color="black"
+                    size="sm" 
+                    fontSize="xs" 
+                    px={3} 
+                    py={2}
                 >
                     Files
                 </Button>
@@ -95,6 +103,10 @@ const NavBar = () => {
                 <Button
                     onClick={goHome}
                     color="black"
+                    size="sm" 
+                    fontSize="xs" 
+                    px={3} 
+                    py={2}
                 >
                     Chat
                 </Button>
@@ -102,6 +114,10 @@ const NavBar = () => {
                 <Button
                     onClick={goHome}
                     color="black"
+                    size="sm" 
+                    fontSize="xs" 
+                    px={3} 
+                    py={2}
                 >
                     Share
                 </Button>
