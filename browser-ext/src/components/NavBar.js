@@ -5,7 +5,7 @@ Date Created: 2/16/2025
 Modified Date: 2/16
 */
 "use client";
-import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-ui/react";
+import { Image, Flex, Heading, VStack, Link, useBreakpointValue } from "@chakra-ui/react";
 
 const NavBar = () => { 
     // Adjust image size based on screen size
@@ -31,39 +31,58 @@ const NavBar = () => {
     });
 
     return (
-        <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="space-between" spacing={4}>
-            {/* Navigation links section */}
-            <Flex
-                gap={navLinkGap} // Reduced gap between links on mobile
-                flexDirection="row" // Keep links in a row on both mobile and desktop
-                w={{ base: "auto", md: "70%" }} // On mobile, take only necessary width, on desktop take 70%
-                justify="flex-start" // Align links to the left
-                align="center"
-                wrap="nowrap" // Prevent wrapping on mobile so they are still in one line
-            >
-                <Link href="/">
-                    <Heading fontSize={headingFontSize}>Home</Heading>
-                </Link>
-                <Link href="/about">
-                    <Heading fontSize={headingFontSize}>About</Heading>
-                </Link>
-                <Link href="/tutorial">
-                    <Heading fontSize={headingFontSize}>Tutorial</Heading>
-                </Link>
-            </Flex>
-
+        <Flex
+            p={4}
+            bg="sunnyYellow.100"
+            color="black"
+            h="100vh" // Make the navbar take up the full height
+            w={{ base: "80px", md: "120px" }} // Adjust width based on screen size
+            flexDirection="column" // Stack items vertically
+            align="center"
+            position="fixed" // Keep it fixed on the left
+            left={0}
+            top={0}
+        >
             {/* Logo section */}
             <Flex
-                gap={0} // Smaller gap between logo and text like in Canva design 
-                w="auto"
-                justify="flex-end" // Align the logo to the right on both mobile and desktop
+                flexDirection="column"
                 align="center"
-                flexDirection="row" // Align logo (image) to the right of the text
+                mb={8} // Add space below the logo
             >
                 <Heading fontSize={logoFontSize}>skyShare</Heading>
                 <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
             </Flex>
-        </HStack>
+
+            {/* Navigation links section */}
+            <VStack spacing={6} align="center" w="100%">
+                <Button
+                    onClick={goNotes}
+                    color="black"
+                >
+                    Notes
+                </Button>                
+                <Button
+                    onClick={goHome2}
+                    color="black"
+                >
+                    Files
+                </Button>
+
+                <Button
+                    onClick={goHome}
+                    color="black"
+                >
+                    Chat
+                </Button>
+
+                <Button
+                    onClick={goHome}
+                    color="black"
+                >
+                    Share
+                </Button>
+            </VStack>
+        </Flex>
     );
 };
 
