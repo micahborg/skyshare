@@ -5,7 +5,7 @@ Date Created: 2/16/2025
 Modified Date: 2/16
 */
 "use client";
-import { Image, Flex, Heading, VStack, Link, useBreakpointValue } from "@chakra-ui/react";
+import { Image, Flex, Heading, VStack, Link, useBreakpointValue, Button } from "@chakra-ui/react";
 
 const NavBar = () => { 
     // Adjust image size based on screen size
@@ -29,6 +29,27 @@ const NavBar = () => {
         base: 4,   // Smaller gap between links on mobile
         md: 6,     // Default gap on desktop
     });
+      const { setIsLoading } = useLoading();
+    
+      const navigate = useNavigate();
+    
+      const goHome = async () => {
+        setIsLoading(true);
+    
+        // simulate a 5-second delay
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+        setIsLoading(false);
+        navigate("/home");
+      };
+    
+      const goHome2 = () => {
+        navigate("/home");
+      };
+    
+      const goNotes = () => {
+        navigate("/notes");
+      };
 
     return (
         <Flex
