@@ -6,6 +6,9 @@ Modified Date: 2/16
 */
 "use client";
 import { Image, Flex, Heading, VStack, Link, useBreakpointValue, Button } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import theme from "../theme";
+import { useLoading } from "../contexts/LoadingContext";
 
 const NavBar = () => { 
     // Adjust image size based on screen size
