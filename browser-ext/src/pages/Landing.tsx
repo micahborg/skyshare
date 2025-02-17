@@ -36,7 +36,6 @@ const Landing = () => {
       alignItems="center"
       p={4}
     >
-      <NavBar />
       <Text fontSize="sm" color="black" textAlign="center" mb={4}>
         TEST TO SEE This is the bare bones skyShare application on the browser extension.
       </Text>
