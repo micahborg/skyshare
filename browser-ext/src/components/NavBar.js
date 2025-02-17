@@ -31,16 +31,30 @@ const NavBar = () => {
     });
 
     return (
-        <HStack p={4} bg="sunnyYellow.100" color="black" align="center" justify="space-between" spacing={4}>
-            {/* Navigation links section */}
+        <Flex
+            p={4}
+            bg="sunnyYellow.100"
+            color="black"
+            h="100vh" // Make the navbar take up the full height
+            w={{ base: "80px", md: "200px" }} // Adjust width based on screen size
+            flexDirection="column" // Stack items vertically
+            align="center"
+            position="fixed" // Keep it fixed on the left
+            left={0}
+            top={0}
+        >
+            {/* Logo section */}
             <Flex
-                gap={navLinkGap} // Reduced gap between links on mobile
-                flexDirection="row" // Keep links in a row on both mobile and desktop
-                w={{ base: "auto", md: "70%" }} // On mobile, take only necessary width, on desktop take 70%
-                justify="flex-start" // Align links to the left
+                flexDirection="column"
                 align="center"
-                wrap="nowrap" // Prevent wrapping on mobile so they are still in one line
+                mb={8} // Add space below the logo
             >
+                <Heading fontSize={logoFontSize}>skyShare</Heading>
+                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
+            </Flex>
+
+            {/* Navigation links section */}
+            <VStack spacing={6} align="center" w="100%">
                 <Link href="/">
                     <Heading fontSize={headingFontSize}>Home</Heading>
                 </Link>
@@ -50,20 +64,8 @@ const NavBar = () => {
                 <Link href="/tutorial">
                     <Heading fontSize={headingFontSize}>Tutorial</Heading>
                 </Link>
-            </Flex>
-
-            {/* Logo section */}
-            <Flex
-                gap={0} // Smaller gap between logo and text like in Canva design 
-                w="auto"
-                justify="flex-end" // Align the logo to the right on both mobile and desktop
-                align="center"
-                flexDirection="row" // Align logo (image) to the right of the text
-            >
-                <Heading fontSize={logoFontSize}>skyShare</Heading>
-                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
-            </Flex>
-        </HStack>
+            </VStack>
+        </Flex>
     );
 };
 
