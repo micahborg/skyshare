@@ -3,6 +3,7 @@ import { Box, Text, Button, Image, VStack, HStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import theme from "../theme";
 import { useLoading } from "../contexts/LoadingContext";
+import NavBar from "../components/NavBar";
 
 const Landing = () => {
   const { setIsLoading } = useLoading();
@@ -35,7 +36,7 @@ const Landing = () => {
       alignItems="center"
       p={4}
     >
-
+      <NavBar />
       <Text fontSize="sm" color="black" textAlign="center" mb={4}>
         This is the bare bones skyShare application on the browser extension.
       </Text>
