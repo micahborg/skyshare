@@ -69,11 +69,16 @@ const NavBar = () => {
         >
             {/* Logo section */}
             <Flex
-                flexDirection="column"
-                align="center"
-                mb={2} // Add space below the logo
+                // flexDirection="column"
+                // align="center"
+                // mb={2} // Add space below the logo
+                flexDirection="row" // Place text and image in the same row
+                align="center" // Align them properly
+                justify= "center"// "flex-start" // Push them towards the left
+                mb={2} // Space below the logo
+                w="100%" // Ensure it spans the full width of the navbar
             >
-                <Heading fontSize={{ base: "xs", md: "lg", lg: "xl" }}>skyShare 2.0</Heading>
+                <Heading fontSize={{ base: "xs", md: "lg", lg: "xl" }} whiteSpace="nowrap">skyShare 2.0</Heading>
                 <Image boxSize={imageSize} src="/images/giraffetransparent.png" alt="skyShare logo" />
             </Flex>
 
