@@ -5,7 +5,7 @@ Date Created: 2/16/2025
 Modified Date: 2/16
 */
 "use client";
-import { Image, Flex, Heading, HStack, Link, useBreakpointValue } from "@chakra-ui/react";
+import { Image, Flex, Heading, VStack, Link, useBreakpointValue } from "@chakra-ui/react";
 
 const NavBar = () => { 
     // Adjust image size based on screen size
