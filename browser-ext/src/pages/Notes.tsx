@@ -1,10 +1,12 @@
 import React from 'react';
-import { Box, Textarea, Text, Button, VStack, HStack } from "@chakra-ui/react";
+import { Box, Textarea, Text, Button, VStack, HStack, Flex } from "@chakra-ui/react";
 import theme from "../theme";
 import NavBar from "../components/NavBar";
 
 const Notes = () => {
   return (
+    <Flex>
+    <NavBar/>
     <VStack
       spacing={4}
       p={4}
@@ -57,9 +59,10 @@ const Notes = () => {
         >
           <Text fontSize="lg" fontWeight="bold">Saved Notes</Text>
         </Box>
-        <NavBar />
+
       </HStack>
     </VStack>
+    </Flex>
   );
 };
 
