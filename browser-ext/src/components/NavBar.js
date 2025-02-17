@@ -12,7 +12,7 @@ import { useLoading } from "../contexts/LoadingContext";
 
 const NavBar = () => { 
     // Adjust image size based on screen size
-    const imageSize = useBreakpointValue({ base: "40px", md: "50px" }); // Adjust image size for mobile
+    const imageSize = useBreakpointValue({ base: "20px", md: "30px" }); // Adjust image size for mobile
 
     // Adjust the font size for headers based on screen size (smaller font size for mobile)
     const headingFontSize = useBreakpointValue({
@@ -23,8 +23,8 @@ const NavBar = () => {
 
     // Adjust the font size for skyShare logo section
     const logoFontSize = useBreakpointValue({
-        base: "lg", // Small font size for mobile
-        md: "xl",   // Larger font size for medium and up
+        base: "xs", // Small font size for mobile
+        md: "sm",   // Larger font size for medium and up
     });
 
     // Adjust the gap between navigation links for mobile
@@ -73,7 +73,7 @@ const NavBar = () => {
                 align="center"
                 mb={2} // Add space below the logo
             >
-                <Heading fontSize="xs">skyShare 2.0</Heading>
+                <Heading fontSize={logoFontSize}>skyShare 2.0</Heading>
                 <Image boxSize={imageSize} src="../../../public/images/giraffetransparent.png" alt="skyShare logo" />
             </Flex>
 
