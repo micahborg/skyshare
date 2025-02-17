@@ -10,8 +10,9 @@ const Notes = () => {
     <VStack
       spacing={4}
       p={4}
-      width={theme.views.default.width}
+      width="100%"
       height={theme.views.default.height}
+      ml={{ base: "80px", md: "120px" }} 
       alignItems="stretch"
     >
       {/* Notes Title */}
