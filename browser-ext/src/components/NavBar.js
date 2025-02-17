@@ -36,7 +36,7 @@ const NavBar = () => {
             bg="sunnyYellow.100"
             color="black"
             h="100vh" // Make the navbar take up the full height
-            w={{ base: "80px", md: "200px" }} // Adjust width based on screen size
+            w={{ base: "80px", md: "120px" }} // Adjust width based on screen size
             flexDirection="column" // Stack items vertically
             align="center"
             position="fixed" // Keep it fixed on the left
@@ -55,15 +55,32 @@ const NavBar = () => {
 
             {/* Navigation links section */}
             <VStack spacing={6} align="center" w="100%">
-                <Link href="/">
-                    <Heading fontSize={headingFontSize}>Home</Heading>
-                </Link>
-                <Link href="/about">
-                    <Heading fontSize={headingFontSize}>About</Heading>
-                </Link>
-                <Link href="/tutorial">
-                    <Heading fontSize={headingFontSize}>Tutorial</Heading>
-                </Link>
+                <Button
+                    onClick={goNotes}
+                    color="black"
+                >
+                    Notes
+                </Button>                
+                <Button
+                    onClick={goHome2}
+                    color="black"
+                >
+                    Files
+                </Button>
+
+                <Button
+                    onClick={goHome}
+                    color="black"
+                >
+                    Chat
+                </Button>
+
+                <Button
+                    onClick={goHome}
+                    color="black"
+                >
+                    Share
+                </Button>
             </VStack>
         </Flex>
     );

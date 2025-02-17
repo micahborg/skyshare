@@ -37,7 +37,7 @@ const Landing = () => {
       p={4}
     >
       <NavBar />
-      <Text fontSize="sm" color="black" textAlign="center" mb={4}>
+      {/* <Text fontSize="sm" color="black" textAlign="center" mb={4}>
         This is the bare bones skyShare application on the browser extension.
       </Text>
 
@@ -68,7 +68,7 @@ const Landing = () => {
             onClick={goNotes}
           >
             Go to Notes Page
-          </Button>
+          </Button> */}
         </HStack>
 
       </VStack>
