@@ -38,7 +38,7 @@ const Landing = () => {
     >
       <NavBar />
       <Text fontSize="sm" color="black" textAlign="center" mb={4}>
-        This is the bare bones skyShare application on the browser extension.
+        TEST TO SEE This is the bare bones skyShare application on the browser extension.
       </Text>
 
       <VStack
