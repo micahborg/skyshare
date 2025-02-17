@@ -73,7 +73,7 @@ const NavBar = () => {
                 align="center"
                 mb={2} // Add space below the logo
             >
-                <Heading fontSize={logoFontSize}>skyShare 2.0</Heading>
+                <Heading fontSize={{ base: "xs", md: "lg", lg: "xl" }}>skyShare 2.0</Heading>
                 <Image boxSize={imageSize} src="../../public/images/giraffetransparent.png" alt="skyShare logo" />
             </Flex>
 
