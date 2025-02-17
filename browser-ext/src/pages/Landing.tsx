@@ -69,9 +69,9 @@ const Landing = () => {
           >
             Go to Notes Page
           </Button> */}
-        </HStack>
+        {/* </HStack>
 
-      </VStack>
+      </VStack> */}
     </Box>
   );
 };
