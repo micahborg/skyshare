@@ -71,10 +71,10 @@ const NavBar = () => {
             <Flex
                 flexDirection="column"
                 align="center"
-                mb={8} // Add space below the logo
+                mb={2} // Add space below the logo
             >
-                <Heading fontSize={logoFontSize}>skyShare</Heading>
-                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
+                <Heading fontSize={logoFontSize}>skyShare 2.0</Heading>
+                <Image boxSize={imageSize} src="../../../../web-app/public/images/giraffetransparent.png" alt="skyShare logo" />
             </Flex>
 
             {/* Navigation links section */}
