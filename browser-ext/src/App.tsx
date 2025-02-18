@@ -4,6 +4,7 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Notes from "./pages/Notes";
 import Chat from "./pages/Chat";
+import Files from "./pages/Files";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import LoadingComponent from "./components/LoadingComponent";
 import { Box } from "@chakra-ui/react";
@@ -21,6 +22,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/notes" element={<Notes />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/files" element={<Files />} />
           </Routes>
         </Box>
       </Router>
