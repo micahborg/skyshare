@@ -9,8 +9,14 @@ export const WebRtcProvider = ({ children }) => {
   const [pairId, setPairId] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState([]); // Store chat messages
+  const [files, setFiles] = useState([]); // received file blobs
   const pc = useRef(null);
   const dataChannel = useRef(null);
+
+  //region File Transfer -- Vars
+  let receivedFile = {};
+  let receiveBuffer = [];
+  let receivedSize = 0;
 
   useEffect(() => {
     const firebaseConfig = {
@@ -26,61 +32,25 @@ export const WebRtcProvider = ({ children }) => {
     const firestore = getFirestore(app);
 
     const servers = {
-      // iceServers: [
-      //   { urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
-      // ],
-      // iceCandidatePoolSize: 10,
       iceServers: [
-        {
-          urls: "stun:openrelay.metered.ca:80"
-        },
-        {
-          urls: "turn:openrelay.metered.ca:80",
-          username: "openrelayproject",
-          credential: "openrelayproject"
-        },
-        {
-          urls: "turn:openrelay.metered.ca:443",
-          username: "openrelayproject",
-          credential: "openrelayproject"
-        },
-        {
-          urls: "turn:openrelay.metered.ca:443?transport=tcp",
-          username: "openrelayproject",
-          credential: "openrelayproject"
-        }
+        { urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
       ],
+      iceCandidatePoolSize: 10,
     };
 
     pc.current = new RTCPeerConnection(servers);
     console.log("Peer connection created:", pc.current);
 
     // Initialize the data channel
-    dataChannel.current = pc.current.createDataChannel("chat");
+    dataChannel.current = pc.current.createDataChannel("dataChannel");
     console.log("Data channel created:", dataChannel.current);
-
-    dataChannel.current.onmessage = (event) => {
-      console.log("Message received on data channel:", event.data);
-      setMessages((prev) => [...prev, { sender: "remote", data: event.data }]);
+    dataChannel.current.binaryType = "arraybuffer";
+    dataChannel.current.bufferedAmountLowThreshold = 0;
+    dataChannel.current.onmessage = (msg) => {
+      console.log("Message received on data channel:", msg.data);
+      onReceiveFile(msg);
+      setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
     };
-
-    pc.current.ondatachannel = (event) => {
-      console.log("Data channel received:", event.channel);
-      event.channel.onmessage = (e) => {
-        console.log("Message received on data channel:", e.data);
-        setMessages((prev) => [...prev, { sender: "remote", data: e.data }]);
-      };
-    };
-
-    if (pc.current.connectionState === 'failed') {
-      console.log("Connection state failed. Restarting ICE...");
-      pc.current.restartIce()
-    }
-
-    if (pc.current.iceconnectionState === 'failed') {
-      console.log("ICE connection state failed. Restarting ICE...");
-      pc.current.restartIce()
-    }
 
     dataChannel.current.onopen = () => {
       setIsConnected(true);
@@ -94,9 +64,34 @@ export const WebRtcProvider = ({ children }) => {
     
     dataChannel.current.onerror = (error) => {
       setIsConnected(false);
-      console.error("Data channel error:", error);
+      console.log("Data channel error:", error);
     };
-  
+
+    pc.current.ondatachannel = (event) => {
+      console.log("Data channel received:", event.channel);
+      dataChannel.current = event.channel;
+      dataChannel.current.binaryType = "arraybuffer";
+      dataChannel.current.bufferedAmountLowThreshold = 0;
+      event.channel.onmessage = (msg) => {
+        console.log("Message received on data channel:", msg.data);
+        onReceiveFile(msg);
+        setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+      };
+      event.channel.onclose = () => {
+        console.log("Data channel closed.");
+        setIsConnected(false);
+      };
+    };
+
+    if (pc.current.connectionState === 'failed') {
+      console.log("Connection state failed. Restarting ICE...");
+      pc.current.restartIce()
+    }
+
+    if (pc.current.iceconnectionState === 'failed') {
+      console.log("ICE connection state failed. Restarting ICE...");
+      pc.current.restartIce()
+    }
 
     return () => {
       console.log("Closing connection...");
@@ -118,7 +113,6 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     const offerDescription = await pc.current.createOffer();
-    //const userAgent = navigator.userAgent;
     await pc.current.setLocalDescription(offerDescription);
 
     const offer = {
@@ -262,6 +256,67 @@ export const WebRtcProvider = ({ children }) => {
     return callDoc.id;
   };
 
+  //region File Transfer
+  function sendFile(file) {
+    dataChannel.current.send(
+      JSON.stringify({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      })
+    )
+
+    let offset = 0;
+    let maxChunkSize = 16384; // 16KB
+
+    console.log("Sending file:", file.name);
+    console.log(dataChannel.current.bufferedAmountLowThreshold);
+
+    file.arrayBuffer().then((buffer) => {
+      const send = () => {
+        while (buffer.byteLength) {
+          if (dataChannel.current.bufferedAmount > dataChannel.current.bufferedAmountLowThreshold) {
+            dataChannel.current.onbufferedamountlow = () => {
+              dataChannel.current.onbufferedamountlow = null;
+              send();
+            };
+            return;
+          }
+          const chunk = buffer.slice(0, maxChunkSize);
+          buffer = buffer.slice(maxChunkSize, buffer.byteLength);
+          dataChannel.current.send(chunk);
+          offset += maxChunkSize;
+          console.log("Sent " + offset + " bytes.");
+        } 
+      };
+
+      send();
+    });
+  }
+
+  function onReceiveFile(event) {
+    if (!receivedFile["name"]) {
+      const file = JSON.parse(event.data);
+      receivedFile = file; // store file metadata (name, size, type)
+      return;
+    }
+  
+    receiveBuffer.push(event.data);
+    receivedSize += event.data.byteLength;
+  
+    if (receivedSize === receivedFile["size"]) {
+      const blob = new Blob(receiveBuffer, { type: receivedFile["type"] });
+      const file = new File([blob], receivedFile["name"], { type: receivedFile["type"] });
+  
+      // reset state
+      receiveBuffer = [];
+      receivedSize = 0;
+      receivedFile = {};
+  
+      setFiles((prev) => [...prev, file]);
+    }
+  }  
+
   const sendMessage = (message) => {
     try {
         dataChannel.current.send(message);
@@ -272,7 +327,7 @@ export const WebRtcProvider = ({ children }) => {
   };
 
   return (
-    <WebRtcContext.Provider value={{ beginPair, connectDevice, sendMessage, isConnected, pairId, messages }}>
+    <WebRtcContext.Provider value={{ beginPair, connectDevice, sendMessage, sendFile, isConnected, pairId, messages, files }}>
       {children}
     </WebRtcContext.Provider>
   );

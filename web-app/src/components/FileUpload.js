@@ -7,62 +7,61 @@ import confetti from "canvas-confetti";
 
 const FileUpload = () => {
   const [isSent, setIsSent] = useState(false);
-  const { isConnected, sendMessage } = useWebRtc();
+  const { isConnected, sendFile, sendMessage } = useWebRtc();
   const [files, setFiles] = useState([]);
-  const [fileHistory, setFileHistory] = useState([]);
-  const { uploadToIpfs } = useIpfs();
+  //const [fileHistory, setFileHistory] = useState([]);
   const { setLoading } = useLoading();
   const toast = useToast();
 
   const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB in bytes
   const uploadSuccessSound = new Audio('/sounds/success.mp3'); // Replace with your audio file
 
-  useEffect(() => {
-    // Load file history from localStorage on component mount
-    const storedHistory = JSON.parse(localStorage.getItem("fileHistory")) || [];
-    const sentHistory = storedHistory.filter((entry) => entry.type === "Sent");
+  // useEffect(() => {
+  //   // Load file history from localStorage on component mount
+  //   const storedHistory = JSON.parse(localStorage.getItem("fileHistory")) || [];
+  //   const sentHistory = storedHistory.filter((entry) => entry.type === "Sent");
 
-    // Load uploaded file history from localStorage on component mount
-    const storedUploadedHistory = JSON.parse(localStorage.getItem("uploadedFileHistory")) || [];
+  //   // Load uploaded file history from localStorage on component mount
+  //   const storedUploadedHistory = JSON.parse(localStorage.getItem("uploadedFileHistory")) || [];
     
-    // Merge the histories
-    const combinedHistory = [...sentHistory, ...storedUploadedHistory];
-    setFileHistory(combinedHistory);
-  }, []);
+  //   // Merge the histories
+  //   const combinedHistory = [...sentHistory, ...storedUploadedHistory];
+  //   setFileHistory(combinedHistory);
+  // }, []);
 
-  const updateFileHistory = (file, type) => {
-    const newEntry = {
-      name: file.name,
-      size: file.size,
-      type,
-      timestamp: new Date().toISOString(),
-    };
-    const updatedHistory = [newEntry, ...fileHistory];
-    setFileHistory(updatedHistory);
-    localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
-  };
+  // const updateFileHistory = (file, type) => {
+  //   const newEntry = {
+  //     name: file.name,
+  //     size: file.size,
+  //     type,
+  //     timestamp: new Date().toISOString(),
+  //   };
+  //   const updatedHistory = [newEntry, ...fileHistory];
+  //   setFileHistory(updatedHistory);
+  //   localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
+  // };
 
-  const cacheUploadedFile = async (file) => {
-    try {
-      const cache = await caches.open('uploaded-files');
-      const response = new Response(file);
-      const cacheKey = `${window.location.origin}/cache/${file.name}-${Date.now()}`;
-      const request = new Request(cacheKey);
-      await cache.put(request, response);
+  // const cacheUploadedFile = async (file) => {
+  //   try {
+  //     const cache = await caches.open('uploaded-files');
+  //     const response = new Response(file);
+  //     const cacheKey = `${window.location.origin}/cache/${file.name}-${Date.now()}`;
+  //     const request = new Request(cacheKey);
+  //     await cache.put(request, response);
 
-      const newEntry = {
-        name: file.name,
-        url: cacheKey,
-        timestamp: new Date().toISOString(),
-      };
-      const updatedHistory = [newEntry, ...fileHistory];
-      setFileHistory(updatedHistory);
-      localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
-      console.log("File cached successfully and history updated:", updatedHistory);
-    } catch (error) {
-      console.error("Error caching uploaded file:", error);
-    }
-  };
+  //     const newEntry = {
+  //       name: file.name,
+  //       url: cacheKey,
+  //       timestamp: new Date().toISOString(),
+  //     };
+  //     const updatedHistory = [newEntry, ...fileHistory];
+  //     setFileHistory(updatedHistory);
+  //     localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
+  //     console.log("File cached successfully and history updated:", updatedHistory);
+  //   } catch (error) {
+  //     console.error("Error caching uploaded file:", error);
+  //   }
+  // };
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -172,41 +171,44 @@ const FileUpload = () => {
     }
     setLoading(true);
     for (const file of files) {
-      const cid = await uploadToIpfs(file);
-      const message = { type: "file", cid, name: file.name };
-      const cidMessage = JSON.stringify(message);
-      console.log("CID message: ", cidMessage);
+      console.log("Uploading file:", file);
+      sendFile(file);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // const cid = await uploadToIpfs(file);
+      // const message = { type: "file", cid, name: file.name };
+      // const cidMessage = JSON.stringify(message);
+      // console.log("CID message: ", cidMessage);
 
-      sendMessage(cidMessage, "file");
-      updateFileHistory(file, "Sent");
-      await cacheUploadedFile(file); // Cache the uploaded file
+      // sendMessage(cidMessage, "file");
+      // updateFileHistory(file, "Sent");
+      // await cacheUploadedFile(file); // Cache the uploaded file
     }
     setIsSent(true);
     setLoading(false);
   };
 
-  const handleDownload = async (url, name) => {
-    try {
-      const cache = await caches.open('uploaded-files');
-      const cachedResponse = await cache.match(url);
+  // const handleDownload = async (url, name) => {
+  //   try {
+  //     const cache = await caches.open('uploaded-files');
+  //     const cachedResponse = await cache.match(url);
 
-      if (cachedResponse) {
-        const blob = await cachedResponse.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = objectUrl;
-        a.download = name; // Use the provided file name for the download
-        document.body.appendChild(a); // Append the anchor to the body
-        a.click(); // Trigger the download
-        document.body.removeChild(a); // Remove the anchor from the document
-        URL.revokeObjectURL(objectUrl); // Revoke the object URL to free up memory
-      } else {
-        console.error('File not found in cache');
-      }
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    }
-  };
+  //     if (cachedResponse) {
+  //       const blob = await cachedResponse.blob();
+  //       const objectUrl = URL.createObjectURL(blob);
+  //       const a = document.createElement('a');
+  //       a.href = objectUrl;
+  //       a.download = name; // Use the provided file name for the download
+  //       document.body.appendChild(a); // Append the anchor to the body
+  //       a.click(); // Trigger the download
+  //       document.body.removeChild(a); // Remove the anchor from the document
+  //       URL.revokeObjectURL(objectUrl); // Revoke the object URL to free up memory
+  //     } else {
+  //       console.error('File not found in cache');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error downloading file:', error);
+  //   }
+  // };
 
   return (
     <VStack spacing={4} width="100%" maxWidth="600px" mx="auto">
@@ -266,7 +268,7 @@ const FileUpload = () => {
           </Text>
         </VStack>
       )}
-      <Divider />
+      {/* <Divider />
       <Heading size="md" alignSelf="flex-start">
         Sent File History
       </Heading>
@@ -298,7 +300,7 @@ const FileUpload = () => {
             No file history yet.
           </Text>
         )}
-      </Box>
+      </Box> */}
     </VStack>
   );
 };

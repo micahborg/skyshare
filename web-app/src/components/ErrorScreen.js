@@ -20,7 +20,7 @@ const styles = { //style the error and use the correct image
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
-        height: "50vh"
+        height: "40vh"
     },
     gif: {
         width: "400px",
