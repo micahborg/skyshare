@@ -23,8 +23,6 @@ const Home: React.FC = () => {
   return (
     <Box
       p={4}
-      width={theme.views.default.width}
-      height={theme.views.default.height}
       flexDirection="column"
       justifyContent="center" // center the content vertically
       alignItems="center" // center the content horizontally

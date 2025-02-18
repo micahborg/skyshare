@@ -44,7 +44,7 @@ const theme = extendTheme({
     Button: {
       variants: {
         solid: {
-          padding: [7, 7, 8], // breakpoints for button padding (base, md, lg)
+          padding: 5,
           bg: "darkYellow",
           fontSize: ["lg", "xl", "xl"], // breakpoints for button size (base, md, lg)
           color: "white",

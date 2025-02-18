@@ -1,38 +1,32 @@
 import React from 'react';
-import { Box, Textarea, Text, Button, VStack, HStack, Flex } from "@chakra-ui/react";
+import { Box, Textarea, Text, Button, VStack, HStack, Flex, Heading } from "@chakra-ui/react";
 import theme from "../theme";
-import NavBar from "../components/NavBar";
 
 const Notes = () => {
   return (
-    <Flex>
-    <NavBar/>
     <VStack
       spacing={4}
       p={4}
-      width={theme.views.default.width}
-      height={theme.views.default.height}
-      ml={{ base: "80px", md: "120px" }} 
       alignItems="stretch"
+      h="100vh"
     >
       {/* Notes Title */}
-      <Text fontSize="xl" fontWeight="bold" textAlign="center">
+      <Heading fontSize="xl" fontWeight="bold" textAlign="center">
         Notes
-      </Text>
+      </Heading>
 
-      <HStack spacing={4} alignItems="flex-start">
+      <HStack spacing={4} alignItems="flex-start" height="100%">
         {/* Main Notes Section */}
         <VStack
-          flex={2} // Adjusted to be shorter
-          p={6}
+          p={4}
           borderRadius="lg"
           boxShadow="md"
-          backgroundColor={theme.colors.sunnyYellow[500]}
+          backgroundColor="sunnyYellow.100"
           alignItems="stretch"
-          height="320px" // Shorter height
+          h="100%"
         >
           <Textarea
-            height="220px" // Adjusted to fit new size
+            flexGrow={1}
             padding="10px"
             fontSize="16px"
             border="1px solid"
@@ -43,27 +37,25 @@ const Notes = () => {
             placeholder="Write your notes here..."
             resize="none"
           />
-          <HStack width="100%" justifyContent="space-between" pt={2}>
-            <Button colorScheme="darkYellow" flex={1}>Share</Button>
-            <Button colorScheme="darkYellow" flex={1}>Save</Button>
+          <HStack width="100%" justifyContent="space-between">
+            <Button>Share</Button>
+            <Button>Save</Button>
           </HStack>
         </VStack>
 
         {/* Saved Notes Section */}
         <Box
-          flex={2} // Increased width
           height="100%"
-          backgroundColor={theme.colors.sunnyYellow[500]}
+          backgroundColor="sunnyYellow.100"
           borderRadius="lg"
           boxShadow="md"
           p={4}
         >
-          <Text fontSize="lg" fontWeight="bold">Saved Notes</Text>
+          <Text color="black">Saved Notes</Text>
         </Box>
 
       </HStack>
     </VStack>
-    </Flex>
   );
 };
 
