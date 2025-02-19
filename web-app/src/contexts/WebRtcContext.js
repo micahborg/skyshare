@@ -9,6 +9,7 @@ export const WebRtcProvider = ({ children }) => {
   const [pairId, setPairId] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState([]); // Store chat messages
+  const [chats, setChats] = useState([]); // Store chat messages
   const [files, setFiles] = useState([]); // received file blobs
   const pc = useRef(null);
   const dataChannel = useRef(null);
@@ -48,11 +49,18 @@ export const WebRtcProvider = ({ children }) => {
     dataChannel.current.bufferedAmountLowThreshold = 0;
     dataChannel.current.onmessage = (msg) => {
       console.log("Message received on data channel:", msg.data);
-      console.log(typeof msg.data);
       if (typeof msg.data === "string") {
-        setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+        const data = JSON.parse(msg.data);
+        if (!data["size"]) {
+          setChats((prev) => [...prev, { sender: "remote", data: msg.data }]);
+          setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+        } else {
+          onReceiveFile(msg);
+          setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+        }
       } else {
         onReceiveFile(msg);
+        setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
       }
     };
 
@@ -78,11 +86,18 @@ export const WebRtcProvider = ({ children }) => {
       dataChannel.current.bufferedAmountLowThreshold = 0;
       event.channel.onmessage = (msg) => {
         console.log("Message received on data channel:", msg.data);
-        console.log(typeof msg.data);
         if (typeof msg.data === "string") {
-          setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+          const data = JSON.parse(msg.data);
+          if (!data["size"]) {
+            setChats((prev) => [...prev, { sender: "remote", data: msg.data }]);
+            setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+          } else {
+            onReceiveFile(msg);
+            setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+          }
         } else {
           onReceiveFile(msg);
+          setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
         }
       };
       event.channel.onclose = () => {
@@ -133,6 +148,27 @@ export const WebRtcProvider = ({ children }) => {
     await setDoc(callDoc, { offer });
     setPairId(callDoc.id);
     console.log("Pair ID:", callDoc.id);
+
+    // begin try something new ---
+    let candidatesComplete = false;
+
+    // Adding event listener for ICE gathering state change
+    pc.current.onicegatheringstatechange = () => {
+      console.log('iceGatheringState:', pc.current.iceGatheringState);
+      if (pc.current.iceGatheringState === 'complete') {
+        console.log('ICE gathering complete. Sending offer.');
+        candidatesComplete = true;
+      }
+    };
+
+    // Add a timeout to force sending the offer if candidates are not complete
+    setTimeout(() => {
+      if (!candidatesComplete) {
+        console.log('Candidates processing not ended. Ending it...');
+        candidatesComplete = true;
+      }
+    }, 3000); // 3 seconds timeout
+    // end try something new ---
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
@@ -207,6 +243,28 @@ export const WebRtcProvider = ({ children }) => {
 
     await setDoc(callDoc, { answer });
     
+    // begin try something new ---
+    // Use similar logic for ICE gathering state
+    let candidatesComplete = false;
+
+    // Adding event listener for ICE gathering state change
+    pc.current.onicegatheringstatechange = () => {
+      console.log('iceGatheringState:', pc.current.iceGatheringState);
+      if (pc.current.iceGatheringState === 'complete') {
+        console.log('ICE gathering complete.');
+        candidatesComplete = true;
+      }
+    };
+
+    // Add a timeout to force adding ICE candidates if not complete
+    setTimeout(() => {
+      if (!candidatesComplete) {
+        console.log('Candidates processing not ended.');
+        candidatesComplete = true;
+      }
+    }, 3000); // 3 seconds timeout
+    // end try something new ---
+    
     onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
@@ -222,40 +280,47 @@ export const WebRtcProvider = ({ children }) => {
   };
 
   //region File Transfer
-  function sendFile(file) {
-    dataChannel.current.send(
-      JSON.stringify({
-        name: file.name,
-        type: file.type,
-        size: file.size,
-      })
-    )
+  async function sendFile(file) {
+    return new Promise((resolve, reject) => {
+      dataChannel.current.send(
+        JSON.stringify({
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        })
+      )
 
-    let offset = 0;
-    let maxChunkSize = 16384; // 16KB
+      let offset = 0;
+      let maxChunkSize = 16384; // 16KB
 
-    console.log("Sending file:", file.name);
-    console.log(dataChannel.current.bufferedAmountLowThreshold);
+      console.log("Sending file:", file.name);
+      console.log(dataChannel.current.bufferedAmountLowThreshold);
 
-    file.arrayBuffer().then((buffer) => {
-      const send = () => {
-        while (buffer.byteLength) {
-          if (dataChannel.current.bufferedAmount > dataChannel.current.bufferedAmountLowThreshold) {
-            dataChannel.current.onbufferedamountlow = () => {
-              dataChannel.current.onbufferedamountlow = null;
-              send();
-            };
-            return;
-          }
-          const chunk = buffer.slice(0, maxChunkSize);
-          buffer = buffer.slice(maxChunkSize, buffer.byteLength);
-          dataChannel.current.send(chunk);
-          offset += maxChunkSize;
-          console.log("Sent " + offset + " bytes.");
-        } 
-      };
+      file.arrayBuffer().then((buffer) => {
+        const send = () => {
+          while (buffer.byteLength) {
+            if (dataChannel.current.bufferedAmount > dataChannel.current.bufferedAmountLowThreshold) {
+              dataChannel.current.onbufferedamountlow = () => {
+                dataChannel.current.onbufferedamountlow = null;
+                send();
+              };
+              return;
+            }
+            const chunk = buffer.slice(0, maxChunkSize);
+            buffer = buffer.slice(maxChunkSize, buffer.byteLength);
+            dataChannel.current.send(chunk);
+            offset += maxChunkSize;
+            console.log("Sent " + offset + " bytes.");
 
-      send();
+            if (buffer.byteLength === 0) {
+              console.log(`Finished sending ${file.name}`);
+              resolve(); // ✅ Ensure Promise resolves when file sending completes
+            }
+          } 
+        };
+
+        send();
+      });
     });
   }
 
@@ -268,6 +333,8 @@ export const WebRtcProvider = ({ children }) => {
   
     receiveBuffer.push(event.data);
     receivedSize += event.data.byteLength;
+    setMessages([]);
+    console.log("WebRTC messages cleared.");
   
     if (receivedSize === receivedFile["size"]) {
       const blob = new Blob(receiveBuffer, { type: receivedFile["type"] });
@@ -285,6 +352,7 @@ export const WebRtcProvider = ({ children }) => {
   const sendMessage = (message) => {
     try {
         dataChannel.current.send(message);
+        setChats((prev) => [...prev, { sender: "local", data: message }]);
         setMessages((prev) => [...prev, { sender: "local", data: message }]);
     } catch (error) {
         console.error("Error sending message:", error);
@@ -292,7 +360,7 @@ export const WebRtcProvider = ({ children }) => {
   };
 
   return (
-    <WebRtcContext.Provider value={{ beginPair, connectDevice, sendMessage, sendFile, isConnected, pairId, messages, files }}>
+    <WebRtcContext.Provider value={{ beginPair, connectDevice, sendMessage, sendFile, isConnected, pairId, messages, chats, files }}>
       {children}
     </WebRtcContext.Provider>
   );

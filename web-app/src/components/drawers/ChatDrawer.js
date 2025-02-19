@@ -21,18 +21,18 @@ import { useWebRtc } from "@/contexts/WebRtcContext";
 import { useLoading } from "@/contexts/LoadingContext"; // Importing the loading context
 
 const ChatDrawer = ({ isOpen, onClose }) => {
-  const { isConnected, sendMessage, messages } = useWebRtc();
+  const { isConnected, sendMessage, chats } = useWebRtc();
   const { setLoading } = useLoading(); // Loading context
   const [texts, setTexts] = useState([]); // State to store downloadable file objects
   const [message, setMessage] = useState(""); // State to store the message
 
   useEffect(() => {
     const fetchTexts = async () => {
-      if (isOpen && messages.length > 0) {
+      if (isOpen && chats.length > 0) {
         setLoading(true);
         const fetchedTexts = []; // Temporary array to hold the fetched file URLs
         
-        for (const message of messages) {
+        for (const message of chats) {
           console.log("message:", message);
           if (JSON.parse(message.data).type !== "text") continue; // Skip messages that are not files
           const messageSender = message.sender;
@@ -49,7 +49,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
     };
 
     fetchTexts();
-  }, [isOpen, messages, setLoading]);
+  }, [isOpen, chats, setLoading]);
 
   const linkifyText = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g; // regular expression to detect URLs
