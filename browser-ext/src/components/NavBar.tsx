@@ -29,6 +29,10 @@ const NavBar = () => {
         navigate("/chat");
     };
 
+    const goFiles = () => {
+        navigate("/files");
+    };
+
     const goNotes = () => {
         navigate("/notes");
     };
@@ -64,7 +68,7 @@ const NavBar = () => {
                     Notes
                 </Button>
                 <Button
-                    onClick={goHome}
+                    onClick={goFiles}
                 >
                     Files
                 </Button>
