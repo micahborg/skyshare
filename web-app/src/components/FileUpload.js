@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useIpfs } from "@/contexts/IpfsContext";
 import { useLoading } from "@/contexts/LoadingContext";
 import { Box, Text, useToast, VStack, Button, Divider, HStack, Heading } from "@chakra-ui/react";
 import { useWebRtc } from "@/contexts/WebRtcContext";

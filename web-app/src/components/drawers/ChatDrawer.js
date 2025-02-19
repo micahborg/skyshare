@@ -9,6 +9,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   Button,
+  Link,
   VStack,
   Input,
   Box,
@@ -50,6 +51,21 @@ const ChatDrawer = ({ isOpen, onClose }) => {
     fetchTexts();
   }, [isOpen, messages, setLoading]);
 
+  const linkifyText = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // regular expression to detect URLs
+    
+    return text.split(urlRegex).map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <Link key={index} href={part} color="blue.500" isExternal>
+            {part}
+          </Link>
+        );
+      }
+      return part;
+    });
+  };
+
   const handleSend = async () => {
     if (message) {
       console.log("sending message:", message);
@@ -59,7 +75,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+    <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
       <DrawerOverlay />
       <DrawerContent
         bg="skyBlue"
@@ -77,7 +93,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
           <VStack align="start" w="100%" p={4} bg="white" borderRadius="md" minHeight="200px" maxHeight="500px" overflowY="auto">
             {texts.map((msg, index) => (
               <Text color="black" key={index} alignSelf={msg.sender === "local" ? "end" : "start"}>
-                <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {msg.text}
+                <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {linkifyText(msg.text)}
               </Text>
             ))}
           </VStack>

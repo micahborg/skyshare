@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react"; // Importing React and useState
 import { Input, Box, VStack, SimpleGrid, Button, Text, Heading, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue, Divider, HStack } from "@chakra-ui/react"; // Importing different Chakra components
 import { useWebRtc } from "@/contexts/WebRtcContext";
-import { useIpfs } from "@/contexts/IpfsContext";
 import { useLoading } from "@/contexts/LoadingContext"; // Importing the loading context
 import { FaFile, FaFileImage } from 'react-icons/fa'; // Importing file icons
 

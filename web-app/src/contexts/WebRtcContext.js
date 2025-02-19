@@ -29,7 +29,7 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     const app = initializeApp(firebaseConfig);
-    const firestore = getFirestore(app);
+    getFirestore(app);
 
     const servers = {
       iceServers: [
@@ -48,8 +48,12 @@ export const WebRtcProvider = ({ children }) => {
     dataChannel.current.bufferedAmountLowThreshold = 0;
     dataChannel.current.onmessage = (msg) => {
       console.log("Message received on data channel:", msg.data);
-      onReceiveFile(msg);
-      setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+      console.log(typeof msg.data);
+      if (typeof msg.data === "string") {
+        setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+      } else {
+        onReceiveFile(msg);
+      }
     };
 
     dataChannel.current.onopen = () => {
@@ -74,8 +78,12 @@ export const WebRtcProvider = ({ children }) => {
       dataChannel.current.bufferedAmountLowThreshold = 0;
       event.channel.onmessage = (msg) => {
         console.log("Message received on data channel:", msg.data);
-        onReceiveFile(msg);
-        setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+        console.log(typeof msg.data);
+        if (typeof msg.data === "string") {
+          setMessages((prev) => [...prev, { sender: "remote", data: msg.data }]);
+        } else {
+          onReceiveFile(msg);
+        }
       };
       event.channel.onclose = () => {
         console.log("Data channel closed.");
@@ -125,27 +133,6 @@ export const WebRtcProvider = ({ children }) => {
     await setDoc(callDoc, { offer });
     setPairId(callDoc.id);
     console.log("Pair ID:", callDoc.id);
-
-    // begin try something new ---
-    let candidatesComplete = false;
-
-    // Adding event listener for ICE gathering state change
-    pc.current.onicegatheringstatechange = () => {
-      console.log('iceGatheringState:', pc.current.iceGatheringState);
-      if (pc.current.iceGatheringState === 'complete') {
-        console.log('ICE gathering complete. Sending offer.');
-        candidatesComplete = true;
-      }
-    };
-
-    // Add a timeout to force sending the offer if candidates are not complete
-    setTimeout(() => {
-      if (!candidatesComplete) {
-        console.log('Candidates processing not ended. Ending it...');
-        candidatesComplete = true;
-      }
-    }, 3000); // 3 seconds timeout
-    // end try something new ---
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
@@ -219,28 +206,6 @@ export const WebRtcProvider = ({ children }) => {
     };
 
     await setDoc(callDoc, { answer });
-    
-    // begin try something new ---
-    // Use similar logic for ICE gathering state
-    let candidatesComplete = false;
-
-    // Adding event listener for ICE gathering state change
-    pc.current.onicegatheringstatechange = () => {
-      console.log('iceGatheringState:', pc.current.iceGatheringState);
-      if (pc.current.iceGatheringState === 'complete') {
-        console.log('ICE gathering complete.');
-        candidatesComplete = true;
-      }
-    };
-
-    // Add a timeout to force adding ICE candidates if not complete
-    setTimeout(() => {
-      if (!candidatesComplete) {
-        console.log('Candidates processing not ended.');
-        candidatesComplete = true;
-      }
-    }, 3000); // 3 seconds timeout
-    // end try something new ---
     
     onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {

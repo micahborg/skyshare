@@ -4,7 +4,6 @@ Programmers: Brynn Hare
 Date Created: 10/29/2024
 Edit Dates: 11/3; 11/18 (only load on the root and about pages)
 */
-
 "use client";
 import React from "react"; //import the react module
 const Load = () => { //create the load component
