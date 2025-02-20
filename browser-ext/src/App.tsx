@@ -1,7 +1,6 @@
 import React from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Home from "./pages/Home";
+import Pair from "./pages/Pair";
 import Notes from "./pages/Notes";
 import Chat from "./pages/Chat";
 import Files from "./pages/Files";
@@ -18,8 +17,7 @@ function App() {
         <NavBar />
         <Box ml="25vw">
           <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/home" element={<Home />} />
+            <Route path="/" element={<Pair />} />
             <Route path="/notes" element={<Notes />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/files" element={<Files />} />

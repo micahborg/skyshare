@@ -1,39 +1,39 @@
 import React from "react";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text, VStack, Heading, Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import theme from "../theme";
 import { useLoading } from "../contexts/LoadingContext";
-import NavBar from "../components/NavBar";
 
 const Landing = () => {
   const { setIsLoading } = useLoading();
 
   const navigate = useNavigate();
 
-  const goHome = async () => {
+  const goShare = async () => {
     setIsLoading(true);
 
     // simulate a 5-second delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsLoading(false);
-    navigate("/home");
-  };
-
-  const goHome2 = () => {
-    navigate("/home");
-  };
-
-  const goNotes = () => {
-    navigate("/notes");
+    navigate("/files");
   };
 
   return (
-    <Flex>
-      <Text fontSize="sm" color="black" textAlign="center" mb={4}>
+    <VStack
+      spacing={4}
+      p={4}
+      alignItems="stretch"
+      h="100vh"
+    >
+      {/* Notes Title */}
+      <Heading fontSize="xl" fontWeight="bold" textAlign="center">
+        Pair
+      </Heading>
+      <Text fontSize="sm" textAlign="center" mb={4}>
         This is the bare bones skyShare application on the browser extension.
       </Text>
-    </Flex>
+      <Button onClick={goShare}>Share</Button>
+    </VStack>
   );
 };
 

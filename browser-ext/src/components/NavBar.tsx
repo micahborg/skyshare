@@ -7,7 +7,6 @@ Modified Date: 2/16
 "use client";
 import { Image, Flex, Heading, VStack, Link, useBreakpointValue, Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import theme from "../theme";
 import { useLoading } from "../contexts/LoadingContext";
 
 const NavBar = () => {
@@ -15,14 +14,14 @@ const NavBar = () => {
 
     const navigate = useNavigate();
 
-    const goHome = async () => {
+    const goPair = async () => {
         setIsLoading(true);
 
         // simulate a 5-second delay
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         setIsLoading(false);
-        navigate("/home");
+        navigate("/");
     };
 
     const goChat = () => {
@@ -63,6 +62,11 @@ const NavBar = () => {
             {/* Navigation links section */}
             <VStack my={4} spacing={4} align="center" w="100%">
                 <Button
+                    onClick={goPair}
+                >
+                    Pair
+                </Button>
+                <Button
                     onClick={goNotes}
                 >
                     Notes
@@ -77,12 +81,6 @@ const NavBar = () => {
                     onClick={goChat}
                 >
                     Chat
-                </Button>
-
-                <Button
-                    onClick={goHome}
-                >
-                    Pair
                 </Button>
             </VStack>
         </Flex>
