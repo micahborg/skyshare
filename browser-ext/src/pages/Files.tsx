@@ -28,8 +28,8 @@ const Files = () => {
           h="100%"
           width = "47%"
         >
-            <Button width="100%" mb={6} color="black">Upload Files</Button>
-            <Button width="100%" color="black">Share</Button>
+            <Button width="100%" mb={6}>Upload Files</Button>
+            <Button width="100%">Share</Button>
         </VStack>
 
         {/* Saved Notes Section */}
