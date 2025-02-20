@@ -82,7 +82,7 @@ const NavBar = () => {
                 <Button
                     onClick={goHome}
                 >
-                    Share
+                    Pair
                 </Button>
             </VStack>
         </Flex>
