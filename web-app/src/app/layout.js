@@ -3,7 +3,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { WebRtcProvider } from "@/contexts/WebRtcContext";
 import { LoadingProvider } from "@/contexts/LoadingContext";
-import { IpfsProvider } from "@/contexts/IpfsContext";
 import Load from "@/components/LoadComponent";
 import '@/styles/globals.css';
 import theme from "@/styles/theme";
@@ -21,7 +20,6 @@ export default function RootLayout({ children }) {
       <body>
         <ChakraProvider theme={theme}>
         <WebRtcProvider>
-        <IpfsProvider>
         <LoadingProvider>
           <div>
             <Load /> 
@@ -29,7 +27,6 @@ export default function RootLayout({ children }) {
             {children}
           </div>
         </LoadingProvider>
-        </IpfsProvider>
         </WebRtcProvider>
         </ChakraProvider>
       </body>

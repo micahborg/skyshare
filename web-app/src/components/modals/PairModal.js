@@ -1,5 +1,4 @@
 "use client"; // Ensures this component runs on the client side
-
 import { Button, Text, VStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react"; //importing different chakra components
 import { useWebRtc } from "@/contexts/WebRtcContext";
 import { useLoading } from "@/contexts/LoadingContext";

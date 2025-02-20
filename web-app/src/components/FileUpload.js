@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useIpfs } from "@/contexts/IpfsContext";
 import { useLoading } from "@/contexts/LoadingContext";
 import { Box, Text, useToast, VStack, Button, Divider, HStack, Heading } from "@chakra-ui/react";
 import { useWebRtc } from "@/contexts/WebRtcContext";
@@ -172,16 +171,8 @@ const FileUpload = () => {
     setLoading(true);
     for (const file of files) {
       console.log("Uploading file:", file);
-      sendFile(file);
+      await sendFile(file);
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      // const cid = await uploadToIpfs(file);
-      // const message = { type: "file", cid, name: file.name };
-      // const cidMessage = JSON.stringify(message);
-      // console.log("CID message: ", cidMessage);
-
-      // sendMessage(cidMessage, "file");
-      // updateFileHistory(file, "Sent");
-      // await cacheUploadedFile(file); // Cache the uploaded file
     }
     setIsSent(true);
     setLoading(false);

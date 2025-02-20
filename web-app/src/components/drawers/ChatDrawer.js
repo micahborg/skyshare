@@ -9,6 +9,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   Button,
+  Link,
   VStack,
   Input,
   Box,
@@ -20,18 +21,18 @@ import { useWebRtc } from "@/contexts/WebRtcContext";
 import { useLoading } from "@/contexts/LoadingContext"; // Importing the loading context
 
 const ChatDrawer = ({ isOpen, onClose }) => {
-  const { isConnected, sendMessage, messages } = useWebRtc();
+  const { isConnected, sendMessage, chats } = useWebRtc();
   const { setLoading } = useLoading(); // Loading context
   const [texts, setTexts] = useState([]); // State to store downloadable file objects
   const [message, setMessage] = useState(""); // State to store the message
 
   useEffect(() => {
     const fetchTexts = async () => {
-      if (isOpen && messages.length > 0) {
+      if (isOpen && chats.length > 0) {
         setLoading(true);
         const fetchedTexts = []; // Temporary array to hold the fetched file URLs
         
-        for (const message of messages) {
+        for (const message of chats) {
           console.log("message:", message);
           if (JSON.parse(message.data).type !== "text") continue; // Skip messages that are not files
           const messageSender = message.sender;
@@ -48,7 +49,22 @@ const ChatDrawer = ({ isOpen, onClose }) => {
     };
 
     fetchTexts();
-  }, [isOpen, messages, setLoading]);
+  }, [isOpen, chats, setLoading]);
+
+  const linkifyText = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // regular expression to detect URLs
+    
+    return text.split(urlRegex).map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <Link key={index} href={part} color="blue.500" isExternal>
+            {part}
+          </Link>
+        );
+      }
+      return part;
+    });
+  };
 
   const handleSend = async () => {
     if (message) {
@@ -59,7 +75,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+    <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
       <DrawerOverlay />
       <DrawerContent
         bg="skyBlue"
@@ -77,7 +93,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
           <VStack align="start" w="100%" p={4} bg="white" borderRadius="md" minHeight="200px" maxHeight="500px" overflowY="auto">
             {texts.map((msg, index) => (
               <Text color="black" key={index} alignSelf={msg.sender === "local" ? "end" : "start"}>
-                <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {msg.text}
+                <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {linkifyText(msg.text)}
               </Text>
             ))}
           </VStack>
