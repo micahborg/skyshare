@@ -8,12 +8,12 @@ import { LoadingProvider } from "./contexts/LoadingContext";
 import LoadingComponent from "./components/LoadingComponent";
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import NavBar from "./components/NavBar";
-import theme from "./theme"; 
-import "@fontsource/lexend-deca";
+import theme from "./theme"; // Applying our theme to the page
+import "@fontsource/lexend-deca"; // Import the font to use
 
 function App() {
   return (
-    <ChakraProvider theme={theme}> {/* Apply the custom theme */}
+    <ChakraProvider theme={theme}> {/* Apply the theme */}
       <LoadingProvider>
         <Router>
           <LoadingComponent />
