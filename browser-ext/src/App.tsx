@@ -8,7 +8,8 @@ import { LoadingProvider } from "./contexts/LoadingContext";
 import LoadingComponent from "./components/LoadingComponent";
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import NavBar from "./components/NavBar";
-import theme from "./theme"; // Correct import path
+import theme from "./theme"; 
+import "@fontsource/lexend-deca";
 
 function App() {
   return (
