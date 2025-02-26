@@ -6,25 +6,28 @@ import Chat from "./pages/Chat";
 import Files from "./pages/Files";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import LoadingComponent from "./components/LoadingComponent";
-import { Box } from "@chakra-ui/react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
 import NavBar from "./components/NavBar";
+import theme from "./theme"; // Correct import path
 
 function App() {
   return (
-    <LoadingProvider>
-      <Router>
-        <LoadingComponent />
-        <NavBar />
-        <Box ml="25vw">
-          <Routes>
-            <Route path="/" element={<Pair />} />
-            <Route path="/notes" element={<Notes />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/files" element={<Files />} />
-          </Routes>
-        </Box>
-      </Router>
-    </LoadingProvider>
+    <ChakraProvider theme={theme}> {/* Apply the custom theme */}
+      <LoadingProvider>
+        <Router>
+          <LoadingComponent />
+          <NavBar />
+          <Box ml="25vw">
+            <Routes>
+              <Route path="/" element={<Pair />} />
+              <Route path="/notes" element={<Notes />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/files" element={<Files />} />
+            </Routes>
+          </Box>
+        </Router>
+      </LoadingProvider>
+    </ChakraProvider>
   );
 }
 
