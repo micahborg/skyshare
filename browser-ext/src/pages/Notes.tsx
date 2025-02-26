@@ -93,29 +93,15 @@ const Notes: React.FC = () => {
           {savedNotes.length > 0 ? (
             <VStack align="start" spacing={2} overflowY="auto">
               {savedNotes.map((savedNote, index) => (
-                <HStack 
-                  key={index} 
-                  p={2} 
-                  borderBottom="1px solid gray" 
-                  w="100%" 
-                  justifyContent="space-between" 
-                  alignItems="center"
-                >
-                  <Box 
-                    flex="1" 
-                    overflow="hidden" 
-                    whiteSpace="nowrap" 
-                    textOverflow="ellipsis"
+                <HStack key={index} p={2} borderBottom="1px solid gray" w="100%" justifyContent="space-between">
+                  <Text 
+                    color="black" 
+                    cursor="pointer" 
+                    _hover={{ textDecoration: "underline" }} 
+                    onClick={() => loadNote(index)}
                   >
-                    <Text 
-                      color="black" 
-                      cursor="pointer" 
-                      _hover={{ textDecoration: "underline" }} 
-                      onClick={() => loadNote(index)}
-                    >
-                      {savedNote}
-                    </Text>
-                  </Box>
+                    {savedNote.length > 20 ? `${savedNote.substring(0, 20)}...` : savedNote}
+                  </Text>
                   <Button size="xs" colorScheme="red" onClick={() => deleteNote(index)}>Delete</Button>
                 </HStack>
               ))}
