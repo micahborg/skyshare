@@ -4,7 +4,8 @@ import theme from "../theme";
 
 const Notes: React.FC = () => {
   const [note, setNote] = useState<string>("");
-  const [savedNotes, setSavedNotes] = useState<string[]>([]);
+  const [savedNotes, setSavedNotes] = useState<{ note: string, timestamp: string, createdAt: string }[]>([]); // Notes with timestamp and creation time
+  const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
 
   // Load saved notes from localStorage on component mount
   useEffect(() => {
@@ -14,31 +15,72 @@ const Notes: React.FC = () => {
     }
   }, []);
 
+  // Format timestamp to user-friendly format: Month Day, Year, Hour:Minute:Second
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return "Invalid Date"; // Handle invalid date
+    return date.toLocaleString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: true
+    });
+  };
+
   // Handle note input change
   const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNote(event.target.value);
   };
 
-  // Save note to localStorage
+  // Save or update note in localStorage
   const saveNote = () => {
     if (note.trim() === "") return;
-    
-    const updatedNotes = [...savedNotes, note];
-    setSavedNotes(updatedNotes);
-    localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
+
+    const timestamp = new Date().toISOString(); // Current timestamp
+    if (editingIndex !== null) {
+      // Update the existing note
+      const updatedNotes = [...savedNotes];
+      const updatedNote = updatedNotes[editingIndex];
+      updatedNote.note = note; // Update the note content
+      updatedNote.timestamp = timestamp; // Store timestamp as an ISO string
+      setSavedNotes(updatedNotes);
+      localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
+    } else {
+      // Save a new note with a creation timestamp
+      const newNote = { note, timestamp, createdAt: timestamp };
+      const updatedNotes = [...savedNotes, newNote];
+      setSavedNotes(updatedNotes);
+      localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
+    }
+
     setNote(""); // Clear the textarea after saving
+    setEditingIndex(null); // Reset editing state
   };
 
-  // Load a saved note into the textarea
+  // Load a saved note into the textarea and set it for editing
   const loadNote = (index: number) => {
-    setNote(savedNotes[index]);
+    setNote(savedNotes[index].note);
+    setEditingIndex(index); // Set the index for the note being edited
   };
 
   // Delete a saved note
-  const deleteNote = (index: number) => {
-    const updatedNotes = savedNotes.filter((_, i) => i !== index);
+  const deleteNote = () => {
+    if (editingIndex === null) return;
+
+    const updatedNotes = savedNotes.filter((_, i) => i !== editingIndex);
     setSavedNotes(updatedNotes);
     localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
+    setEditingIndex(null); // Reset editing state
+    setNote(""); // Clear the note input
+  };
+
+  // Create a new note (clear the editor)
+  const createNewNote = () => {
+    setNote("");
+    setEditingIndex(null); // Reset editing state
   };
 
   return (
@@ -74,8 +116,9 @@ const Notes: React.FC = () => {
             resize="none"
           />
           <HStack width="100%" justifyContent="space-between" pt={2}>
-            <Button>Share</Button>
+            <Button onClick={createNewNote}>+</Button> {/* Create new note button */}
             <Button onClick={saveNote}>Save</Button>
+            <Button onClick={deleteNote} isDisabled={editingIndex === null}>-</Button> {/* Delete current note button */}
           </HStack>
         </VStack>
 
@@ -100,9 +143,8 @@ const Notes: React.FC = () => {
                     _hover={{ textDecoration: "underline" }} 
                     onClick={() => loadNote(index)}
                   >
-                    {savedNote.length > 20 ? `${savedNote.substring(0, 20)}...` : savedNote}
+                    {formatTimestamp(savedNote.timestamp)} {/* Display formatted timestamp */}
                   </Text>
-                  <Button size="xs" colorScheme="red" onClick={() => deleteNote(index)}>Delete</Button>
                 </HStack>
               ))}
             </VStack>
