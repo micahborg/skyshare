@@ -4,7 +4,7 @@ import theme from "../theme";
 
 const Notes: React.FC = () => {
   const [note, setNote] = useState<string>("");
-  const [savedNotes, setSavedNotes] = useState<{ note: string, timestamp: string, createdAt: string }[]>([]); // Notes with timestamp and creation time
+  const [savedNotes, setSavedNotes] = useState<{ note: string, timestamp: string, createdAt: string }[]>([]); // Add time stamp of creation
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
 
   // Load saved notes from localStorage on component mount
@@ -15,17 +15,17 @@ const Notes: React.FC = () => {
     }
   }, []);
 
-  // Format timestamp to user-friendly format: Month Day, Year, Hour:Minute:Second
+  // Time stamp note will be stored as: Month Day, Year, Hour:Minute:Second
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
-    if (isNaN(date.getTime())) return "Invalid Date"; // Handle invalid date
+    if (isNaN(date.getTime())) return "Invalid Date"; // Handling invalid date
     return date.toLocaleString("en-US", {
-      month: "long",
+      month: "short",
       day: "numeric",
       year: "numeric",
       hour: "numeric",
       minute: "numeric",
-      second: "numeric",
+      second: "numeric", 
       hour12: true
     });
   };
@@ -39,17 +39,18 @@ const Notes: React.FC = () => {
   const saveNote = () => {
     if (note.trim() === "") return;
 
-    const timestamp = new Date().toISOString(); // Current timestamp
-    if (editingIndex !== null) {
+    const timestamp = new Date().toISOString(); // Current time stamp
+    // Checking if note is being edited vs. being created for the first time
+    if (editingIndex !== null) { 
       // Update the existing note
       const updatedNotes = [...savedNotes];
       const updatedNote = updatedNotes[editingIndex];
       updatedNote.note = note; // Update the note content
-      updatedNote.timestamp = timestamp; // Store timestamp as an ISO string
+      updatedNote.timestamp = timestamp; // Store the time stamp
       setSavedNotes(updatedNotes);
       localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
     } else {
-      // Save a new note with a creation timestamp
+      // Save a new note with time stamp of creation
       const newNote = { note, timestamp, createdAt: timestamp };
       const updatedNotes = [...savedNotes, newNote];
       setSavedNotes(updatedNotes);
@@ -60,7 +61,7 @@ const Notes: React.FC = () => {
     setEditingIndex(null); // Reset editing state
   };
 
-  // Load a saved note into the textarea and set it for editing
+  // Loading a saved note and setting it to be edited
   const loadNote = (index: number) => {
     setNote(savedNotes[index].note);
     setEditingIndex(index); // Set the index for the note being edited
@@ -77,7 +78,7 @@ const Notes: React.FC = () => {
     setNote(""); // Clear the note input
   };
 
-  // Create a new note (clear the editor)
+  // Creating a new note (clear the editor)
   const createNewNote = () => {
     setNote("");
     setEditingIndex(null); // Reset editing state
@@ -138,10 +139,11 @@ const Notes: React.FC = () => {
               {savedNotes.map((savedNote, index) => (
                 <HStack key={index} p={2} borderBottom="1px solid gray" w="100%" justifyContent="space-between">
                   <Text 
-                    color="black" 
                     cursor="pointer" 
                     _hover={{ textDecoration: "underline" }} 
                     onClick={() => loadNote(index)}
+                    fontSize="sm" 
+                    color="gray.600" 
                   >
                     {formatTimestamp(savedNote.timestamp)} {/* Display formatted timestamp */}
                   </Text>
