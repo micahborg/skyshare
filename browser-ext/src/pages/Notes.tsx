@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Box, Textarea, Text, Button, VStack, HStack, Heading } from "@chakra-ui/react";
 import theme from "../theme";
@@ -15,20 +16,38 @@ const Notes: React.FC = () => {
     }
   }, []);
 
-  // Time stamp note will be stored as: Month Day, Year, Hour:Minute:Second
+  // // Time stamp note will be stored as: Month Day, Year, Hour:Minute:Second
+  // const formatTimestamp = (timestamp: string) => {
+  //   const date = new Date(timestamp);
+  //   if (isNaN(date.getTime())) return "Invalid Date"; // Handling invalid date
+  //   return date.toLocaleString("en-US", {
+  //     month: "short",
+  //     day: "numeric",
+  //     year: "numeric",
+  //     hour: "numeric",
+  //     minute: "numeric",
+  //     second: "numeric", 
+  //     hour12: true
+  //   });
+  // };
+  // Time stamp note will be stored as: Month/Day/Year Hour:Minute AM/PM
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
-    if (isNaN(date.getTime())) return "Invalid Date"; // Handling invalid date
-    return date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric", 
-      hour12: true
-    });
+    if (isNaN(date.getTime())) return "Invalid Date";
+  
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const yy = String(date.getFullYear()).slice(-2);
+  
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+  
+    return `${mm}/${dd}/${yy} ${hours}:${minutes} ${ampm}`;
   };
+  
 
   // Handle note input change
   const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -40,6 +59,7 @@ const Notes: React.FC = () => {
     if (note.trim() === "") return;
 
     const timestamp = new Date().toISOString(); // Current time stamp
+    console.log("Timestamp:", timestamp);
     // Checking if note is being edited vs. being created for the first time
     if (editingIndex !== null) { 
       // Update the existing note
@@ -85,7 +105,7 @@ const Notes: React.FC = () => {
   };
 
   return (
-    <VStack spacing={4} p={4} alignItems="stretch" h="100vh">
+    <VStack spacing={4} p={4} h="100vh">
       {/* Notes Title */}
       <Heading fontSize="xl" fontWeight="bold" textAlign="center">
         Notes
@@ -107,7 +127,7 @@ const Notes: React.FC = () => {
             onChange={handleNoteChange}
             flexGrow={1}
             padding="10px"
-            fontSize="16px"
+            fontSize="md"
             border="1px solid"
             borderColor={theme.border}
             borderRadius="5px"
@@ -126,7 +146,9 @@ const Notes: React.FC = () => {
         {/* Saved Notes Section */}
         <Box
           height="100%"
+          maxHeight="78vh"
           backgroundColor="sunnyYellow.100"
+          flex={1} 
           borderRadius="lg"
           boxShadow="md"
           p={4}
@@ -135,7 +157,7 @@ const Notes: React.FC = () => {
         >
           <Text fontWeight="bold" mb={2} color="black">Saved Notes</Text>
           {savedNotes.length > 0 ? (
-            <VStack align="start" spacing={2} overflowY="auto">
+            <VStack flex={1} align="start" id="saved-notes" spacing={2} overflowY="auto">
               {savedNotes.map((savedNote, index) => (
                 <HStack key={index} p={2} borderBottom="1px solid gray" w="100%" justifyContent="space-between">
                   <Text 

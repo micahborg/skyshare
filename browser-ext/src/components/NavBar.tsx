@@ -15,12 +15,6 @@ const NavBar = () => {
     const navigate = useNavigate();
 
     const goPair = async () => {
-        setIsLoading(true);
-
-        // simulate a 5-second delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        setIsLoading(false);
         navigate("/");
     };
 

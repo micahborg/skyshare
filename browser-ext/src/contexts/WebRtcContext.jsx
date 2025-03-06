@@ -1,6 +1,8 @@
+"use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { initializeApp } from "firebase/app";
+//import { initializeApp } from "firebase/app";
 import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, getDoc } from "firebase/firestore";
+import { app } from '../lib/connectionDetails';
 
 const WebRtcContext = createContext();
 
@@ -19,16 +21,7 @@ export const WebRtcProvider = ({ children }) => {
   let receivedSize = 0;
 
   useEffect(() => {
-    const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    };
-
-    const app = initializeApp(firebaseConfig);
+    console.log("Initializing WebRTC connection...");
     getFirestore(app);
 
     const servers = {
@@ -124,7 +117,12 @@ export const WebRtcProvider = ({ children }) => {
 
   const beginPair = async () => {
     console.log("Creating stream...");
-    const firestore = getFirestore();
+    if (!pc.current) {
+      console.error("PeerConnection has not been initialized yet.");
+      return;
+    }
+    
+    const firestore = getFirestore(app);
     const callDoc = doc(collection(firestore, "calls"));
     const offerCandidates = collection(callDoc, "offerCandidates");
     const answerCandidates = collection(callDoc, "answerCandidates");
@@ -194,6 +192,12 @@ export const WebRtcProvider = ({ children }) => {
         console.error("Invalid pairId provided.");
         return;
     }
+    if (!pc.current) {
+      console.error("PeerConnection has not been initialized yet.");
+      return;
+    }
+
+    
     const firestore = getFirestore();
     const callDoc = doc(firestore, "calls", pairId);
 

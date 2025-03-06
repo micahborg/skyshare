@@ -1,4 +1,5 @@
-import React from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Textarea, 
@@ -10,15 +11,65 @@ import {
   Heading,
   Alert,
   AlertIcon,
-  Input
+  Input,
+  Link
 } from "@chakra-ui/react";
-import theme from "../theme";
+import { useWebRtc } from "../contexts/WebRtcContext";
+import { useLoading } from "../contexts/LoadingContext";
 
 const Notes = () => {
-  const isConnected = true;
-  const [message, setMessage] = React.useState("");
-  const [texts, setTexts] = React.useState([ { sender: "local", text: "Hello!" }, { sender: "remote", text: "Hi!" }, { sender: "remote", text: "rthfhfh" }, { sender: "remote", text: "fgrth64ghfbgfb" }, { sender: "local", text: "oh no..." }, { sender: "local", text: "dvgggggggg" } ]);
-  //const [texts, setTexts] = React.useState([ { sender: "local", text: "Hello!" }, { sender: "remote", text: "Hi!" } ]);
+  const { isConnected, sendMessage, chats } = useWebRtc();
+  const { setIsLoading } = useLoading();
+  const [texts, setTexts] = useState<{ sender: string; text: string }[]>([]); // State to store downloadable file objects
+  const [message, setMessage] = useState(""); // State to store the message
+
+  useEffect(() => {
+    const fetchTexts = async () => {
+      if (chats.length > 0) {
+        setIsLoading(true);
+        const fetchedTexts = []; // Temporary array to hold the fetched file URLs
+        
+        for (const message of chats) {
+          console.log("message:", message);
+          if (JSON.parse(message.data).type !== "text") continue; // Skip messages that are not files
+          const messageSender = message.sender;
+          const messageText = JSON.parse(message.data).text;
+          fetchedTexts.push({sender: messageSender, text: messageText});
+        }
+
+        setTexts(fetchedTexts); // Set the state with the fetched file URLs
+        setIsLoading(false);
+      } else {
+        console.log("no texts");
+        setTexts([]); // Clear files if no messages
+      }
+    };
+
+    fetchTexts();
+  }, [chats, setIsLoading]);
+
+  const handleSend = async () => {
+    if (message) {
+      console.log("sending message:", message);
+      sendMessage(JSON.stringify({ type: "text", text: message }));
+      setMessage("");
+    }
+  };
+
+  const linkifyText = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // regular expression to detect URLs
+    
+    return text.split(urlRegex).map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <Link key={index} href={part} color="blue.500" isExternal>
+            {part}
+          </Link>
+        );
+      }
+      return part;
+    });
+  };
 
   return (
     <VStack
@@ -40,7 +91,7 @@ const Notes = () => {
           <VStack flex={1} overflowY="auto" id="chatbox" align="start" w="100%" p={4} bg="white" borderRadius="md">
             {texts.map((msg, index) => (
               <Text color="black" key={index} alignSelf={msg.sender === "local" ? "end" : "start"}>
-                <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {msg.text}
+                <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {linkifyText(msg.text)}
               </Text>
             ))}
           </VStack>
@@ -50,7 +101,7 @@ const Notes = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <Button disabled={!message}>Send</Button>
+            <Button onClick={handleSend} disabled={!message}>Send</Button>
           </HStack>
         </VStack>
         ) : (
