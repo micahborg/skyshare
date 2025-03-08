@@ -31,7 +31,7 @@ const PairBox = () => {
     return (
         <Box>
             {pairId ? (
-                <><QRCodeGenerator data={JSON.stringify({ pairId })} /><Text>Pair ID: {pairId}</Text></>
+                <><QRCodeGenerator data={JSON.stringify({ pairId })} /><Text textColor="black">Pair ID: {pairId}</Text></>
             ) : (
                 <Spinner
                     thickness='4px'

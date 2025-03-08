@@ -45,7 +45,7 @@ const Notes: React.FC = () => {
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
   
-    return `${mm}/${dd}/${yy} ${hours}:${minutes} ${ampm}`;
+    return `${mm}/${dd}/${yy} ${hours}:${minutes}${ampm}`;
   };
   
 
@@ -120,6 +120,7 @@ const Notes: React.FC = () => {
           backgroundColor="sunnyYellow.100"
           alignItems="stretch"
           h="100%"
+          w="30%"
           flex={2}
         >
           <Textarea
@@ -152,7 +153,7 @@ const Notes: React.FC = () => {
           borderRadius="lg"
           boxShadow="md"
           p={4}
-          w="40%"
+          w="45%"
           overflowY="auto"
         >
           <Text fontWeight="bold" mb={2} color="black">Saved Notes</Text>

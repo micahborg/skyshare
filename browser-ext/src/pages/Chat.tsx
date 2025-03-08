@@ -56,6 +56,11 @@ const Notes = () => {
     }
   };
 
+  const handleRightClick = (e: { preventDefault: () => void; }) => {
+    e.preventDefault(); // prevent the default context menu
+    handleSend();
+  };
+
   const linkifyText = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g; // regular expression to detect URLs
     
@@ -100,6 +105,7 @@ const Notes = () => {
               placeholder="Type a message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onContextMenu={handleRightClick} // doesn't work
             />
             <Button onClick={handleSend} disabled={!message}>Send</Button>
           </HStack>
