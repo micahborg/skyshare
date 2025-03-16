@@ -32,7 +32,7 @@ const PairBox = () => {
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center">
             {pairId ? (
                 <>
-                    <Box mb={4} display="flex" justifyContent="center">
+                    <Box display="flex" justifyContent="center">
                         <QRCodeGenerator data={JSON.stringify({ pairId })} />
                     </Box>
                     <Text textColor="black" mt={4}>Pair ID: {pairId}</Text>
