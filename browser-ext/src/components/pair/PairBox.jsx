@@ -29,16 +29,21 @@ const PairBox = () => {
     }, [pairId]);
 
     return (
-        <Box>
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center">
             {pairId ? (
-                <><QRCodeGenerator data={JSON.stringify({ pairId })} /><Text textColor="black">Pair ID: {pairId}</Text></>
+                <>
+                    <Box mb={4} display="flex" justifyContent="center">
+                        <QRCodeGenerator data={JSON.stringify({ pairId })} />
+                    </Box>
+                    <Text textColor="black" mt={4}>Pair ID: {pairId}</Text>
+                </>
             ) : (
                 <Spinner
-                    thickness='4px'
-                    speed='0.65s'
-                    emptyColor='gray.200'
-                    color='skyBlue'
-                    size='xl'
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="skyBlue"
+                    size="xl"
                 />
             )}
         </Box>
