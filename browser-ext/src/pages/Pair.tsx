@@ -17,7 +17,7 @@ const Landing = () => {
 
   return (
     <VStack
-      spacing={4}
+      spacing={0}
       p={4}
       alignItems="stretch"
       h="100vh"
@@ -26,7 +26,7 @@ const Landing = () => {
       <Heading fontSize="xl" fontWeight="bold" textAlign="center" mb={6}>
         Pair
       </Heading>
-      <Box bg="sunnyYellow.100" p={4} borderRadius="lg" boxShadow="md" w="100%" h="100%">
+      <Box bg="sunnyYellow.100" p={4} borderRadius="lg" boxShadow="md" w="100%" h="70vh">
         <HStack w="100%" h="100%" justifyContent="space-between" alignItems="center">
           {/* Left Section (QR Code and Pair ID) */}
           <Box w="50%" display="flex" justifyContent="center" alignItems="center">
