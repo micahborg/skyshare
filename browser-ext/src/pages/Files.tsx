@@ -88,8 +88,6 @@ const Files = () => {
             <Text color="black">No received files yet.</Text>
           </VStack>
         </Box>
-
-
       </HStack>
     </VStack>
   );

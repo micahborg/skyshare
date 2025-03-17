@@ -2,11 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Textarea, Text, Button, VStack, HStack, Heading } from "@chakra-ui/react";
 import theme from "../theme";
+import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to match your project structure
 
 const Notes: React.FC = () => {
   const [note, setNote] = useState<string>("");
   const [savedNotes, setSavedNotes] = useState<{ note: string, timestamp: string, createdAt: string }[]>([]); // Add time stamp of creation
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
+  const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
+
 
   // Load saved notes from localStorage on component mount
   useEffect(() => {
@@ -104,6 +107,12 @@ const Notes: React.FC = () => {
     setEditingIndex(null); // Reset editing state
   };
 
+  const shareNote = () => {
+    if (isConnected) {
+      sendMessage(note); // Send the note to the paired device
+    }
+  };
+
   return (
     <VStack spacing={4} p={4} h="100vh">
       {/* Notes Title */}
@@ -138,7 +147,7 @@ const Notes: React.FC = () => {
             resize="none"
           />
           <HStack width="100%" justifyContent="space-between" pt={2}>
-            <Button onClick={createNewNote}>+</Button> {/* Create new note button */}
+            <Button onClick={shareNote}>+</Button> {/* Create new note button */}
             <Button onClick={saveNote}>Save</Button>
             <Button onClick={deleteNote} isDisabled={editingIndex === null}>-</Button> {/* Delete current note button */}
           </HStack>
