@@ -109,7 +109,10 @@ const Notes: React.FC = () => {
 
   const shareNote = () => {
     if (isConnected) {
-      sendMessage(note); // Send the note to the paired device
+      const noteFile = new Blob([note], { type: 'text/plain' });
+      const fileName = `note-${new Date().toISOString()}.txt`;
+      const file = new File([noteFile], fileName, { type: 'text/plain' });
+      sendFile(file); // Send the note file to the paired device
     }
   };
 
