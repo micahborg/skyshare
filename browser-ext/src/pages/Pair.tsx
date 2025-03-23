@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { Box, VStack, HStack, Heading, Button } from "@chakra-ui/react";
+import React, { useRef, useState } from "react";
+import { Box, VStack, HStack, Heading, Button, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useLoading } from "../contexts/LoadingContext";
 import { useWebRtc } from "../contexts/WebRtcContext";
@@ -8,39 +8,74 @@ import PairBox from "../components/pair/PairBox.jsx";
 
 const Landing = () => {
   const { setIsLoading } = useLoading();
-  const { isConnected } = useWebRtc();
+  const { isConnected, sendFile } = useWebRtc();
   const navigate = useNavigate();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const goShare = async () => {
-    navigate("/files");
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleShareFile = () => {
+    if (selectedFile && isConnected) {
+      sendFile(selectedFile);
+
+      const sharedItems = JSON.parse(localStorage.getItem("sharedItems") || "[]");
+      const newSharedItems = [...sharedItems, selectedFile.name];
+      localStorage.setItem("sharedItems", JSON.stringify(newSharedItems));
+    } else {
+      alert("Please select a file and ensure you are connected.");
+    }
+  };
+
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click(); // Triggers the hidden file input
   };
 
   return (
-    <VStack
-      spacing={0}
-      p={4}
-      alignItems="stretch"
-      h="100vh"
-    >
-      {/* Notes Title */}
-      <Heading fontSize="xl" fontWeight="bold" textAlign="center" mb={6}>
+    <VStack spacing={4} p={4} alignItems="stretch" h="100vh">
+      <Heading fontSize="xl" fontWeight="bold" textAlign="center" mb={4}>
         Pair
       </Heading>
+
       <Box bg="sunnyYellow.100" p={4} borderRadius="lg" boxShadow="md" w="100%" h="70vh">
         <HStack w="100%" h="100%" justifyContent="space-between" alignItems="center">
-          {/* Left Section (QR Code and Pair ID) */}
           <Box w="50%" display="flex" justifyContent="center" alignItems="center">
             <PairBox />
           </Box>
 
-          {/* Right Section (Share and Not Connected buttons) */}
-          <VStack w="50%" spacing={6} alignItems="center" justify="center">
-            <Button onClick={goShare}>Share</Button>
+          <VStack w="50%" spacing={3} alignItems="center" justify="center">
             <Button
+              size="sm"
               bg={isConnected ? "green.500" : "gray.500"}
               _hover={{ bg: isConnected ? "green.600" : "gray.600", cursor: "help" }}
             >
               {isConnected ? "Connected" : "Not Connected"}
+            </Button>
+
+            {/* Custom button to trigger file picker */}
+            <Button size="xs" onClick={handleFileButtonClick}>
+              Select File
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+
+            {/* Show selected file name if exists */}
+            {selectedFile && (
+              <Text fontSize="sm" color="gray.700">
+                Selected: {selectedFile.name}
+              </Text>
+            )}
+
+            <Button size="xs" onClick={handleShareFile}>
+              Share
             </Button>
           </VStack>
         </HStack>
