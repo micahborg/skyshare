@@ -30,6 +30,10 @@ const NavBar = () => {
         navigate("/notes");
     };
 
+    const goGame = () => {
+        navigate("/game"); // Navigates to the Giraffe Game page
+    };
+
     return (
         <Flex
             p={4}
@@ -47,6 +51,8 @@ const NavBar = () => {
                 align="center" // Align them properly
                 justify="center"// "flex-start" // Push them towards the left
                 w="100%" // Ensure it spans the full width of the navbar
+                onClick={goGame} // Use skyShare logo to navigate to the game
+                cursor="pointer" // Add pointer cursor indicating it's clickable
             >
                 <Heading fontSize="xs" whiteSpace="nowrap">skyShare</Heading>
                 <Image boxSize="20px" src="/images/giraffetransparent.png" alt="skyShare logo" />

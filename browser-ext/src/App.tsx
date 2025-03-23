@@ -11,6 +11,7 @@ import LoadingComponent from "./components/LoadingComponent";
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import NavBar from "./components/NavBar";
 import theme from "./theme"; // Applying our theme to the page
+import GiraffeGame from './components/GiraffeGame';
 // import "@fontsource/lexend-deca"; // Import the font to use
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
               <Route path="/notes" element={<Notes />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/files" element={<Files />} />
+              <Route path="/game" element={<GiraffeGame />} />
             </Routes>
           </Box>
         </Router>
