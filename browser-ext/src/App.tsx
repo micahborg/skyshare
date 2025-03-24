@@ -12,6 +12,7 @@ import { Box, ChakraProvider } from "@chakra-ui/react";
 import NavBar from "./components/NavBar";
 import theme from "./theme"; // Applying our theme to the page
 import GiraffeGame from './components/GiraffeGame';
+import Connected from "./components/Connected";
 // import "@fontsource/lexend-deca"; // Import the font to use
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Router>
           <LoadingComponent />
           <NavBar />
+          <Connected />
           <Box ml="25vw">
             <Routes>
               <Route path="/" element={<Pair />} />
