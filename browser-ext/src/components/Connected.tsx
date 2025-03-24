@@ -18,12 +18,14 @@ const Paired = () => {
     return (
         <Box 
             position="fixed"
-            top="1rem"  // Keeps some padding from the top edge
-            right="1rem" // Keeps some padding from the right edge
+            top="0.5rem"  // Keeps some padding from the top edge
+            right="0.5rem" // Keeps some padding from the right edge
             zIndex="1000" // Ensures it stays on top of other elements
         >
             <Button
-              size="sm"
+              size="xs" // Smallest predefined button size
+              fontSize="0.7rem" // Makes text smaller
+              p="0.3rem 0.5rem" // Reduces padding for a compact button
               bg={isConnected ? "green.500" : "gray.500"}
               _hover={{ bg: isConnected ? "green.600" : "gray.600", cursor: "help" }}
             >
