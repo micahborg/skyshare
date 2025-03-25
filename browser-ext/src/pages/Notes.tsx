@@ -7,6 +7,7 @@ import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to mat
 const Notes: React.FC = () => {
   const [note, setNote] = useState<string>("");
   const [customName, setCustomName] = useState<string>("");
+  // const [searchTerm, setSearchTerm] = useState<string>(""); //Potential added feature to search for a note
   const [savedNotes, setSavedNotes] = useState<{ name: string, note: string, timestamp: string, createdAt: string }[]>([]); // Add time stamp of creation
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
   const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
@@ -51,7 +52,11 @@ const Notes: React.FC = () => {
   
     return `${mm}/${dd}/${yy} ${hours}:${minutes}${ampm}`;
   };
-  
+  //Potential added feature to search for notes
+  // const filteredNotes = savedNotes.filter(note =>
+  //   note.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
+
 
   // Handle note input change
   const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
