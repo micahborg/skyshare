@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Box, Textarea, Text, Button, VStack, HStack, Heading } from "@chakra-ui/react";
+import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input } from "@chakra-ui/react";
 import theme from "../theme";
 import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to match your project structure
 
 const Notes: React.FC = () => {
   const [note, setNote] = useState<string>("");
-  const [savedNotes, setSavedNotes] = useState<{ note: string, timestamp: string, createdAt: string }[]>([]); // Add time stamp of creation
+  const [customName, setCustomName] = useState<string>("");
+  const [savedNotes, setSavedNotes] = useState<{ name: string, note: string, timestamp: string, createdAt: string }[]>([]); // Add time stamp of creation
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
   const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
 
@@ -57,6 +58,10 @@ const Notes: React.FC = () => {
     setNote(event.target.value);
   };
 
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomName(event.target.value);
+  };
+
   // Save or update note in localStorage
   const saveNote = () => {
     if (note.trim() === "") return;
@@ -74,19 +79,27 @@ const Notes: React.FC = () => {
       localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
     } else {
       // Save a new note with time stamp of creation
-      const newNote = { note, timestamp, createdAt: timestamp };
-      const updatedNotes = [...savedNotes, newNote];
+      let name
+      if (customName.trim() != "") {
+        name = customName;
+      } else{
+        name = `${formatTimestamp(timestamp)}`;
+      }
+      const newNote = { name, note, timestamp, createdAt: timestamp };
+      const updatedNotes = [newNote, ...savedNotes];
       setSavedNotes(updatedNotes);
       localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
     }
 
     setNote(""); // Clear the textarea after saving
+    setCustomName(""); //clear the title spot after saving
     setEditingIndex(null); // Reset editing state
   };
 
   // Loading a saved note and setting it to be edited
   const loadNote = (index: number) => {
     setNote(savedNotes[index].note);
+    setCustomName(savedNotes[index].name);
     setEditingIndex(index); // Set the index for the note being edited
   };
 
@@ -135,6 +148,15 @@ const Notes: React.FC = () => {
           w="30%"
           flex={2}
         >
+          <Input
+            value={customName}
+            onChange={handleNameChange}
+            placeholder="Optional Note Title"
+            color="black"
+            size='sm'
+            mb={2}
+            borderColor="gray.400"
+          />
           <Textarea
             value={note}
             onChange={handleNoteChange}
@@ -180,7 +202,7 @@ const Notes: React.FC = () => {
                     fontSize="sm" 
                     color="gray.600" 
                   >
-                    {formatTimestamp(savedNote.timestamp)} {/* Display formatted timestamp */}
+                    {savedNote.name} 
                   </Text>
                 </HStack>
               ))}
