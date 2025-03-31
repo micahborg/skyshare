@@ -12,29 +12,20 @@ const Notes: React.FC = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
   const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
 
-
   // Load saved notes from localStorage on component mount
   useEffect(() => {
-    const storedNotes = localStorage.getItem("savedNotes");
-    if (storedNotes) {
-      setSavedNotes(JSON.parse(storedNotes));
-    }
+    const saved = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+    const now = Date.now();
+    const expirationThreshold = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+  
+    const filtered = saved.filter((note: any) => {
+      return now - new Date(note.createdAt).getTime() < expirationThreshold;
+    });
+  
+    setSavedNotes(filtered);
+    localStorage.setItem("savedNotes", JSON.stringify(filtered));
   }, []);
 
-  // // Time stamp note will be stored as: Month Day, Year, Hour:Minute:Second
-  // const formatTimestamp = (timestamp: string) => {
-  //   const date = new Date(timestamp);
-  //   if (isNaN(date.getTime())) return "Invalid Date"; // Handling invalid date
-  //   return date.toLocaleString("en-US", {
-  //     month: "short",
-  //     day: "numeric",
-  //     year: "numeric",
-  //     hour: "numeric",
-  //     minute: "numeric",
-  //     second: "numeric", 
-  //     hour12: true
-  //   });
-  // };
   // Time stamp note will be stored as: Month/Day/Year Hour:Minute AM/PM
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
