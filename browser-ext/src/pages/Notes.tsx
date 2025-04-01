@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input } from "@chakra-ui/react";
+import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input, Flex, Image } from "@chakra-ui/react";
 import theme from "../theme";
 import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to match your project structure
 
@@ -108,6 +108,7 @@ const Notes: React.FC = () => {
     localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
     setEditingIndex(null); // Reset editing state
     setNote(""); // Clear the note input
+    setCustomName(""); //clear the title spot after saving
   };
 
   // Creating a new note (clear the editor)
@@ -186,7 +187,10 @@ const Notes: React.FC = () => {
           w="45%"
           overflowY="auto"
         >
-          <Text fontWeight="bold" mb={2} color="black">Saved Notes</Text>
+          <Flex>
+          <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Saved Notes</Text>
+          <Image ml="4px" boxSize="12px" src="/images/magnify_glass.png" alt="magnifying glass" />
+          </Flex>
           {savedNotes.length > 0 ? (
             <VStack flex={1} align="start" id="saved-notes" spacing={2} overflowY="auto">
               {savedNotes.map((savedNote, index) => (
