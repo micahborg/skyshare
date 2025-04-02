@@ -48,16 +48,11 @@ const Landing = () => {
           </Box>
 
           <VStack w="50%" spacing={3} alignItems="center" justify="center">
-            <Button
-              size="sm"
-              bg={isConnected ? "green.500" : "gray.500"}
-              _hover={{ bg: isConnected ? "green.600" : "gray.600", cursor: "help" }}
-            >
-              {isConnected ? "Connected" : "Not Connected"}
-            </Button>
-
             {/* Custom button to trigger file picker */}
-            <Button size="xs" onClick={handleFileButtonClick}>
+            <Button
+              size="xs"
+              onClick={handleFileButtonClick}
+            >
               Select File
             </Button>
             <input
@@ -74,7 +69,12 @@ const Landing = () => {
               </Text>
             )}
 
-            <Button size="xs" onClick={handleShareFile}>
+            <Button 
+              size="xs" 
+              onClick={handleShareFile}
+              disabled={!isConnected}
+              title="You must be connected to enable file sharing"
+            >
               Share
             </Button>
           </VStack>

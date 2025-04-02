@@ -76,7 +76,7 @@ const Notes: React.FC = () => {
     } else {
       // Save a new note with time stamp of creation
       let name
-      if (customName.trim() != "") {
+      if (customName.trim() !== "") {
         name = customName;
       } else{
         name = `${formatTimestamp(timestamp)}`;
@@ -133,7 +133,7 @@ const Notes: React.FC = () => {
         Notes
       </Heading>
 
-      <HStack spacing={4} alignItems="flex-start" height="100%">
+      <HStack spacing={4} alignItems="stretch" justifyContent="space-between" maxW="100%" height="100%">
         {/* Main Notes Section */}
         <VStack
           p={4}
@@ -142,18 +142,22 @@ const Notes: React.FC = () => {
           backgroundColor="sunnyYellow.100"
           alignItems="stretch"
           h="100%"
-          w="30%"
+          w="60%"
+          maxW="60%"
           flex={2}
         >
-          <Input
-            value={customName}
-            onChange={handleNameChange}
-            placeholder="Optional Note Title"
-            color="black"
-            size='sm'
-            mb={2}
-            borderColor="gray.400"
-          />
+          <HStack>
+            <Input
+              value={customName}
+              onChange={handleNameChange}
+              placeholder="Optional Title"
+              color="black"
+              size='sm'
+              mb={2}
+              borderColor="gray.400"
+            />
+            <Button onClick={createNewNote} size='xs'>Share</Button>
+          </HStack>
           <Textarea
             value={note}
             onChange={handleNoteChange}
@@ -184,7 +188,8 @@ const Notes: React.FC = () => {
           borderRadius="lg"
           boxShadow="md"
           p={4}
-          w="45%"
+          w="35"
+          maxW="35%"
           overflowY="auto"
         >
           <Flex>

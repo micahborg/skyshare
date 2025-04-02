@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from 'react';
 import { Box, Text, Button, VStack, HStack, Heading, Input } from "@chakra-ui/react";
-import theme from "../theme";
+import { useWebRtc } from '../contexts/WebRtcContext'; 
 
 const Files = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const { isConnected } = useWebRtc(); // Use the WebRTC hook
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -55,7 +56,13 @@ const Files = () => {
           >
             Upload Files
           </Button>
-          <Button width="100%">Share</Button>
+            <Button 
+            width="100%"
+            disabled={!isConnected}
+            title="You must be connected to enable file sharing"
+            >
+            Share
+            </Button>
         </VStack>
 
         {/* Uploaded and Received Files Section */}
@@ -72,7 +79,7 @@ const Files = () => {
           width="50%"
         >
           <VStack align="start" spacing={2} mb={4}>
-            <Text color="black" fontSize="xl">Uploaded Files</Text>
+            <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Uploaded Files</Text>
             {uploadedFiles.length > 0 ? (
               uploadedFiles.map((file, index) => (
                 <HStack
@@ -104,7 +111,7 @@ const Files = () => {
           </VStack>
 
           <VStack align="start" spacing={2}>
-            <Text color="black" fontSize="xl">Received Files</Text>
+            <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Received Files</Text>
             {/* Add logic to display received files here */}
             <Text color="black">No received files yet.</Text>
           </VStack>
