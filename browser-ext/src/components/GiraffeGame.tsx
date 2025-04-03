@@ -20,7 +20,7 @@ const GiraffeGame: React.FC = () => {
     // Set the jump duration and reset it after a smooth transition
     setTimeout(() => {
       setIsJumping(false);
-    }, 500); // Duration of the jump (adjust as needed)
+    }, 500); // Duration of the jump 
   };
 
   useEffect(() => {
@@ -55,20 +55,20 @@ const GiraffeGame: React.FC = () => {
           position: 'absolute',
           bottom: isJumping ? '150px' : '50px', // Giraffe jumps when space is pressed
           left: '50px',
-          width: '50px', // Width of the giraffe image
-          height: '50px', // Height of the giraffe image
+          width: '50px', // Width of the giraffe image (container size)
+          height: '50px', // Height of the giraffe image (container size)
           transition: 'bottom 0.5s ease-out', // Smooth jump transition
         }}
       >
-        {/* Giraffe Image with horizontal flip */}
+        {/* Giraffe Image with conditional image change based on jumping state */}
         <img
-          src="/images/giraffetransparent.png"  // The giraffe image source
+          src={isJumping ? '/images/jumpinggiraffe.png' : '/images/giraffetransparent.png'}  // Switch image based on jump state
           alt="Giraffe"
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'contain', // Ensures the image is scaled properly
-            transform: 'scaleX(-1)', // Flip the image horizontally
+            transform: `scaleX(-1) ${isJumping ? 'scale(3)' : 'scale(1)'}`, // Huge scaling on jump (3x bigger)
           }}
         />
       </div>
