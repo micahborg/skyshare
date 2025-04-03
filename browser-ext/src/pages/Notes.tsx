@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input } from "@chakra-ui/react";
+import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input, Flex, Image } from "@chakra-ui/react";
 import theme from "../theme";
 import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to match your project structure
 
@@ -76,7 +76,7 @@ const Notes: React.FC = () => {
     } else {
       // Save a new note with time stamp of creation
       let name
-      if (customName.trim() != "") {
+      if (customName.trim() !== "") {
         name = customName;
       } else{
         name = `${formatTimestamp(timestamp)}`;
@@ -108,6 +108,7 @@ const Notes: React.FC = () => {
     localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
     setEditingIndex(null); // Reset editing state
     setNote(""); // Clear the note input
+    setCustomName(""); //clear the title spot after saving
   };
 
   // Creating a new note (clear the editor)
@@ -132,7 +133,7 @@ const Notes: React.FC = () => {
         Notes
       </Heading>
 
-      <HStack spacing={4} alignItems="flex-start" height="100%">
+      <HStack spacing={4} alignItems="stretch" justifyContent="space-between" maxW="100%" height="100%">
         {/* Main Notes Section */}
         <VStack
           p={4}
@@ -141,18 +142,22 @@ const Notes: React.FC = () => {
           backgroundColor="sunnyYellow.100"
           alignItems="stretch"
           h="100%"
-          w="30%"
+          w="60%"
+          maxW="60%"
           flex={2}
         >
-          <Input
-            value={customName}
-            onChange={handleNameChange}
-            placeholder="Optional Note Title"
-            color="black"
-            size='sm'
-            mb={2}
-            borderColor="gray.400"
-          />
+          <HStack>
+            <Input
+              value={customName}
+              onChange={handleNameChange}
+              placeholder="Optional Title"
+              color="black"
+              size='sm'
+              mb={2}
+              borderColor="gray.400"
+            />
+            <Button onClick={createNewNote} size='xs'>Share</Button>
+          </HStack>
           <Textarea
             value={note}
             onChange={handleNoteChange}
@@ -183,10 +188,14 @@ const Notes: React.FC = () => {
           borderRadius="lg"
           boxShadow="md"
           p={4}
-          w="45%"
+          w="35"
+          maxW="35%"
           overflowY="auto"
         >
-          <Text fontWeight="bold" mb={2} color="black">Saved Notes</Text>
+          <Flex>
+          <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Saved Notes</Text>
+          <Image ml="4px" boxSize="12px" src="/images/magnify_glass.png" alt="magnifying glass" />
+          </Flex>
           {savedNotes.length > 0 ? (
             <VStack flex={1} align="start" id="saved-notes" spacing={2} overflowY="auto">
               {savedNotes.map((savedNote, index) => (
