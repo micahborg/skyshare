@@ -13,54 +13,6 @@ const FileUpload = () => {
   const toast = useToast();
 
   const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB in bytes
-  const uploadSuccessSound = new Audio('/sounds/success.mp3'); // Replace with your audio file
-
-  // useEffect(() => {
-  //   // Load file history from localStorage on component mount
-  //   const storedHistory = JSON.parse(localStorage.getItem("fileHistory")) || [];
-  //   const sentHistory = storedHistory.filter((entry) => entry.type === "Sent");
-
-  //   // Load uploaded file history from localStorage on component mount
-  //   const storedUploadedHistory = JSON.parse(localStorage.getItem("uploadedFileHistory")) || [];
-    
-  //   // Merge the histories
-  //   const combinedHistory = [...sentHistory, ...storedUploadedHistory];
-  //   setFileHistory(combinedHistory);
-  // }, []);
-
-  // const updateFileHistory = (file, type) => {
-  //   const newEntry = {
-  //     name: file.name,
-  //     size: file.size,
-  //     type,
-  //     timestamp: new Date().toISOString(),
-  //   };
-  //   const updatedHistory = [newEntry, ...fileHistory];
-  //   setFileHistory(updatedHistory);
-  //   localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
-  // };
-
-  // const cacheUploadedFile = async (file) => {
-  //   try {
-  //     const cache = await caches.open('uploaded-files');
-  //     const response = new Response(file);
-  //     const cacheKey = `${window.location.origin}/cache/${file.name}-${Date.now()}`;
-  //     const request = new Request(cacheKey);
-  //     await cache.put(request, response);
-
-  //     const newEntry = {
-  //       name: file.name,
-  //       url: cacheKey,
-  //       timestamp: new Date().toISOString(),
-  //     };
-  //     const updatedHistory = [newEntry, ...fileHistory];
-  //     setFileHistory(updatedHistory);
-  //     localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
-  //     console.log("File cached successfully and history updated:", updatedHistory);
-  //   } catch (error) {
-  //     console.error("Error caching uploaded file:", error);
-  //   }
-  // };
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -178,29 +130,6 @@ const FileUpload = () => {
     setLoading(false);
   };
 
-  // const handleDownload = async (url, name) => {
-  //   try {
-  //     const cache = await caches.open('uploaded-files');
-  //     const cachedResponse = await cache.match(url);
-
-  //     if (cachedResponse) {
-  //       const blob = await cachedResponse.blob();
-  //       const objectUrl = URL.createObjectURL(blob);
-  //       const a = document.createElement('a');
-  //       a.href = objectUrl;
-  //       a.download = name; // Use the provided file name for the download
-  //       document.body.appendChild(a); // Append the anchor to the body
-  //       a.click(); // Trigger the download
-  //       document.body.removeChild(a); // Remove the anchor from the document
-  //       URL.revokeObjectURL(objectUrl); // Revoke the object URL to free up memory
-  //     } else {
-  //       console.error('File not found in cache');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error downloading file:', error);
-  //   }
-  // };
-
   return (
     <VStack spacing={4} width="100%" maxWidth="600px" mx="auto">
       {!isSent && (
@@ -248,7 +177,6 @@ const FileUpload = () => {
         <VStack alignItems="center">
           {(() => {
             triggerConfetti();
-            uploadSuccessSound.play(); // Play the success sound
             return null;
           })()}
           <Text fontSize="lg" color="green.500">
@@ -259,39 +187,6 @@ const FileUpload = () => {
           </Text>
         </VStack>
       )}
-      {/* <Divider />
-      <Heading size="md" alignSelf="flex-start">
-        Sent File History
-      </Heading>
-      <Box width="100%">
-        {fileHistory.length > 0 ? (
-          fileHistory.map((entry, index) => (
-            <HStack
-              key={index}
-              justifyContent="space-between"
-              p={3}
-              borderWidth={1}
-              borderColor="gray.300"
-              borderRadius="md"
-              mb={2}
-            >
-              <Text fontSize="md">
-                📤 {entry.name}
-              </Text>
-              <Button variant="link" onClick={() => handleDownload(entry.url, entry.name)}>
-                Open
-              </Button>
-              <Text fontSize="sm" color="gray.500">
-                {entry.type} - {new Date(entry.timestamp).toLocaleString()}
-              </Text>
-            </HStack>
-          ))
-        ) : (
-          <Text fontSize="sm" color="gray.500" mt={2}>
-            No file history yet.
-          </Text>
-        )}
-      </Box> */}
     </VStack>
   );
 };

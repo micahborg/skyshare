@@ -5,119 +5,73 @@ Date Created: 3/23/2025
 Modified Date: 3/23
 */
 
-// This is a foundation for the jumping giraffe game
-// NOT MEANT TO BE FUNCTIONAL YET! Simply for storyboarding purposes
+// SO FAR: Giraffe jumps in white space :O
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const GiraffeGame: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isJumping, setIsJumping] = useState(false);
+  const giraffeRef = useRef<HTMLDivElement | null>(null);
 
-  const gameWidth = 800;
-  const gameHeight = 400;
+  const jump = () => {
+    if (isJumping) return; // Prevent jumping while already jumping
+    setIsJumping(true);
 
-  // Giraffe character properties - TO BE CHANGED
-  const giraffe = {
-    x: 50,
-    y: 300,
-    width: 50,
-    height: 80,
-    color: '#8B4513',
-    gravity: 0.5,
-    lift: -15,
-    velocity: 0,
+    // Set the jump duration and reset it after a smooth transition
+    setTimeout(() => {
+      setIsJumping(false);
+    }, 500); // Duration of the jump 
   };
-
-  const obstacle = {
-    x: gameWidth,
-    y: 300,
-    width: 40,
-    height: 50,
-    color: 'green',
-    speed: 3,
-  };
-
-  let gameInterval: NodeJS.Timeout;
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const updateGame = () => {
-        // Clear the canvas for the next frame
-        ctx.clearRect(0, 0, gameWidth, gameHeight);
-
-        // Update giraffe position (jumping mechanics)
-        if (isJumping) {
-          giraffe.velocity += giraffe.gravity;
-          giraffe.y += giraffe.velocity;
-
-          // Prevent the giraffe from falling through the ground
-          if (giraffe.y >= 300) {
-            giraffe.y = 300;
-            giraffe.velocity = 0;
-            setIsJumping(false); 
-          }
-        }
-
-        // Draw giraffe (simplified as a rectangle) -- TO BE CHANGED
-        ctx.fillStyle = giraffe.color;
-        ctx.fillRect(giraffe.x, giraffe.y, giraffe.width, giraffe.height);
-
-        // Update obstacle position and detect collision
-        obstacle.x -= obstacle.speed;
-        if (obstacle.x < 0) {
-          obstacle.x = gameWidth; // reset position after it goes off-screen
-        }
-
-        // Draw obstacle
-        ctx.fillStyle = obstacle.color;
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-
-        // Check for collision (simple rectangle collision check)
-        if (
-          giraffe.x < obstacle.x + obstacle.width &&
-          giraffe.x + giraffe.width > obstacle.x &&
-          giraffe.y < obstacle.y + obstacle.height &&
-          giraffe.y + giraffe.height > obstacle.y
-        ) {
-          alert('Game Over!');
-          clearInterval(gameInterval);
-        }
-      };
-
-      gameInterval = setInterval(updateGame, 1000 / 60); // 60 FPS game loop
-
-      return () => {
-        clearInterval(gameInterval);
-      };
-    }
-  }, [isJumping]);
-
-  // Handle space bar to trigger jump
-  const handleKeyPress = (e: KeyboardEvent) => {
-    if (e.key === ' ') {
-      if (giraffe.y === 300 && !isJumping) {
-        setIsJumping(true);
-        giraffe.velocity = giraffe.lift;
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.code === 'Space') {
+        jump(); // Trigger jump on spacebar press
       }
-    }
-  };
+    };
+    document.addEventListener('keydown', handleKeyPress);
 
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
     return () => {
-      window.removeEventListener('keydown', handleKeyPress);
+      document.removeEventListener('keydown', handleKeyPress);
     };
   }, [isJumping]);
 
   return (
-    <div>
-      <h2>Giraffe Jumping Game</h2>
-      <canvas ref={canvasRef} width={gameWidth} height={gameHeight} />
+    <div
+      style={{
+        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: '#f0f0f0',
+        overflow: 'hidden',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <div
+        ref={giraffeRef}
+        style={{
+          position: 'absolute',
+          bottom: isJumping ? '150px' : '50px', // Giraffe jumps when space is pressed
+          left: '50px',
+          width: '50px', // Width of the giraffe image (container size)
+          height: '50px', // Height of the giraffe image (container size)
+          transition: 'bottom 0.5s ease-out', // Smooth jump transition
+        }}
+      >
+        {/* Giraffe Image with conditional image change based on jumping state */}
+        <img
+          src={isJumping ? '/images/jumpinggiraffe.png' : '/images/giraffetransparent.png'}  // Switch image based on jump state
+          alt="Giraffe"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain', // Ensures the image is scaled properly
+            transform: `scaleX(-1) ${isJumping ? 'scale(3)' : 'scale(1)'}`, // Huge scaling on jump (3x bigger)
+          }}
+        />
+      </div>
     </div>
   );
 };

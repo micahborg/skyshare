@@ -1,29 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Text,
-  Button,
-  VStack,
-  HStack,
-  Heading,
-  Input,
-  IconButton,
-} from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
-import { useWebRtc } from "../contexts/WebRtcContext";
-
-interface ReceivedFile {
-  fileUrl: string;
-  fileName: string;
-  fileObj: File;
-}
+import React, { useState } from 'react';
+import { Box, Text, Button, VStack, HStack, Heading, Input } from "@chakra-ui/react";
+import { useWebRtc } from '../contexts/WebRtcContext'; 
 
 const Files = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [receivedFiles, setReceivedFiles] = useState<ReceivedFile[]>([]);
-  const { isConnected, sendFile, files: webrtcFiles } = useWebRtc();
+  const { isConnected } = useWebRtc(); // Use the WebRTC hook
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -104,6 +86,13 @@ const Files = () => {
           >
             Share
           </Button>
+            <Button 
+            width="100%"
+            disabled={!isConnected}
+            title="You must be connected to enable file sharing"
+            >
+            Share
+            </Button>
         </VStack>
 
         {/* Uploaded & Received Files */}
@@ -121,9 +110,7 @@ const Files = () => {
         >
           {/* Uploaded Files */}
           <VStack align="start" spacing={2} mb={4}>
-            <Text color="black" fontSize="xl">
-              Uploaded Files
-            </Text>
+            <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Uploaded Files</Text>
             {uploadedFiles.length > 0 ? (
               uploadedFiles.map((file, index) => (
                 <HStack
@@ -163,45 +150,9 @@ const Files = () => {
 
           {/* Received Files */}
           <VStack align="start" spacing={2}>
-            <Text color="black" fontSize="xl">
-              Received Files
-            </Text>
-            {receivedFiles.length > 0 ? (
-              receivedFiles.map((received, index) => (
-                <HStack
-                  key={index}
-                  p={2}
-                  borderWidth={1}
-                  borderRadius="md"
-                  width="100%"
-                  justifyContent="space-between"
-                >
-                  <Box>
-                    <Text fontSize="md">{received.fileName}</Text>
-                  </Box>
-                  <HStack spacing={2}>
-                    <Button
-                      size="sm"
-                      colorScheme="green"
-                      as="a"
-                      href={received.fileUrl}
-                      download={received.fileName}
-                    >
-                      Download
-                    </Button>
-                    <Button
-                      size="sm"
-                      colorScheme="red"
-                      onClick={() => deleteReceivedFile(index)}
-                    >
-                      Delete
-                    </Button>
-                  </HStack>
-                </HStack>
-              ))
-            ) : (
-              <Text color="black">No received files yet.</Text>
-            )}
+            <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Received Files</Text>
+            {/* Add logic to display received files here */}
+            <Text color="black">No received files yet.</Text>
           </VStack>
         </Box>
       </HStack>
