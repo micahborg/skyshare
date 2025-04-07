@@ -10,8 +10,8 @@ import {
   Input,
   IconButton,
 } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
 import { useWebRtc } from "../contexts/WebRtcContext";
+import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
 
 interface ReceivedFile {
   fileUrl: string;
@@ -142,9 +142,8 @@ const Files = () => {
                   cursor="pointer"
                 >
                   <Box>
-                    <Text fontSize="md">{file.name}</Text>
+                    <Text fontSize="sm">{file.name}</Text>
                     <Text fontSize="sm" color="gray.500">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB
                     </Text>
                   </Box>
                   <IconButton
@@ -165,48 +164,51 @@ const Files = () => {
             )}
           </VStack>
 
-          {/* Received Files */}
-          <VStack align="start" spacing={2}>
-            <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">
-              Received Files
-            </Text>
-            {receivedFiles.length > 0 ? (
-              receivedFiles.map((file, index) => (
-                <HStack
-                  key={index}
-                  p={2}
-                  borderWidth={1}
-                  borderRadius="md"
-                  width="100%"
-                  justifyContent="space-between"
-                >
-                  <Box>
-                    <Text fontSize="md">{file.fileName}</Text>
-                  </Box>
-                  <HStack spacing={2}>
-                    <Button
-                      size="sm"
-                      colorScheme="green"
-                      as="a"
-                      href={file.fileUrl}
-                      download={file.fileName}
-                    >
-                      Download
-                    </Button>
-                    <Button
-                      size="sm"
-                      colorScheme="red"
-                      onClick={() => deleteReceivedFile(index)}
-                    >
-                      Delete
-                    </Button>
-                  </HStack>
-                </HStack>
-              ))
-            ) : (
-              <Text color="black">No received files yet.</Text>
-            )}
-          </VStack>
+       {/* Received Files */}
+      <VStack align="start" spacing={2}>
+        <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">
+          Received Files
+        </Text>
+        {receivedFiles.length > 0 ? (
+          receivedFiles.map((file, index) => (
+            <HStack
+              key={index}
+              p={2}
+              borderWidth={1}
+              borderRadius="md"
+              width="100%"
+              justifyContent="space-between"
+              bg="blue.100"
+            >
+              <Box>
+                <Text fontSize="xs">{file.fileName}</Text>
+              </Box>
+              <HStack spacing={2}>
+              <IconButton
+                as="a"
+                href={file.fileUrl}
+                download={file.fileName}
+                aria-label="Download file"
+                icon={<DownloadIcon />}
+                size="xs"
+                colorScheme="green"
+                variant="ghost"
+              />
+              <IconButton
+                aria-label="Delete file"
+                icon={<DeleteIcon />}
+                size="xs"
+                colorScheme="red"
+                variant="ghost"
+                onClick={() => deleteReceivedFile(index)}
+              />
+            </HStack>
+            </HStack>
+          ))
+        ) : (
+          <Text color="black">No received files yet.</Text>
+        )}
+      </VStack>
         </Box>
       </HStack>
     </VStack>
