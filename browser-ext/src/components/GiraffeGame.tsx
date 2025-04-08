@@ -92,11 +92,26 @@ const GiraffeGame: React.FC = () => {
       );
 
       // Check for collisions
-      obstacles.forEach((obstacle) => {
+      obstaclesRef.current.forEach((obstacle) => {
+      //obstacles.forEach((obstacle) => {
+        const obstacleId = `obstacle-${obstacle.id}`;
+        // console.log(`Querying obstacle with id: ${obstacleId}`);
+        // const obstacleElement = gameContainerRef.current?.querySelector(`#obstacle-${obstacle.id}`);
+        setTimeout(() => {
+          const obstacleElement = gameContainerRef.current?.querySelector(`#obstacle-${obstacle.id}`);
+          // console.log(`Obstacle Element for id obstacle-${obstacle.id}:`, obstacleElement);
+        }, 100); // Delay by 100ms
+        const obstacleElement = gameContainerRef.current?.querySelector(`#${obstacleId}`);
+
+        // console.log(`Obstacle Element for id ${obstacleId}:`, obstacleElement);
         const giraffe = giraffeRef.current?.getBoundingClientRect();
         const obstacleRect = gameContainerRef.current?.querySelector(
           `#obstacle-${obstacle.id}`
         )?.getBoundingClientRect();
+
+        // console.log('Giraffe Bounding Box:', giraffe);
+  // console.log('Obstacle Bounding Box:', obstacleRect);
+
 
         if (
           giraffe &&
@@ -122,6 +137,7 @@ const GiraffeGame: React.FC = () => {
 
   return (
     <div
+    ref={gameContainerRef} // Assign the ref here
       style={{
         position: 'relative',
         width: '100vw',
@@ -142,7 +158,7 @@ const GiraffeGame: React.FC = () => {
           left: 0,
           width: '200%',
           height: '100%',
-          backgroundImage: 'url(/images/background.png)', // Replace with your background image
+          // backgroundImage: 'url(/images/background.png)', // Replace with your background image
           backgroundRepeat: 'repeat-x',
           animation: 'scroll 5s linear infinite',
         }}
@@ -158,6 +174,7 @@ const GiraffeGame: React.FC = () => {
           width: '50px', // Width of the giraffe image (container size)
           height: '50px', // Height of the giraffe image (container size)
           transition: 'bottom 0.5s ease-out', // Smooth jump transition
+          // border: '2px solid red', // Add a red border to visualize the giraffe's bounding box
         }}
       >
         {/* Giraffe Image with conditional image change based on jumping state */}
@@ -173,20 +190,25 @@ const GiraffeGame: React.FC = () => {
         />
       </div>
       {/* Obstacles */}
-      {obstacles.map((obstacle) => (
-        <div
-          key={obstacle.id}
-          id={`obstacle-${obstacle.id}`}
-          style={{
-            position: 'absolute',
-            bottom: '50px',
-            left: `${obstacle.left}px`,
-            width: '30px',
-            height: '30px',
-            backgroundColor: 'brown', // Replace with obstacle image if needed
-          }}
-        />
-      ))}
+      {obstacles.map((obstacle) => {
+        const obstacleId = `obstacle-${obstacle.id}`;
+  // console.log(`Rendering obstacle with id: obstacle-${obstacle.id}`);
+  return (
+    <div
+      key={obstacle.id}
+      id={`obstacle-${obstacle.id}`}
+      style={{
+        position: 'absolute',
+        bottom: '50px',
+        left: `${obstacle.left}px`,
+        width: '30px',
+        height: '30px',
+        backgroundColor: 'brown',
+        // border: '2px solid blue',
+      }}
+    />
+  );
+})}
 
       {/* Score */}
       <div
