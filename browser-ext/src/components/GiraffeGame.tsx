@@ -11,7 +11,17 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const GiraffeGame: React.FC = () => {
   const [isJumping, setIsJumping] = useState(false);
+  const [obstacles, setObstacles] = useState<{ id: number; left: number }[]>([]);
+  const [score, setScore] = useState(0);
   const giraffeRef = useRef<HTMLDivElement | null>(null);
+  const gameContainerRef = useRef<HTMLDivElement | null>(null);
+  const obstacleId = useRef(0);
+  const obstaclesRef = useRef(obstacles); // Ref to store the latest obstacles state
+
+  // Update the ref whenever obstacles change
+  useEffect(() => {
+    obstaclesRef.current = obstacles;
+  }, [obstacles]);
 
   const jump = () => {
     if (isJumping) return; // Prevent jumping while already jumping
@@ -36,6 +46,80 @@ const GiraffeGame: React.FC = () => {
     };
   }, [isJumping]);
 
+  // Generate obstacles at random intervals
+  /*
+  useEffect(() => {
+    const obstacleInterval = setInterval(() => {
+      setObstacles((prev) => [
+        ...prev,
+        { id: obstacleId.current++, left: window.innerWidth },
+      ]);
+    }, 2000); // Generate a new obstacle every 2 seconds
+
+    return () => clearInterval(obstacleInterval);
+  }, []);
+  */
+
+  // Generate obstacles at random intervals
+  useEffect(() => {
+    const generateObstacle = () => {
+      setObstacles((prev) => [
+        ...prev,
+        { id: obstacleId.current++, left: window.innerWidth },
+      ]);
+
+      // Set a random delay for the next obstacle
+      const randomDelay = Math.random() * 2000 + 1000; // Random delay between 1s and 3s
+      setTimeout(generateObstacle, randomDelay);
+    };
+
+    generateObstacle(); // Start generating obstacles
+
+    return () => {
+      // Cleanup any pending timeouts when the component unmounts
+      obstacleId.current = 0;
+    };
+  }, []);
+
+
+  // Move obstacles and check for collisions
+  useEffect(() => {
+    const gameLoop = setInterval(() => {
+      setObstacles((prev) =>
+        prev
+          .map((obstacle) => ({ ...obstacle, left: obstacle.left - 10 })) // Move obstacles left
+          .filter((obstacle) => obstacle.left > -50) // Remove obstacles that are off-screen
+      );
+
+      // Check for collisions
+      obstacles.forEach((obstacle) => {
+        const giraffe = giraffeRef.current?.getBoundingClientRect();
+        const obstacleRect = gameContainerRef.current?.querySelector(
+          `#obstacle-${obstacle.id}`
+        )?.getBoundingClientRect();
+
+        if (
+          giraffe &&
+          obstacleRect &&
+          giraffe.left < obstacleRect.right &&
+          giraffe.right > obstacleRect.left &&
+          giraffe.bottom > obstacleRect.top &&
+          giraffe.top < obstacleRect.bottom
+        ) {
+          alert('Game Over! Your score: ' + score);
+          setScore(0);
+          setObstacles([]);
+        }
+      });
+
+      setScore((prev) => prev + 1); // Increment score
+    }, 50); // Game loop runs every 50ms
+
+    return () => clearInterval(gameLoop);
+  // }, [obstacles, score]);
+}, [score]);
+
+
   return (
     <div
       style={{
@@ -49,6 +133,22 @@ const GiraffeGame: React.FC = () => {
         alignItems: 'center',
       }}
     >
+
+      {/* Scrolling Background */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '200%',
+          height: '100%',
+          backgroundImage: 'url(/images/background.png)', // Replace with your background image
+          backgroundRepeat: 'repeat-x',
+          animation: 'scroll 5s linear infinite',
+        }}
+      />
+      
+      {/* Giraffe */}
       <div
         ref={giraffeRef}
         style={{
@@ -71,6 +171,34 @@ const GiraffeGame: React.FC = () => {
             transform: `scaleX(-1) ${isJumping ? 'scale(3)' : 'scale(1)'}`, // Huge scaling on jump (3x bigger)
           }}
         />
+      </div>
+      {/* Obstacles */}
+      {obstacles.map((obstacle) => (
+        <div
+          key={obstacle.id}
+          id={`obstacle-${obstacle.id}`}
+          style={{
+            position: 'absolute',
+            bottom: '50px',
+            left: `${obstacle.left}px`,
+            width: '30px',
+            height: '30px',
+            backgroundColor: 'brown', // Replace with obstacle image if needed
+          }}
+        />
+      ))}
+
+      {/* Score */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '10px',
+          left: '10px',
+          fontSize: '24px',
+          fontWeight: 'bold',
+        }}
+      >
+        Score: {score}
       </div>
     </div>
   );
