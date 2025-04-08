@@ -7,9 +7,10 @@ import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to mat
 const Notes: React.FC = () => {
   const [note, setNote] = useState<string>("");
   const [customName, setCustomName] = useState<string>("");
-  // const [searchTerm, setSearchTerm] = useState<string>(""); //Potential added feature to search for a note
   const [savedNotes, setSavedNotes] = useState<{ name: string, note: string, timestamp: string, createdAt: string }[]>([]); // Add time stamp of creation
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
+  const [isSearchVisible, setIsSearchVisible] = useState(false); // New state for showing search bar
+  const [searchTerm, setSearchTerm] = useState<string>(""); // State to store the search input
   const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
 
   // Load saved notes from localStorage on component mount
@@ -43,11 +44,6 @@ const Notes: React.FC = () => {
   
     return `${mm}/${dd}/${yy} ${hours}:${minutes}${ampm}`;
   };
-  //Potential added feature to search for notes
-  // const filteredNotes = savedNotes.filter(note =>
-  //   note.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
-
 
   // Handle note input change
   const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -63,58 +59,46 @@ const Notes: React.FC = () => {
     if (note.trim() === "") return;
 
     const timestamp = new Date().toISOString(); // Current time stamp
-    console.log("Timestamp:", timestamp);
-    // Checking if note is being edited vs. being created for the first time
     if (editingIndex !== null) { 
-      // Update the existing note
       const updatedNotes = [...savedNotes];
       const updatedNote = updatedNotes[editingIndex];
-      updatedNote.note = note; // Update the note content
-      updatedNote.timestamp = timestamp; // Store the time stamp
+      updatedNote.note = note; 
+      updatedNote.timestamp = timestamp; 
       setSavedNotes(updatedNotes);
       localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
     } else {
-      // Save a new note with time stamp of creation
-      let name
-      if (customName.trim() !== "") {
-        name = customName;
-      } else{
-        name = `${formatTimestamp(timestamp)}`;
-      }
+      let name = customName.trim() !== "" ? customName : `${formatTimestamp(timestamp)}`;
       const newNote = { name, note, timestamp, createdAt: timestamp };
       const updatedNotes = [newNote, ...savedNotes];
       setSavedNotes(updatedNotes);
       localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
     }
 
-    setNote(""); // Clear the textarea after saving
-    setCustomName(""); //clear the title spot after saving
-    setEditingIndex(null); // Reset editing state
+    setNote(""); 
+    setCustomName(""); 
+    setEditingIndex(null);
   };
 
-  // Loading a saved note and setting it to be edited
   const loadNote = (index: number) => {
     setNote(savedNotes[index].note);
     setCustomName(savedNotes[index].name);
-    setEditingIndex(index); // Set the index for the note being edited
+    setEditingIndex(index); 
   };
 
-  // Delete a saved note
   const deleteNote = () => {
     if (editingIndex === null) return;
 
     const updatedNotes = savedNotes.filter((_, i) => i !== editingIndex);
     setSavedNotes(updatedNotes);
     localStorage.setItem("savedNotes", JSON.stringify(updatedNotes));
-    setEditingIndex(null); // Reset editing state
-    setNote(""); // Clear the note input
-    setCustomName(""); //clear the title spot after saving
+    setEditingIndex(null);
+    setNote(""); 
+    setCustomName("");
   };
 
-  // Creating a new note (clear the editor)
   const createNewNote = () => {
     setNote("");
-    setEditingIndex(null); // Reset editing state
+    setEditingIndex(null); 
   };
 
   const shareNote = () => {
@@ -122,42 +106,50 @@ const Notes: React.FC = () => {
       const noteFile = new Blob([note], { type: 'text/plain' });
       const fileName = `note-${new Date().toISOString()}.txt`;
       const file = new File([noteFile], fileName, { type: 'text/plain' });
-      sendFile(file); // Send the note file to the paired device
+      sendFile(file); 
+    }
+  };
+
+  // Toggle search bar visibility
+  const toggleSearch = () => {
+    setIsSearchVisible(prevState => !prevState);
+  };
+
+  // Handle the search input change
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // Handle the enter key press in the search bar
+  const handleSearchEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      const noteToLoad = savedNotes.find(note => note.name.toLowerCase() === searchTerm.toLowerCase());
+      if (noteToLoad) {
+        const index = savedNotes.indexOf(noteToLoad);
+        loadNote(index); // Load the note if found
+        setIsSearchVisible(false);
+      }
+      setSearchTerm("");
     }
   };
 
   return (
     <VStack spacing={4} p={4} h="100vh">
-      {/* Notes Title */}
       <Heading fontSize="xl" fontWeight="bold" textAlign="center">
         Notes
       </Heading>
 
-      <HStack spacing={4} alignItems="stretch" justifyContent="space-between" maxW="100%" height="100%">
-        {/* Main Notes Section */}
-        <VStack
-          p={4}
-          borderRadius="lg"
-          boxShadow="md"
-          backgroundColor="sunnyYellow.100"
-          alignItems="stretch"
-          h="100%"
-          w="60%"
-          maxW="60%"
-          flex={2}
-        >
-          <HStack>
-            <Input
-              value={customName}
-              onChange={handleNameChange}
-              placeholder="Optional Title"
-              color="black"
-              size='sm'
-              mb={2}
-              borderColor="gray.400"
-            />
-            <Button onClick={createNewNote} size='xs'>Share</Button>
-          </HStack>
+      <HStack spacing={4} alignItems="flex-start" height="100%">
+        <VStack p={4} borderRadius="lg" boxShadow="md" backgroundColor="sunnyYellow.100" alignItems="stretch" h="100%" w="30%" flex={2}>
+          <Input
+            value={customName}
+            onChange={handleNameChange}
+            placeholder="Optional Note Title"
+            color="black"
+            size="sm"
+            mb={2}
+            borderColor="gray.400"
+          />
           <Textarea
             value={note}
             onChange={handleNoteChange}
@@ -173,29 +165,32 @@ const Notes: React.FC = () => {
             resize="none"
           />
           <HStack width="100%" justifyContent="space-between" pt={2}>
-            <Button onClick={shareNote}>+</Button> {/* Create new note button */}
+            <Button onClick={shareNote}>+</Button> 
             <Button onClick={saveNote}>Save</Button>
-            <Button onClick={deleteNote} isDisabled={editingIndex === null}>-</Button> {/* Delete current note button */}
+            <Button onClick={deleteNote} isDisabled={editingIndex === null}>-</Button>
           </HStack>
         </VStack>
 
-        {/* Saved Notes Section */}
-        <Box
-          height="100%"
-          maxHeight="78vh"
-          backgroundColor="sunnyYellow.100"
-          flex={1} 
-          borderRadius="lg"
-          boxShadow="md"
-          p={4}
-          w="35"
-          maxW="35%"
-          overflowY="auto"
-        >
+        <Box height="100%" maxHeight="78vh" backgroundColor="sunnyYellow.100" flex={1} borderRadius="lg" boxShadow="md" p={4} w="45%" overflowY="auto">
           <Flex>
-          <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Saved Notes</Text>
-          <Image ml="4px" boxSize="12px" src="/images/magnify_glass.png" alt="magnifying glass" />
+            <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">Saved Notes</Text>
+            <Image ml="4px" boxSize="12px" src="/images/magnify_glass.png" alt="magnifying glass" cursor="pointer" onClick={toggleSearch} />
           </Flex>
+
+          {/* Conditionally render the search bar */}
+          {isSearchVisible && (
+            <Input
+              placeholder="Search Title"
+              size="sm"
+              mb={2}
+              color="black"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onKeyDown={handleSearchEnter} 
+              width="110%"
+            />
+          )}
+
           {savedNotes.length > 0 ? (
             <VStack flex={1} align="start" id="saved-notes" spacing={2} overflowY="auto">
               {savedNotes.map((savedNote, index) => (
