@@ -71,7 +71,7 @@ const GiraffeGame: React.FC = () => {
   useEffect(() => {
     const gameLoop = setInterval(() => {
       // Adjust the speed based on the score (e.g., speed increases as the score increases)
-      const speed = Math.max(10, 10 + Math.floor(score / 5)); // Increase speed every 5 points
+      const speed = Math.max(10, 10 + Math.floor(score / 20)); // Increase speed every 25 points
 
       setObstacles((prev) =>
         prev
