@@ -159,22 +159,24 @@ const GiraffeGame: React.FC = () => {
       </div>
       {/* Obstacles */}
       {obstacles.map((obstacle) => {
-        const obstacleId = `obstacle-${obstacle.id}`;
-        return (
-          <div
-            key={obstacle.id}
-            id={`obstacle-${obstacle.id}`}
-            style={{
-              position: 'absolute',
-              bottom: '50px',
-              left: `${obstacle.left}px`,
-              width: '30px',
-              height: '30px',
-              backgroundColor: 'brown',
-            }}
-          />
-        );
-      })}
+  const obstacleId = `obstacle-${obstacle.id}`;
+  return (
+    <img
+      key={obstacle.id}
+      id={obstacleId}
+      src="/images/folder-icon.png"
+      alt="Obstacle"
+      style={{
+        position: 'absolute',
+        bottom: '50px',
+        left: `${obstacle.left}px`,
+        width: '30px',
+        height: '30px',
+        objectFit: 'contain',
+      }}
+    />
+  );
+})}
 
       {/* Score */}
       <div
