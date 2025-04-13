@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Text,
@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useWebRtc } from "../contexts/WebRtcContext";
 import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
+import Confetti from "react-confetti";
 
 interface ReceivedFile {
   fileUrl: string;
@@ -23,6 +24,9 @@ const Files = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [receivedFiles, setReceivedFiles] = useState<ReceivedFile[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiTimeout = useRef<NodeJS.Timeout | null>(null);
+
   const { isConnected, sendFile, files: webrtcFiles } = useWebRtc();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,10 +47,24 @@ const Files = () => {
     });
   };
 
-  const handleShareSelectedFile = () => {
+  const handleShareSelectedFile = async () => {
     if (!isConnected) return alert("Not connected");
     if (selectedIndex === null) return alert("No file selected");
-    sendFile(uploadedFiles[selectedIndex]);
+    try {
+      // assume sendFile returns a Promise
+      await sendFile(uploadedFiles[selectedIndex]);
+      // trigger confetti
+      setShowConfetti(true);
+      // clear any existing timer
+      if (confettiTimeout.current) clearTimeout(confettiTimeout.current);
+      // stop confetti after 3s
+      confettiTimeout.current = setTimeout(() => {
+        setShowConfetti(false);
+      }, 3000);
+    } catch (err) {
+      console.error("File share failed", err);
+      alert("Failed to share file");
+    }
   };
 
   const deleteReceivedFile = (index: number) => {
@@ -64,8 +82,25 @@ const Files = () => {
     }
   }, [webrtcFiles]);
 
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (confettiTimeout.current) clearTimeout(confettiTimeout.current);
+    };
+  }, []);
+
   return (
     <VStack spacing={4} p={4} alignItems="stretch" h="100vh">
+      {showConfetti && (
+        <Confetti
+          // full-screen
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={500}
+        />
+      )}
+
       <Heading fontSize="xl" fontWeight="bold" textAlign="center">
         Files
       </Heading>
@@ -143,8 +178,6 @@ const Files = () => {
                 >
                   <Box>
                     <Text fontSize="sm">{file.name}</Text>
-                    <Text fontSize="sm" color="gray.500">
-                    </Text>
                   </Box>
                   <IconButton
                     aria-label="Delete"
@@ -164,51 +197,51 @@ const Files = () => {
             )}
           </VStack>
 
-       {/* Received Files */}
-      <VStack align="start" spacing={2}>
-        <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">
-          Received Files
-        </Text>
-        {receivedFiles.length > 0 ? (
-          receivedFiles.map((file, index) => (
-            <HStack
-              key={index}
-              p={2}
-              borderWidth={1}
-              borderRadius="md"
-              width="100%"
-              justifyContent="space-between"
-              bg="blue.100"
-            >
-              <Box>
-                <Text fontSize="xs">{file.fileName}</Text>
-              </Box>
-              <HStack spacing={2}>
-              <IconButton
-                as="a"
-                href={file.fileUrl}
-                download={file.fileName}
-                aria-label="Download file"
-                icon={<DownloadIcon />}
-                size="xs"
-                colorScheme="green"
-                variant="ghost"
-              />
-              <IconButton
-                aria-label="Delete file"
-                icon={<DeleteIcon />}
-                size="xs"
-                colorScheme="red"
-                variant="ghost"
-                onClick={() => deleteReceivedFile(index)}
-              />
-            </HStack>
-            </HStack>
-          ))
-        ) : (
-          <Text color="black">No received files yet.</Text>
-        )}
-      </VStack>
+          {/* Received Files */}
+          <VStack align="start" spacing={2}>
+            <Text fontWeight="bold" mb="2px" color="black" whiteSpace="nowrap">
+              Received Files
+            </Text>
+            {receivedFiles.length > 0 ? (
+              receivedFiles.map((file, index) => (
+                <HStack
+                  key={index}
+                  p={2}
+                  borderWidth={1}
+                  borderRadius="md"
+                  width="100%"
+                  justifyContent="space-between"
+                  bg="blue.100"
+                >
+                  <Box>
+                    <Text fontSize="xs">{file.fileName}</Text>
+                  </Box>
+                  <HStack spacing={2}>
+                    <IconButton
+                      as="a"
+                      href={file.fileUrl}
+                      download={file.fileName}
+                      aria-label="Download file"
+                      icon={<DownloadIcon />}
+                      size="xs"
+                      colorScheme="green"
+                      variant="ghost"
+                    />
+                    <IconButton
+                      aria-label="Delete file"
+                      icon={<DeleteIcon />}
+                      size="xs"
+                      colorScheme="red"
+                      variant="ghost"
+                      onClick={() => deleteReceivedFile(index)}
+                    />
+                  </HStack>
+                </HStack>
+              ))
+            ) : (
+              <Text color="black">No received files yet.</Text>
+            )}
+          </VStack>
         </Box>
       </HStack>
     </VStack>
