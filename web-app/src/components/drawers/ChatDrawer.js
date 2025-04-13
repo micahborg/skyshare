@@ -88,7 +88,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
           <VStack spacing={5}>
           <Alert color="black" status='info'>
             <AlertIcon />
-            Chats are only kept here while the session is active.
+            Chats are only kept while the session is active.
           </Alert>
           <VStack align="start" w="100%" p={4} bg="white" borderRadius="md" minHeight="200px" maxHeight="500px" overflowY="auto">
             {texts.map((msg, index) => (

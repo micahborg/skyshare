@@ -1,8 +1,9 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input, Flex, Image } from "@chakra-ui/react";
 import theme from "../theme";
 import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to match your project structure
+import Confetti from "react-confetti";
 
 const Notes: React.FC = () => {
   const [note, setNote] = useState<string>("");
@@ -12,6 +13,8 @@ const Notes: React.FC = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false); // New state for showing search bar
   const [searchTerm, setSearchTerm] = useState<string>(""); // State to store the search input
   const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
+  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Load saved notes from localStorage on component mount
   useEffect(() => {
@@ -101,12 +104,26 @@ const Notes: React.FC = () => {
     setEditingIndex(null); 
   };
 
-  const shareNote = () => {
+  const shareNote = async () => {
     if (isConnected) {
       const noteFile = new Blob([note], { type: 'text/plain' });
       const fileName = `note-${new Date().toISOString()}.txt`;
       const file = new File([noteFile], fileName, { type: 'text/plain' });
-      sendFile(file); 
+      try {
+        // assume sendFile returns a Promise
+        await sendFile(file);
+        // trigger confetti
+        setShowConfetti(true);
+        // clear any existing timer
+        if (confettiTimeout.current) clearTimeout(confettiTimeout.current);
+        // stop confetti after 3s
+        confettiTimeout.current = setTimeout(() => {
+          setShowConfetti(false);
+        }, 3000);
+      } catch (err) {
+        console.error("File share failed", err);
+        alert("Failed to share file");
+      }
     }
   };
 
@@ -133,13 +150,29 @@ const Notes: React.FC = () => {
     }
   };
 
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (confettiTimeout.current) clearTimeout(confettiTimeout.current);
+    };
+  }, []);
+
   return (
     <VStack spacing={4} p={4} h="100vh">
+      {showConfetti && (
+        <Confetti
+          // full-screen
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={500}
+        />
+      )}
       <Heading fontSize="xl" fontWeight="bold" textAlign="center">
         Notes
       </Heading>
 
-      <HStack spacing={4} alignItems="flex-start" height="100%">
+      <HStack spacing={4} alignItems="flex-start" height="100%" maxWidth="100%">
         <VStack p={4} borderRadius="lg" boxShadow="md" backgroundColor="sunnyYellow.100" alignItems="stretch" h="100%" w="30%" flex={2}>
           <Input
             value={customName}

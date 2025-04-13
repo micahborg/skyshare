@@ -91,11 +91,17 @@ const Notes = () => {
         <VStack spacing={4} w="100%" flex={1} overflow="hidden">
           <Alert color="black" status='info'>
             <AlertIcon />
-            Chats are only kept here while the session is active.
+            Chats are only kept while the session is active.
           </Alert>
-          <VStack flex={1} overflowY="auto" id="chatbox" align="start" w="100%" p={4} bg="white" borderRadius="md">
+          <VStack flex={1} overflowY="auto" overflowX="auto" id="chatbox" align="start" w="100%" p={4} bg="white" borderRadius="md">
             {texts.map((msg, index) => (
-              <Text color="black" key={index} alignSelf={msg.sender === "local" ? "end" : "start"}>
+              <Text 
+                color="black" 
+                key={index} 
+                alignSelf={msg.sender === "local" ? "end" : "start"}
+                overflowWrap="break-word"
+                whiteSpace="break-word"
+              >
                 <strong>{msg.sender === "local" ? "You" : "Remote"}:</strong> {linkifyText(msg.text)}
               </Text>
             ))}

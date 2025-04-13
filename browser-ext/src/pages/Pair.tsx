@@ -9,7 +9,6 @@ import PairBox from "../components/pair/PairBox.jsx";
 const Landing = () => {
   const { setIsLoading } = useLoading();
   const { isConnected, sendFile } = useWebRtc();
-  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -19,10 +18,11 @@ const Landing = () => {
     }
   };
 
-  const handleShareFile = () => {
+  const handleShareFile = async () => {
     if (selectedFile && isConnected) {
-      sendFile(selectedFile);
-
+      setIsLoading(true);
+      await sendFile(selectedFile);
+      setIsLoading(false);
       const sharedItems = JSON.parse(localStorage.getItem("sharedItems") || "[]");
       const newSharedItems = [...sharedItems, selectedFile.name];
       localStorage.setItem("sharedItems", JSON.stringify(newSharedItems));
@@ -78,7 +78,7 @@ const Landing = () => {
               Share
             </Button>
             <Text fontSize="xs" color="gray.500" textAlign="center" mt={2}>
-              If you're connecting via mobile, visit <strong>skyshare.technology</strong>.
+              If you're connecting via mobile, visit <a href="https://skyshare.technology" target="_blank" rel="noopener noreferrer"><strong>skyshare.technology</strong></a>.
             </Text>
           </VStack>
         </HStack>
