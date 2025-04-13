@@ -77,6 +77,9 @@ const Landing = () => {
             >
               Share
             </Button>
+            <Text fontSize="xs" color="gray.500" textAlign="center" mt={2}>
+              If you're connecting via mobile, visit <strong>skyshare.technology</strong>.
+            </Text>
           </VStack>
         </HStack>
       </Box>
