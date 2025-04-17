@@ -17,22 +17,32 @@ const GiraffeGame: React.FC = () => {
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const obstacleId = useRef(0);
   const obstaclesRef = useRef(obstacles); // Ref to store the latest obstacles state
-  
+  const [gameOver, setGameOver] = useState(false);
+
 
   // Update the ref whenever obstacles change
   useEffect(() => {
     obstaclesRef.current = obstacles;
   }, [obstacles]);
 
-  const jump = () => {
-    if (isJumping) return; // Prevent jumping while already jumping
-    setIsJumping(true);
+  const isJumpingRef = useRef(isJumping);
 
-    // Set the jump duration and reset it after a smooth transition
-    setTimeout(() => {
-      setIsJumping(false);
-    }, 500); // Duration of the jump
-  };
+useEffect(() => {
+  isJumpingRef.current = isJumping;
+}, [isJumping]);
+
+
+const jump = () => {
+  if (isJumpingRef.current) return;
+  setIsJumping(true);
+  isJumpingRef.current = true;
+
+  setTimeout(() => {
+    setIsJumping(false);
+    isJumpingRef.current = false;
+  }, 500);
+};
+
 
   const duck = (isKeyDown: boolean) => {
     setIsDucking(isKeyDown); // Set ducking state based on key press
@@ -40,32 +50,35 @@ const GiraffeGame: React.FC = () => {
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.repeat) return; // 👈 This line blocks held key repeats
-    
+      if (event.repeat || gameOver) return;
+  
       if (event.code === 'Space') {
-        jump(); // Trigger jump on spacebar press
+        event.preventDefault();
+        jump();
       } else if (event.code === 'ArrowDown') {
-        duck(true); // Start ducking on down arrow press
+        duck(true);
       }
     };
-
+  
     const handleKeyRelease = (event: KeyboardEvent) => {
       if (event.code === 'ArrowDown') {
-        duck(false); // Stop ducking on down arrow release
+        duck(false);
       }
     };
-
+  
     document.addEventListener('keydown', handleKeyPress);
     document.addEventListener('keyup', handleKeyRelease);
-
+  
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
       document.removeEventListener('keyup', handleKeyRelease);
     };
-  }, [isJumping]);
+  }, []);
+  
 
   // Generate obstacles at random intervals
   useEffect(() => {
+    if (gameOver) return;
     const generateObstacle = () => {
       // const isHighObstacle = score > 20 && Math.random() < 0.5; // Start generating high obstacles after score > 20
       const randomValue = Math.random();
@@ -93,6 +106,7 @@ const GiraffeGame: React.FC = () => {
 
   // Move obstacles and check for collisions
   useEffect(() => {
+    if (gameOver) return; //stops the game loop when the game is over
     const gameLoop = setInterval(() => {
       // Adjust the speed based on the score (e.g., speed increases as the score increases)
       const speed = Math.max(10, 10 + Math.floor(score / 20)); // Increase speed every 25 points
@@ -118,9 +132,9 @@ const GiraffeGame: React.FC = () => {
           ((obstacle.type === 'low' && giraffe.bottom > obstacleRect.top) || // Collision with low obstacle
             (obstacle.type === 'high' && !isDucking && giraffe.top < obstacleRect.bottom)) // Collision with high obstacle
         ) {
-          alert('Game Over! Your score: ' + score);
-          setScore(0);
-          setObstacles([]);
+          setGameOver(true)
+          // setScore(0);
+          // setObstacles([]);
           //obstacleId.current = 0; // Reset obstacle ID counter
         }
       });
@@ -129,7 +143,7 @@ const GiraffeGame: React.FC = () => {
     }, 50); // Game loop runs every 50ms
 
     return () => clearInterval(gameLoop);
-  }, [score, isDucking]);
+  }, [score, isDucking, gameOver]);
 
   return (
     <div
@@ -216,6 +230,37 @@ const GiraffeGame: React.FC = () => {
       >
         Score: {score}
       </div>
+      {gameOver && (
+  <div
+    style={{
+      position: 'absolute',
+      top: '40%',
+      textAlign: 'center',
+      width: '100%',
+      fontSize: '24px',
+      fontWeight: 'bold',
+    }}
+  >
+    <div>Game Over! Final Score: {score}</div>
+    <button
+      onClick={() => {
+        setGameOver(false);
+        setScore(0);
+        setObstacles([]);
+        obstacleId.current = 0;
+      }}
+      style={{
+        marginTop: '20px',
+        padding: '10px 20px',
+        fontSize: '18px',
+        cursor: 'pointer',
+      }}
+    >
+      Restart Game
+    </button>
+  </div>
+)}
+
     </div>
   );
 };
