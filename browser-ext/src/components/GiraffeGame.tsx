@@ -234,11 +234,14 @@ const jump = () => {
   <div
     style={{
       position: 'absolute',
-      top: '40%',
       textAlign: 'center',
       width: '100%',
-      fontSize: '24px',
+      fontSize: '22px',
       fontWeight: 'bold',
+      top: '50%',
+      left: '36%',
+      transform: 'translate(-50%, -50%)',
+      color: "black"
     }}
   >
     <div>Game Over! Final Score: {score}</div>
@@ -251,10 +254,11 @@ const jump = () => {
       }}
       style={{
         marginTop: '20px',
+        marginRight: '30px',
         padding: '10px 20px',
         fontSize: '18px',
-        cursor: 'pointer',
-      }}
+        cursor: 'pointer'
+            }}
     >
       Restart Game
     </button>
