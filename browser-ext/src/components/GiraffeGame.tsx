@@ -17,6 +17,7 @@ const GiraffeGame: React.FC = () => {
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const obstacleId = useRef(0);
   const obstaclesRef = useRef(obstacles); // Ref to store the latest obstacles state
+  
 
   // Update the ref whenever obstacles change
   useEffect(() => {
@@ -39,6 +40,8 @@ const GiraffeGame: React.FC = () => {
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.repeat) return; // 👈 This line blocks held key repeats
+    
       if (event.code === 'Space') {
         jump(); // Trigger jump on spacebar press
       } else if (event.code === 'ArrowDown') {
