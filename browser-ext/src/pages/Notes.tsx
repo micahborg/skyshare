@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input, Flex, Image } from "@chakra-ui/react";
+import { Box, Textarea, Text, Button, VStack, HStack, Heading, Input, Flex, Image, Tooltip } from "@chakra-ui/react";
+import { useToast } from '@chakra-ui/react'
 import theme from "../theme";
 import { useWebRtc } from '../contexts/WebRtcContext'; // Adjust the path to match your project structure
 import Confetti from "react-confetti";
@@ -15,6 +16,7 @@ const Notes: React.FC = () => {
   const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
   const [showConfetti, setShowConfetti] = useState(false);
   const confettiTimeout = useRef<NodeJS.Timeout | null>(null);
+  const toast = useToast();
 
   // Load saved notes from localStorage on component mount
   useEffect(() => {
@@ -114,6 +116,12 @@ const Notes: React.FC = () => {
         await sendFile(file);
         // trigger confetti
         setShowConfetti(true);
+        toast({
+          title: 'Note shared successfully!',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
         // clear any existing timer
         if (confettiTimeout.current) clearTimeout(confettiTimeout.current);
         // stop confetti after 3s
@@ -198,9 +206,19 @@ const Notes: React.FC = () => {
             resize="none"
           />
           <HStack width="100%" justifyContent="space-between" pt={2}>
-            <Button onClick={shareNote}>+</Button> 
+            <Tooltip label={isConnected ? "Share note" : "Connect to a device to share note"} hasArrow>
+            <Button 
+              onClick={shareNote} 
+              isDisabled={!isConnected}
+            >+</Button> 
+            </Tooltip>
             <Button onClick={saveNote}>Save</Button>
-            <Button onClick={deleteNote} isDisabled={editingIndex === null}>-</Button>
+            <Tooltip label="Delete note" hasArrow>
+              <Button 
+                onClick={deleteNote} 
+                isDisabled={editingIndex === null}
+              >-</Button>
+            </Tooltip>
           </HStack>
         </VStack>
 

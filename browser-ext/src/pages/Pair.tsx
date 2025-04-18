@@ -4,10 +4,12 @@ import { Box, VStack, HStack, Heading, Button, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useLoading } from "../contexts/LoadingContext";
 import { useWebRtc } from "../contexts/WebRtcContext";
+import { useToast } from "@chakra-ui/react";
 import PairBox from "../components/pair/PairBox.jsx";
 
 const Landing = () => {
   const { setIsLoading } = useLoading();
+  const toast = useToast();
   const { isConnected, sendFile } = useWebRtc();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -26,6 +28,12 @@ const Landing = () => {
       const sharedItems = JSON.parse(localStorage.getItem("sharedItems") || "[]");
       const newSharedItems = [...sharedItems, selectedFile.name];
       localStorage.setItem("sharedItems", JSON.stringify(newSharedItems));
+      toast({
+        title: "File shared successfully!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } else {
       alert("Please select a file and ensure you are connected.");
     }

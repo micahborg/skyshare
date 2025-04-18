@@ -13,6 +13,7 @@ import {
 import { useWebRtc } from "../contexts/WebRtcContext";
 import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
 import { useLoading } from "../contexts/LoadingContext";
+import { useToast } from "@chakra-ui/react";
 import Confetti from "react-confetti";
 
 interface ReceivedFile {
@@ -28,6 +29,7 @@ const Files = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const confettiTimeout = useRef<NodeJS.Timeout | null>(null);
   const { setIsLoading } = useLoading();
+  const toast = useToast();
 
   const { isConnected, sendFile, files: webrtcFiles } = useWebRtc();
 
@@ -59,6 +61,13 @@ const Files = () => {
       // disable loading and trigger confetti
       setIsLoading(false);
       setShowConfetti(true);
+      toast({
+        title: "File shared successfully!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
       // clear any existing timer
       if (confettiTimeout.current) clearTimeout(confettiTimeout.current);
       // stop confetti after 3s
