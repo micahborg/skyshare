@@ -52,7 +52,7 @@ const jump = () => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.repeat || gameOver) return;
   
-      if (event.code === 'Space') {
+      if (event.code === 'Space' || event.code === 'ArrowUp') {
         event.preventDefault();
         jump();
       } else if (event.code === 'ArrowDown') {
