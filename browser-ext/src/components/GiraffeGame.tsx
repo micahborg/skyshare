@@ -11,7 +11,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const GiraffeGame: React.FC = () => {
   const [isJumping, setIsJumping] = useState(false);
   const [isDucking, setIsDucking] = useState(false); // New state for ducking
-  const [obstacles, setObstacles] = useState<{ id: number; left: number; type: 'low' | 'high' }[]>([]);
+  const [obstacles, setObstacles] = useState<{ id: number; left: number; type: 'low' | 'medium' | 'high' }[]>([]);
   const [score, setScore] = useState(0);
   const giraffeRef = useRef<HTMLDivElement | null>(null);
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
@@ -80,17 +80,26 @@ const jump = () => {
   useEffect(() => {
     if (gameOver) return;
     const generateObstacle = () => {
-      // const isHighObstacle = score > 20 && Math.random() < 0.5; // Start generating high obstacles after score > 20
       const randomValue = Math.random();
-      const isHighObstacle = obstacleId.current > 15 && randomValue < 0.5; // Start generating high obstacles after 20 obstacles
-      
-      const newObstacle = { id: obstacleId.current++, left: window.innerWidth, type: isHighObstacle ? 'high' : 'low' };
-      
-      setObstacles((prev) => [
-        ...prev,
-        { id: obstacleId.current++, left: window.innerWidth, type: isHighObstacle ? 'high' : 'low' },
-      ]);
-
+      let obstacleType: 'low' | 'medium' | 'high';
+  
+      if (obstacleId.current > 15) {
+        // Start generating medium and high obstacles after 15 obstacles
+        if (randomValue < 0.33) {
+          obstacleType = 'low';
+        } else if (randomValue < 0.66) {
+          obstacleType = 'medium';
+        } else {
+          obstacleType = 'high';
+        }
+      } else {
+        // Only generate low obstacles initially
+        obstacleType = 'low';
+      }
+  
+      const newObstacle = { id: obstacleId.current++, left: window.innerWidth, type: obstacleType };
+      setObstacles((prev) => [...prev, newObstacle]);
+  
       // Set a random delay for the next obstacle
       const randomDelay = Math.random() * 2000 + 1000; // Random delay between 1s and 3s
       setTimeout(generateObstacle, randomDelay);
@@ -208,7 +217,13 @@ const jump = () => {
             alt="Obstacle"
             style={{
               position: 'absolute',
-              bottom: obstacle.type === 'low' ? '50px' : '95px', // High obstacles are at head height
+              // bottom: obstacle.type === 'low' ? '50px' : '95px', // High obstacles are at head height
+              bottom:
+                obstacle.type === 'low'
+                  ? '50px' // Low obstacles are on the ground
+                  : obstacle.type === 'medium'
+                  ? '95px' // Medium obstacles are at head height
+                  : '140px', // High obstacles are above the giraffe's head
               left: `${obstacle.left}px`,
               width: '30px',
               height: '30px',
