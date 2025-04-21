@@ -1,46 +1,62 @@
 "use client";
-import React, { useRef, useState } from "react";
-import { Box, VStack, HStack, Heading, Button, Text } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { useLoading } from "../contexts/LoadingContext";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  VStack,
+  HStack,
+  Heading,
+  Button,
+  Text,
+  Input,
+  FormControl,
+  useToast,
+} from "@chakra-ui/react";
 import { useWebRtc } from "../contexts/WebRtcContext";
-import { useToast } from "@chakra-ui/react";
 import PairBox from "../components/pair/PairBox.jsx";
 
 const Landing = () => {
-  const { setIsLoading } = useLoading();
   const toast = useToast();
-  const { isConnected, sendFile } = useWebRtc();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { isConnected, connectDevice } = useWebRtc();
+  const [pairIdInput, setPairIdInput] = useState("");
+  const [connecting, setConnecting] = useState(false);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setSelectedFile(event.target.files[0]);
-    }
-  };
+  const handleConnectToPeer = async () => {
+    const trimmedId = pairIdInput.trim();
 
-  const handleShareFile = async () => {
-    if (selectedFile && isConnected) {
-      setIsLoading(true);
-      await sendFile(selectedFile);
-      setIsLoading(false);
-      const sharedItems = JSON.parse(localStorage.getItem("sharedItems") || "[]");
-      const newSharedItems = [...sharedItems, selectedFile.name];
-      localStorage.setItem("sharedItems", JSON.stringify(newSharedItems));
+    if (!trimmedId) {
       toast({
-        title: "File shared successfully!",
+        title: "Invalid Pair ID",
+        description: "Please enter a valid pair ID",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setConnecting(true);
+    try {
+      await connectDevice(trimmedId);
+      toast({
+        title: "Connected!",
+        description: "Successfully connected to peer.",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
-    } else {
-      alert("Please select a file and ensure you are connected.");
+    } catch (err) {
+      toast({
+        title: "Connection Failed",
+        description: "Could not connect to the peer ID.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      console.error("WebRTC Connection Error:", err);
+    } finally {
+      setConnecting(false);
+      setPairIdInput(""); // reset textbox to original state
     }
-  };
-
-  const handleFileButtonClick = () => {
-    fileInputRef.current?.click(); // Triggers the hidden file input
   };
 
   return (
@@ -56,37 +72,38 @@ const Landing = () => {
           </Box>
 
           <VStack w="50%" spacing={3} alignItems="center" justify="center">
-            {/* Custom button to trigger file picker */}
+            <FormControl>
+              <Input
+                placeholder="Enter Pair ID"
+                value={pairIdInput}
+                onChange={(e) => setPairIdInput(e.target.value)}
+                size="sm"
+                bg="white"
+                color="black" // Fix text visibility issue
+                mb={2}
+              />
+            </FormControl>
+
             <Button
               size="xs"
-              onClick={handleFileButtonClick}
+              onClick={handleConnectToPeer}
+              colorScheme="blue"
+              isLoading={connecting}
+              isDisabled={isConnected || connecting}
             >
-              Select File
+              Connect
             </Button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
 
-            {/* Show selected file name if exists */}
-            {selectedFile && (
-              <Text fontSize="sm" color="gray.700">
-                Selected: {selectedFile.name}
-              </Text>
-            )}
 
-            <Button 
-              size="xs" 
-              onClick={handleShareFile}
-              disabled={!isConnected}
-              title="You must be connected to enable file sharing"
-            >
-              Share
-            </Button>
             <Text fontSize="xs" color="gray.500" textAlign="center" mt={2}>
-              If you're connecting via mobile, visit <a href="https://skyshare.technology" target="_blank" rel="noopener noreferrer"><strong>skyshare.technology</strong></a>.
+              If you're connecting via mobile, visit{" "}
+              <a
+                href="https://skyshare.technology"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <strong>skyshare.technology</strong>
+              </a>.
             </Text>
           </VStack>
         </HStack>
