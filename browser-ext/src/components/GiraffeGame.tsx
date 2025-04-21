@@ -82,7 +82,7 @@ const jump = () => {
     const generateObstacle = () => {
       // const isHighObstacle = score > 20 && Math.random() < 0.5; // Start generating high obstacles after score > 20
       const randomValue = Math.random();
-      const isHighObstacle = obstacleId.current > 20 && randomValue < 0.5; // Start generating high obstacles after 20 obstacles
+      const isHighObstacle = obstacleId.current > 15 && randomValue < 0.5; // Start generating high obstacles after 20 obstacles
       
       const newObstacle = { id: obstacleId.current++, left: window.innerWidth, type: isHighObstacle ? 'high' : 'low' };
       
@@ -208,7 +208,7 @@ const jump = () => {
             alt="Obstacle"
             style={{
               position: 'absolute',
-              bottom: obstacle.type === 'low' ? '50px' : '150px', // High obstacles are at head height
+              bottom: obstacle.type === 'low' ? '50px' : '95px', // High obstacles are at head height
               left: `${obstacle.left}px`,
               width: '30px',
               height: '30px',
