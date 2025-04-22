@@ -18,6 +18,9 @@ const GiraffeGame: React.FC = () => {
   const obstacleId = useRef(0);
   const obstaclesRef = useRef(obstacles); // Ref to store the latest obstacles state
   const [gameOver, setGameOver] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
+  const cooldownRef = useRef(false); // for real-time check in callbacks
+  const isGiraffeBusy = () => isJumpingRef.current || isDuckingRef.current || cooldownRef.current;
 
 
   // Update the ref whenever obstacles change
@@ -31,11 +34,21 @@ useEffect(() => {
   isJumpingRef.current = isJumping;
 }, [isJumping]);
 
+const startCooldown = (duration = 980) => {
+  setCooldown(true);
+  cooldownRef.current = true;
+  setTimeout(() => {
+    setCooldown(false);
+    cooldownRef.current = false;
+  }, duration);
+};
+
 
 const jump = () => {
-  if (isJumpingRef.current) return;
+  if (isGiraffeBusy()) return; // Don't jump if busy
   setIsJumping(true);
   isJumpingRef.current = true;
+  startCooldown();
 
   setTimeout(() => {
     setIsJumping(false);
@@ -44,9 +57,26 @@ const jump = () => {
 };
 
 
-  const duck = (isKeyDown: boolean) => {
-    setIsDucking(isKeyDown); // Set ducking state based on key press
-  };
+
+const duck = () => {
+  if (isGiraffeBusy()) return;
+  setIsDucking(true);
+  isDuckingRef.current = true;
+  startCooldown();
+
+  setTimeout(() => {
+    setIsDucking(false);
+    isDuckingRef.current = false;
+  }, 500);
+};
+
+
+
+const isDuckingRef = useRef(false);
+useEffect(() => {
+  isDuckingRef.current = isDucking;
+}, [isDucking]);
+
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -56,14 +86,14 @@ const jump = () => {
         event.preventDefault();
         jump();
       } else if (event.code === 'ArrowDown') {
-        duck(true);
+        duck();
       }
     };
   
     const handleKeyRelease = (event: KeyboardEvent) => {
       if (event.code === 'ArrowDown') {
-        duck(false);
-      }
+        duck();
+      } 
     };
   
     document.addEventListener('keydown', handleKeyPress);
