@@ -8,6 +8,7 @@ Modified Date: 3/23
 // SO FAR: Giraffe jumps in white space :O
 
 import React, { useState, useEffect, useRef } from 'react';
+
 const GiraffeGame: React.FC = () => {
   const [isJumping, setIsJumping] = useState(false);
   const [isDucking, setIsDucking] = useState(false); // New state for ducking
@@ -22,7 +23,6 @@ const GiraffeGame: React.FC = () => {
   const cooldownRef = useRef(false); // for real-time check in callbacks
   const isGiraffeBusy = () => isJumpingRef.current || isDuckingRef.current || cooldownRef.current;
 
-
   // Update the ref whenever obstacles change
   useEffect(() => {
     obstaclesRef.current = obstacles;
@@ -30,58 +30,52 @@ const GiraffeGame: React.FC = () => {
 
   const isJumpingRef = useRef(isJumping);
 
-useEffect(() => {
-  isJumpingRef.current = isJumping;
-}, [isJumping]);
+  useEffect(() => {
+    isJumpingRef.current = isJumping;
+  }, [isJumping]);
 
-const startCooldown = (duration = 980) => {
-  setCooldown(true);
-  cooldownRef.current = true;
-  setTimeout(() => {
-    setCooldown(false);
-    cooldownRef.current = false;
-  }, duration);
-};
+  const startCooldown = (duration = 980) => {
+    setCooldown(true);
+    cooldownRef.current = true;
+    setTimeout(() => {
+      setCooldown(false);
+      cooldownRef.current = false;
+    }, duration);
+  };
 
+  const jump = () => {
+    if (isGiraffeBusy()) return; // Don't jump if busy
+    setIsJumping(true);
+    isJumpingRef.current = true;
+    startCooldown();
 
-const jump = () => {
-  if (isGiraffeBusy()) return; // Don't jump if busy
-  setIsJumping(true);
-  isJumpingRef.current = true;
-  startCooldown();
+    setTimeout(() => {
+      setIsJumping(false);
+      isJumpingRef.current = false;
+    }, 500);
+  };
 
-  setTimeout(() => {
-    setIsJumping(false);
-    isJumpingRef.current = false;
-  }, 500);
-};
+  const duck = () => {
+    if (isGiraffeBusy()) return;
+    setIsDucking(true);
+    isDuckingRef.current = true;
+    startCooldown();
 
+    setTimeout(() => {
+      setIsDucking(false);
+      isDuckingRef.current = false;
+    }, 500);
+  };
 
-
-const duck = () => {
-  if (isGiraffeBusy()) return;
-  setIsDucking(true);
-  isDuckingRef.current = true;
-  startCooldown();
-
-  setTimeout(() => {
-    setIsDucking(false);
-    isDuckingRef.current = false;
-  }, 500);
-};
-
-
-
-const isDuckingRef = useRef(false);
-useEffect(() => {
-  isDuckingRef.current = isDucking;
-}, [isDucking]);
-
+  const isDuckingRef = useRef(false);
+  useEffect(() => {
+    isDuckingRef.current = isDucking;
+  }, [isDucking]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.repeat || gameOver) return;
-  
+
       if (event.code === 'Space' || event.code === 'ArrowUp') {
         event.preventDefault();
         jump();
@@ -89,22 +83,21 @@ useEffect(() => {
         duck();
       }
     };
-  
+
     const handleKeyRelease = (event: KeyboardEvent) => {
       if (event.code === 'ArrowDown') {
         duck();
-      } 
+      }
     };
-  
+
     document.addEventListener('keydown', handleKeyPress);
     document.addEventListener('keyup', handleKeyRelease);
-  
+
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
       document.removeEventListener('keyup', handleKeyRelease);
     };
   }, []);
-  
 
   // Generate obstacles at random intervals
   useEffect(() => {
@@ -112,7 +105,7 @@ useEffect(() => {
     const generateObstacle = () => {
       const randomValue = Math.random();
       let obstacleType: 'low' | 'medium' | 'high';
-  
+
       if (obstacleId.current > 15) {
         // Start generating medium and high obstacles after 15 obstacles
         if (randomValue < 0.33) {
@@ -126,10 +119,10 @@ useEffect(() => {
         // Only generate low obstacles initially
         obstacleType = 'low';
       }
-  
+
       const newObstacle = { id: obstacleId.current++, left: window.innerWidth, type: obstacleType };
       setObstacles((prev) => [...prev, newObstacle]);
-  
+
       // Set a random delay for the next obstacle
       const randomDelay = Math.random() * 2000 + 1000; // Random delay between 1s and 3s
       setTimeout(generateObstacle, randomDelay);
@@ -172,9 +165,6 @@ useEffect(() => {
             (obstacle.type === 'high' && !isDucking && giraffe.top < obstacleRect.bottom)) // Collision with high obstacle
         ) {
           setGameOver(true)
-          // setScore(0);
-          // setObstacles([]);
-          //obstacleId.current = 0; // Reset obstacle ID counter
         }
       });
 
@@ -191,7 +181,7 @@ useEffect(() => {
         position: 'relative',
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#f0f0f0',
+        background: 'linear-gradient(to bottom, #BFEFFF 60%, #90EE90 60%)', // Background with grass at the bottom
         overflow: 'hidden',
         display: 'flex',
         justifyContent: 'center',
@@ -216,16 +206,15 @@ useEffect(() => {
         ref={giraffeRef}
         style={{
           position: 'absolute',
-          bottom: isJumping ? '150px' :isDucking ? '20px' : '50px', // Giraffe jumps when space is pressed
+          bottom: isJumping ? '150px' : isDucking ? '20px' : '50px', // Giraffe jumps when space is pressed
           left: '50px',
           width: '50px', // Width of the giraffe image (container size)
           height: '50px', // Keep the height consistent
-          transition: 'bottom 0.5s ease-out',  // Smooth transition for ducking
+          transition: 'bottom 0.5s ease-out', // Smooth transition for ducking
         }}
       >
-        {/* Giraffe Image with conditional image change based on jumping state */}
         <img
-          src={isJumping ? '/images/jumpinggiraffe.png' : isDucking ? '/images/jumpinggiraffe.png' : '/images/giraffetransparent.png'}  // Switch image based on jump state
+          src={isJumping ? '/images/jumpinggiraffe.png' : isDucking ? '/images/jumpinggiraffe.png' : '/images/giraffetransparent.png'}
           alt="Giraffe"
           style={{
             width: '100%',
@@ -235,8 +224,8 @@ useEffect(() => {
           }}
         />
       </div>
+
       {/* Obstacles */}
-  
       {obstacles.map((obstacle) => {
         const obstacleId = `obstacle-${obstacle.id}`;
         return (
@@ -247,7 +236,6 @@ useEffect(() => {
             alt="Obstacle"
             style={{
               position: 'absolute',
-              // bottom: obstacle.type === 'low' ? '50px' : '95px', // High obstacles are at head height
               bottom:
                 obstacle.type === 'low'
                   ? '50px' // Low obstacles are on the ground
@@ -275,41 +263,40 @@ useEffect(() => {
       >
         Score: {score}
       </div>
-      {gameOver && (
-  <div
-    style={{
-      position: 'absolute',
-      textAlign: 'center',
-      width: '100%',
-      fontSize: '22px',
-      fontWeight: 'bold',
-      top: '50%',
-      left: '36%',
-      transform: 'translate(-50%, -50%)',
-      color: "black"
-    }}
-  >
-    <div>Game Over! Final Score: {score}</div>
-    <button
-      onClick={() => {
-        setGameOver(false);
-        setScore(0);
-        setObstacles([]);
-        obstacleId.current = 0;
-      }}
-      style={{
-        marginTop: '20px',
-        marginRight: '30px',
-        padding: '10px 20px',
-        fontSize: '18px',
-        cursor: 'pointer'
-            }}
-    >
-      Restart Game
-    </button>
-  </div>
-)}
 
+      {gameOver && (
+        <div
+          style={{
+            position: 'absolute',
+            textAlign: 'center',
+            width: '100%',
+            fontSize: '22px',
+            fontWeight: 'bold',
+            top: '50%',
+            left: '36%',
+            transform: 'translate(-50%, -50%)',
+            color: 'black',
+          }}
+        >
+          <div>Game Over! Final Score: {score}</div>
+          <button
+            onClick={() => {
+              setGameOver(false);
+              setScore(0);
+              setObstacles([]);
+              obstacleId.current = 0;
+            }}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              fontSize: '18px',
+              cursor: 'pointer',
+            }}
+          >
+            Restart Game
+          </button>
+        </div>
+      )}
     </div>
   );
 };
