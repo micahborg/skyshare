@@ -141,7 +141,7 @@ const GiraffeGame: React.FC = () => {
     if (gameOver) return; //stops the game loop when the game is over
     const gameLoop = setInterval(() => {
       // Adjust the speed based on the score (e.g., speed increases as the score increases)
-      const speed = Math.max(10, 10 + Math.floor(score / 20)); // Increase speed every 25 points
+      const speed = Math.max(10, 10 + Math.floor(score / 40)); // Increase speed every 25 points
 
       setObstacles((prev) =>
         prev
@@ -161,8 +161,11 @@ const GiraffeGame: React.FC = () => {
           obstacleRect &&
           giraffe.left < obstacleRect.right &&
           giraffe.right > obstacleRect.left &&
-          ((obstacle.type === 'low' && giraffe.bottom > obstacleRect.top) || // Collision with low obstacle
-            (obstacle.type === 'high' && !isDucking && giraffe.top < obstacleRect.bottom)) // Collision with high obstacle
+          (
+            (obstacle.type === 'low' && giraffe.bottom > obstacleRect.top) || // Collision with low obstacle
+            (obstacle.type === 'medium' && !isDucking && giraffe.top < obstacleRect.bottom) || // Collision with medium obstacle
+            (obstacle.type === 'high' && giraffe.top < obstacleRect.bottom) // Collision with high obstacle
+          )
         ) {
           setGameOver(true)
         }
@@ -240,7 +243,7 @@ const GiraffeGame: React.FC = () => {
                 obstacle.type === 'low'
                   ? '50px' // Low obstacles are on the ground
                   : obstacle.type === 'medium'
-                  ? '95px' // Medium obstacles are at head height
+                  ? '85px' // Medium obstacles are at head height
                   : '140px', // High obstacles are above the giraffe's head
               left: `${obstacle.left}px`,
               width: '30px',
