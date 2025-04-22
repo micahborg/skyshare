@@ -5,7 +5,7 @@ Date Created: 3/23/2025
 Modified Date: 3/23
 */
 
-// SO FAR: Giraffe jumps in white space :O
+// Added background!!!
 
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -181,7 +181,7 @@ const GiraffeGame: React.FC = () => {
         position: 'relative',
         width: '100vw',
         height: '100vh',
-        background: 'linear-gradient(to bottom, #BFEFFF 60%, #90EE90 60%)', // Background with grass at the bottom
+        background: 'linear-gradient(to bottom, #BFEFFF 65%, #90EE90 65%)', // Background with grass at the bottom
         overflow: 'hidden',
         display: 'flex',
         justifyContent: 'center',
