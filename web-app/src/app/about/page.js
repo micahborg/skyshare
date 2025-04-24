@@ -63,6 +63,20 @@ function About() {
                     </Heading>
                     We are committed to making your digital life easier. Our goal is to provide a fast and user-friendly file transfer solution that allows you to stay connected across all your devices. With skyShare, transferring files becomes as simple as a tap, ensuring your data is always just a few steps away—no matter the device you are using.
 
+                    <Text>
+                    <br />
+                    Please take a moment to review our{" "}
+                    <Link 
+                        href="/privacy" 
+                        color="blue.500" // Link color
+                        textDecoration="none" // Remove underline by default
+                        _hover={{ textDecoration: 'underline' }} // Add underline on hover
+                    >
+                        Prvacy Policy
+                    </Link>
+                    . We are committed to keeping you data fully peer-to-peer.
+                    </Text>
+
                     <Heading as="h3" size="md" mb={2} mt={10}>
                         Who We Are
                     </Heading>

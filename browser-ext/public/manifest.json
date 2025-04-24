@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "skyShare 2.0",
+  "name": "skyShare: P2P File Sharing",
   "version": "1.0",
   "description": "A browser extension built for peer-to-peer file sharing across any device.",
   "action": {
