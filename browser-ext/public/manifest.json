@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "skyShare 2.0",
   "version": "1.0",
-  "description": "A browser extension built for sharing files between devices.",
+  "description": "A browser extension built for peer-to-peer file sharing across any device.",
   "action": {
     "default_popup": "index.html",
     "default_icon": "icon.png"
@@ -10,21 +10,10 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": [
-    "<all_urls>",
-    "https://skyshare.technology/*"
-  ],
   "web_accessible_resources": [
     {
       "resources": ["next_static/static/*", "icon.png"],
       "matches": ["<all_urls>"]
-    }
-  ],
-  "content_scripts": [
-    {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["inject.js", "contentScript.js"]
     }
   ]
 }
