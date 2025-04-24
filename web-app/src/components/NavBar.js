@@ -61,7 +61,7 @@ const NavBar = () => {
                 flexDirection="row" // Align logo (image) to the right of the text
             >
                 <Heading fontSize={logoFontSize}>skyShare</Heading>
-                <Image boxSize={imageSize} src="images/giraffetransparent.png" alt="skyShare logo" />
+                <Image objectFit='contain' boxSize={imageSize} src="images/giraffe_transparent_small.png" alt="skyShare logo" />
             </Flex>
         </HStack>
     );
