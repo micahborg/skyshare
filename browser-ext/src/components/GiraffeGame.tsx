@@ -217,7 +217,7 @@ const GiraffeGame: React.FC = () => {
         }}
       >
         <img
-          src={isJumping ? '/images/jumpinggiraffe.png' : isDucking ? '/images/jumpinggiraffe.png' : '/images/giraffetransparent.png'}
+          src={isJumping ? '/images/jumpinggiraffe.png' : isDucking ? '/images/jumpinggiraffe.png' : '/images/giraffe_transparent_small.png'}
           alt="Giraffe"
           style={{
             width: '100%',

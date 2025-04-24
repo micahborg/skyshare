@@ -55,7 +55,7 @@ const NavBar = () => {
                 cursor="pointer" // Add pointer cursor indicating it's clickable
             >
                 <Heading fontSize="xs" whiteSpace="nowrap">skyShare</Heading>
-                <Image boxSize="20px" src="/images/giraffetransparent.png" alt="skyShare logo" />
+                <Image boxSize="20px" src="/images/giraffe_transparent_small.png" alt="skyShare logo" />
             </Flex>
             <Heading fontSize="xs" whiteSpace="nowrap">2.0</Heading>
 
