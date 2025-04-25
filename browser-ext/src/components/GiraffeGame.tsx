@@ -217,13 +217,13 @@ const GiraffeGame: React.FC = () => {
         }}
       >
         <img
-          src={isJumping ? '/images/updatedgiraffejumping.png' : isDucking ? '/images/updatedgiraffejumping' : '/images/giraffe_transparent_small.png'}
+          src={isJumping ? '/images/updatedgiraffejumping.png' : isDucking ? '/images/duckinggiraffe.png' : '/images/giraffe_transparent_small.png'}
           alt="Giraffe"
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'contain',
-            transform: `scaleX(-1) ${isJumping ? 'scale(2)' : 'scale(1)'}`, // Huge scaling on jump (3x bigger)
+            transform: `scaleX(-1) ${isJumping || isDucking ? 'scale(2)' : 'scale(1)'}`, // Huge scaling on jump and duck (2x bigger)
           }}
         />
       </div>
