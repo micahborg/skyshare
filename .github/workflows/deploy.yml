@@ -27,9 +27,11 @@ jobs:
         working-directory: browser-ext
         run: yarn build
       - name: Zip build folder
+        working-directory: browser-ext/build
         run: |
-          cd browser-ext/build
-          zip -r ../chrome-extension.zip .
+          zip -r "../skyshare-chrome-web-$TAG_NAME.zip" .
+        env:
+          TAG_NAME: ${{ github.ref_name }}
       - name: Extract release notes from CHANGELOG.md
         run: |
           VERSION="${{ github.ref_name }}"  # e.g., v1.1.0
@@ -38,9 +40,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ github.ref_name }}
+          name: Chrome Web Release ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           body_path: RELEASE_NOTES.md
-          files: browser-ext/chrome-extension.zip
+          files: browser-ext/skyshare-chrome-web-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
