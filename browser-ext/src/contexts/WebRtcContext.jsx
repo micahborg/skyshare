@@ -16,9 +16,9 @@ export const WebRtcProvider = ({ children }) => {
   const dataChannel = useRef(null);
 
   //region File Transfer -- Vars
-  let receivedFile = {};
-  let receiveBuffer = [];
-  let receivedSize = 0;
+  const receivedFile = useRef({});
+  const receiveBuffer = useRef([]);
+  const receivedSize = useRef(0);
 
   useEffect(() => {
     console.log("Initializing WebRTC connection...");
@@ -30,6 +30,31 @@ export const WebRtcProvider = ({ children }) => {
       ],
       iceCandidatePoolSize: 10,
     };
+
+    function onReceiveFile(event) {
+    if (!receivedFile.current["name"]) {
+      const file = JSON.parse(event.data);
+      receivedFile.current = file; // store file metadata (name, size, type)
+      return;
+    }
+  
+    receiveBuffer.current.push(event.data);
+    receivedSize.current += event.data.byteLength;
+    setMessages([]);
+    console.log("WebRTC messages cleared.");
+  
+    if (receivedSize.current === receivedFile.current["size"]) {
+      const blob = new Blob(receiveBuffer.current, { type: receivedFile.current["type"] });
+      const file = new File([blob], receivedFile.current["name"], { type: receivedFile.current["type"] });
+  
+      // reset state
+      receiveBuffer.current = [];
+      receivedSize.current = 0;
+      receivedFile.current = {};
+  
+      setFiles((prev) => [...prev, file]);
+    }
+  }  
 
     pc.current = new RTCPeerConnection(servers);
     console.log("Peer connection created:", pc.current);
@@ -113,7 +138,7 @@ export const WebRtcProvider = ({ children }) => {
       setIsConnected(false);
       pc.current.close();
     };
-  }, [onReceiveFile]);
+  }, []);
 
   const beginPair = async () => {
     console.log("Creating stream...");
@@ -326,31 +351,6 @@ export const WebRtcProvider = ({ children }) => {
       });
     });
   }
-
-  function onReceiveFile(event) {
-    if (!receivedFile["name"]) {
-      const file = JSON.parse(event.data);
-      receivedFile = file; // store file metadata (name, size, type)
-      return;
-    }
-  
-    receiveBuffer.push(event.data);
-    receivedSize += event.data.byteLength;
-    setMessages([]);
-    console.log("WebRTC messages cleared.");
-  
-    if (receivedSize === receivedFile["size"]) {
-      const blob = new Blob(receiveBuffer, { type: receivedFile["type"] });
-      const file = new File([blob], receivedFile["name"], { type: receivedFile["type"] });
-  
-      // reset state
-      receiveBuffer = [];
-      receivedSize = 0;
-      receivedFile = {};
-  
-      setFiles((prev) => [...prev, file]);
-    }
-  }  
 
   const sendMessage = (message) => {
     try {
