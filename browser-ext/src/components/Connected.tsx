@@ -4,16 +4,12 @@ Programmers: Brynn Hare, Micah Borghese, Katelyn Accola, Nora Manolescu, Kyle Jo
 Date Created: 3/24/2025
 Modified Date: 3/24
 */
-
 "use client";
-import { Image, Box, Flex, Heading, VStack, Link, useBreakpointValue, Button } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { useLoading } from "../contexts/LoadingContext";
+import { Box, Button } from "@chakra-ui/react";
 import { useWebRtc } from "../contexts/WebRtcContext";
 
 const Paired = () => {
     const { isConnected } = useWebRtc();
-
 
     return (
         <Box 

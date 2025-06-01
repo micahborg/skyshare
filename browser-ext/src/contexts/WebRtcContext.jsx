@@ -113,7 +113,7 @@ export const WebRtcProvider = ({ children }) => {
       setIsConnected(false);
       pc.current.close();
     };
-  }, []);
+  }, [onReceiveFile]);
 
   const beginPair = async () => {
     console.log("Creating stream...");

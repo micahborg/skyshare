@@ -5,8 +5,6 @@ Date Created: 3/23/2025
 Modified Date: 3/23
 */
 
-// Added background!!!
-
 import React, { useState, useEffect, useRef } from 'react';
 
 const GiraffeGame: React.FC = () => {
@@ -19,7 +17,6 @@ const GiraffeGame: React.FC = () => {
   const obstacleId = useRef(0);
   const obstaclesRef = useRef(obstacles); // Ref to store the latest obstacles state
   const [gameOver, setGameOver] = useState(false);
-  const [cooldown, setCooldown] = useState(false);
   const cooldownRef = useRef(false); // for real-time check in callbacks
   const isGiraffeBusy = () => isJumpingRef.current || isDuckingRef.current || cooldownRef.current;
 
@@ -35,36 +32,10 @@ const GiraffeGame: React.FC = () => {
   }, [isJumping]);
 
   const startCooldown = (duration = 980) => {
-    setCooldown(true);
     cooldownRef.current = true;
     setTimeout(() => {
-      setCooldown(false);
       cooldownRef.current = false;
     }, duration);
-  };
-
-  const jump = () => {
-    if (isGiraffeBusy()) return; // Don't jump if busy
-    setIsJumping(true);
-    isJumpingRef.current = true;
-    startCooldown();
-
-    setTimeout(() => {
-      setIsJumping(false);
-      isJumpingRef.current = false;
-    }, 500);
-  };
-
-  const duck = () => {
-    if (isGiraffeBusy()) return;
-    setIsDucking(true);
-    isDuckingRef.current = true;
-    startCooldown();
-
-    setTimeout(() => {
-      setIsDucking(false);
-      isDuckingRef.current = false;
-    }, 500);
   };
 
   const isDuckingRef = useRef(false);
@@ -73,6 +44,30 @@ const GiraffeGame: React.FC = () => {
   }, [isDucking]);
 
   useEffect(() => {
+    const jump = () => {
+      if (isGiraffeBusy()) return; // Don't jump if busy
+      setIsJumping(true);
+      isJumpingRef.current = true;
+      startCooldown();
+
+      setTimeout(() => {
+        setIsJumping(false);
+        isJumpingRef.current = false;
+      }, 500);
+    };
+
+    const duck = () => {
+      if (isGiraffeBusy()) return;
+      setIsDucking(true);
+      isDuckingRef.current = true;
+      startCooldown();
+
+      setTimeout(() => {
+        setIsDucking(false);
+        isDuckingRef.current = false;
+      }, 500);
+    };
+
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.repeat || gameOver) return;
 
@@ -97,7 +92,7 @@ const GiraffeGame: React.FC = () => {
       document.removeEventListener('keydown', handleKeyPress);
       document.removeEventListener('keyup', handleKeyRelease);
     };
-  }, []);
+  }, [gameOver]);
 
   // Generate obstacles at random intervals
   useEffect(() => {
@@ -134,7 +129,7 @@ const GiraffeGame: React.FC = () => {
       // Cleanup any pending timeouts when the component unmounts
       obstacleId.current = 0;
     };
-  }, []);
+  }, [gameOver]);
 
   // Move obstacles and check for collisions
   useEffect(() => {
@@ -213,7 +208,7 @@ const GiraffeGame: React.FC = () => {
           left: '50px',
           width: '50px', // Width of the giraffe image (container size)
           height: '50px', // Keep the height consistent
-          transition: 'bottom 0.5s ease-out', // Smooth transition for ducking
+          transition: 'bottom 0.7s ease-out', // Smooth transition for ducking
         }}
       >
         <img
@@ -223,7 +218,7 @@ const GiraffeGame: React.FC = () => {
             width: '100%',
             height: '100%',
             objectFit: 'contain',
-            transform: `scaleX(-1) ${isJumping || isDucking ? 'scale(2)' : 'scale(1)'}`, // Huge scaling on jump and duck (2x bigger)
+            transform: `scaleX(-1) ${isJumping || isDucking ? 'scale(2)' : 'scale(1.2)'}`, // Huge scaling on jump and duck (2x bigger)
           }}
         />
       </div>

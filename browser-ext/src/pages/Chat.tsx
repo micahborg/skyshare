@@ -2,12 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Box, 
-  Textarea, 
   Text, 
   Button, 
   VStack, 
   HStack, 
-  Flex, 
   Heading,
   Alert,
   AlertIcon,

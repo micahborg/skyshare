@@ -5,12 +5,10 @@ Date Created: 2/16/2025
 Modified Date: 2/16
 */
 "use client";
-import { Image, Flex, Heading, VStack, Link, useBreakpointValue, Button } from "@chakra-ui/react";
+import { Image, Flex, Heading, VStack, Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { useLoading } from "../contexts/LoadingContext";
 
 const NavBar = () => {
-    const { setIsLoading } = useLoading();
 
     const navigate = useNavigate();
 

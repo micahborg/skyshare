@@ -13,7 +13,7 @@ const Notes: React.FC = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track if a note is being edited
   const [isSearchVisible, setIsSearchVisible] = useState(false); // New state for showing search bar
   const [searchTerm, setSearchTerm] = useState<string>(""); // State to store the search input
-  const { isConnected, sendFile, sendMessage } = useWebRtc(); // Use the WebRTC hook
+  const { isConnected, sendFile } = useWebRtc(); // Use the WebRTC hook
   const [showConfetti, setShowConfetti] = useState(false);
   const confettiTimeout = useRef<NodeJS.Timeout | null>(null);
   const toast = useToast();
@@ -99,11 +99,6 @@ const Notes: React.FC = () => {
     setEditingIndex(null);
     setNote(""); 
     setCustomName("");
-  };
-
-  const createNewNote = () => {
-    setNote("");
-    setEditingIndex(null); 
   };
 
   const shareNote = async () => {

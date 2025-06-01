@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Text, Box } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { QRCodeSVG  } from "qrcode.react";
 
 function QRCodeGenerator({ data }) { //generate the qr code that will be used to connect two devices

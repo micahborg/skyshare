@@ -26,7 +26,7 @@ const PairBox = () => {
             handlePairing();
             setIsLoading(false);
         }
-    }, [pairId]);
+    }, [pairId, beginPair, setIsLoading]);
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center">
