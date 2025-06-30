@@ -84,15 +84,21 @@ resource "google_compute_instance" "turn_server" {
     enable_vtpm                 = true
   }
 
-  # need to fix this so it actually works (multiline doesn't function properly), only runs `#!/bin/bash`
-  metadata_startup_script = <<-EOF
-    #!/bin/bash
-    sudo apt-get update
-    sudo apt-get install coturn -y
-    sudo systemctl enable coturn
-    sudo systemctl restart coturn
-    echo 'TURN server installed and started.'
-  EOF
+  metadata = {
+    enable-osconfig = "TRUE"
+    startup-script = <<-EOT
+      #!/bin/bash
+      set -ex
+      exec > /var/log/startup-script.log 2>&1
+
+      apt-get update
+      apt-get install -y coturn
+      systemctl enable coturn
+      systemctl restart coturn
+
+      echo "TURN server installed and started successfully."
+    EOT
+  }
 }
 
 resource "google_compute_firewall" "turn_ports" {
