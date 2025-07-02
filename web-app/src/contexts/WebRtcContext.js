@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 //import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, getDoc } from "firebase/firestore";
+import { getFirestore, collection, doc, setDoc, updateDoc, addDoc, onSnapshot, getDoc, serverTimestamp } from "firebase/firestore";
 import { app } from '../lib/connectionDetails';
 
 const WebRtcContext = createContext();
@@ -24,12 +24,11 @@ export const WebRtcProvider = ({ children }) => {
     console.log("Initializing WebRTC connection...");
     getFirestore(app);
 
-    const servers = {
-      iceServers: [
-        { urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
-      ],
-      iceCandidatePoolSize: 10,
-    };
+    const servers = [
+      {
+        urls: ["stun:stun.l.google.com:19302"],
+      },
+    ]
 
     pc.current = new RTCPeerConnection(servers);
     console.log("Peer connection created:", pc.current);
@@ -37,8 +36,12 @@ export const WebRtcProvider = ({ children }) => {
     // Initialize the data channel
     dataChannel.current = pc.current.createDataChannel("dataChannel");
     console.log("Data channel created:", dataChannel.current);
+
+    // Set up data channel properties
     dataChannel.current.binaryType = "arraybuffer";
     dataChannel.current.bufferedAmountLowThreshold = 0;
+
+    // Set up event listeners for the data channel
     dataChannel.current.onmessage = (msg) => {
       console.log("Message received on data channel:", msg.data);
       if (typeof msg.data === "string") {
@@ -98,15 +101,15 @@ export const WebRtcProvider = ({ children }) => {
       };
     };
 
-    if (pc.current.connectionState === 'failed') {
-      console.log("Connection state failed. Restarting ICE...");
-      pc.current.restartIce()
-    }
+    // if (pc.current.connectionState === 'failed') {
+    //   console.log("Connection state failed. Restarting ICE...");
+    //   pc.current.restartIce()
+    // }
 
-    if (pc.current.iceconnectionState === 'failed') {
-      console.log("ICE connection state failed. Restarting ICE...");
-      pc.current.restartIce()
-    }
+    // if (pc.current.iceconnectionState === 'failed') {
+    //   console.log("ICE connection state failed. Restarting ICE...");
+    //   pc.current.restartIce()
+    // }
 
     return () => {
       console.log("Closing connection...");
@@ -119,13 +122,13 @@ export const WebRtcProvider = ({ children }) => {
     console.log("Creating stream...");
     const firestore = getFirestore();
     const callDoc = doc(collection(firestore, "calls"));
-    const offerCandidates = collection(callDoc, "offerCandidates");
-    const answerCandidates = collection(callDoc, "answerCandidates");
+    // const offerCandidates = collection(callDoc, "offerCandidates");
+    // const answerCandidates = collection(callDoc, "answerCandidates");
 
-    pc.current.onicecandidate = (event) => {
-      console.log("New ICE candidate:", event.candidate);
-      event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
-    };
+    // pc.current.onicecandidate = (event) => {
+    //   console.log("New ICE candidate:", event.candidate);
+    //   event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
+    // };
 
     const offerDescription = await pc.current.createOffer();
     await pc.current.setLocalDescription(offerDescription);
@@ -133,34 +136,14 @@ export const WebRtcProvider = ({ children }) => {
     const offer = {
       sdp: offerDescription.sdp,
       type: offerDescription.type,
-      // pubKey: "senders public key, testing for now",
-      // deviceInfo: userAgent,
     };
 
-    await setDoc(callDoc, { offer });
+    await setDoc(callDoc, { 
+      offer,
+      createdAt: serverTimestamp() // Store creation time for TTL 
+    });
     setPairId(callDoc.id);
     console.log("Pair ID:", callDoc.id);
-
-    // begin try something new ---
-    let candidatesComplete = false;
-
-    // Adding event listener for ICE gathering state change
-    pc.current.onicegatheringstatechange = () => {
-      console.log('iceGatheringState:', pc.current.iceGatheringState);
-      if (pc.current.iceGatheringState === 'complete') {
-        console.log('ICE gathering complete. Sending offer.');
-        candidatesComplete = true;
-      }
-    };
-
-    // Add a timeout to force sending the offer if candidates are not complete
-    setTimeout(() => {
-      if (!candidatesComplete) {
-        console.log('Candidates processing not ended. Ending it...');
-        candidatesComplete = true;
-      }
-    }, 3000); // 3 seconds timeout
-    // end try something new ---
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
@@ -170,14 +153,14 @@ export const WebRtcProvider = ({ children }) => {
       }
     });
 
-    onSnapshot(answerCandidates, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const candidate = new RTCIceCandidate(change.doc.data());
-          pc.current.addIceCandidate(candidate);
-        }
-      });
-    });
+    // onSnapshot(answerCandidates, (snapshot) => {
+    //   snapshot.docChanges().forEach((change) => {
+    //     if (change.type === "added") {
+    //       const candidate = new RTCIceCandidate(change.doc.data());
+    //       pc.current.addIceCandidate(candidate);
+    //     }
+    //   });
+    // });
 
     return callDoc.id;
   };
@@ -197,13 +180,13 @@ export const WebRtcProvider = ({ children }) => {
         return;
     }
 
-    const answerCandidates = collection(callDoc, "answerCandidates");
-    const offerCandidates = collection(callDoc, "offerCandidates");
+    // const answerCandidates = collection(callDoc, "answerCandidates");
+    // const offerCandidates = collection(callDoc, "offerCandidates");
 
-    pc.current.onicecandidate = (event) => {
-      console.log("New ICE candidate:", event.candidate);
-      event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
-    };
+    // pc.current.onicecandidate = (event) => {
+    //   console.log("New ICE candidate:", event.candidate);
+    //   event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
+    // };
 
     const callData = (await getDoc(callDoc)).data();
     const offerDescription = callData.offer;
@@ -229,43 +212,41 @@ export const WebRtcProvider = ({ children }) => {
     const answer = {
       type: answerDescription.type,
       sdp: answerDescription.sdp,
-      // pubKey: "receivers public key, testing for now",
-      // deviceInfo: userAgent,
     };
 
-    await setDoc(callDoc, { answer });
+    await updateDoc(callDoc, { answer });
     
-    // begin try something new ---
-    // Use similar logic for ICE gathering state
-    let candidatesComplete = false;
+    // // begin try something new ---
+    // // Use similar logic for ICE gathering state
+    // let candidatesComplete = false;
 
-    // Adding event listener for ICE gathering state change
-    pc.current.onicegatheringstatechange = () => {
-      console.log('iceGatheringState:', pc.current.iceGatheringState);
-      if (pc.current.iceGatheringState === 'complete') {
-        console.log('ICE gathering complete.');
-        candidatesComplete = true;
-      }
-    };
+    // // Adding event listener for ICE gathering state change
+    // pc.current.onicegatheringstatechange = () => {
+    //   console.log('iceGatheringState:', pc.current.iceGatheringState);
+    //   if (pc.current.iceGatheringState === 'complete') {
+    //     console.log('ICE gathering complete.');
+    //     candidatesComplete = true;
+    //   }
+    // };
 
-    // Add a timeout to force adding ICE candidates if not complete
-    setTimeout(() => {
-      if (!candidatesComplete) {
-        console.log('Candidates processing not ended.');
-        candidatesComplete = true;
-      }
-    }, 3000); // 3 seconds timeout
-    // end try something new ---
+    // // Add a timeout to force adding ICE candidates if not complete
+    // setTimeout(() => {
+    //   if (!candidatesComplete) {
+    //     console.log('Candidates processing not ended.');
+    //     candidatesComplete = true;
+    //   }
+    // }, 3000); // 3 seconds timeout
+    // // end try something new ---
     
-    onSnapshot(offerCandidates, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          console.log("New ICE candidate:", change.doc.data());
-          const candidate = new RTCIceCandidate(change.doc.data());
-          pc.current.addIceCandidate(candidate);
-        }
-      });
-    });
+    // onSnapshot(offerCandidates, (snapshot) => {
+    //   snapshot.docChanges().forEach((change) => {
+    //     if (change.type === "added") {
+    //       console.log("New ICE candidate:", change.doc.data());
+    //       const candidate = new RTCIceCandidate(change.doc.data());
+    //       pc.current.addIceCandidate(candidate);
+    //     }
+    //   });
+    // });
 
     setPairId(callDoc.id);
     return callDoc.id;
