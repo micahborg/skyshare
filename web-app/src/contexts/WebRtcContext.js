@@ -24,14 +24,31 @@ export const WebRtcProvider = ({ children }) => {
     console.log("Initializing WebRTC connection...");
     getFirestore(app);
 
-    const servers = [
-      {
-        urls: ["stun:stun.l.google.com:19302"],
-      },
-    ]
+    pc.current  = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: [process.env.NEXT_PUBLIC_TURN_SERVER_URL],
+          username: process.env.NEXT_PUBLIC_TURN_SERVER_USERNAME,
+          credential: process.env.NEXT_PUBLIC_TURN_SERVER_CREDENTIAL,
+        }
+      ],
+      iceTransportPolicy: "relay"  // only allow TURN (no STUN or direct)
+    });
 
-    pc.current = new RTCPeerConnection(servers);
     console.log("Peer connection created:", pc.current);
+
+    // Set up ICE candidate handling
+    pc.current.oniceconnectionstatechange = () => {
+      console.log("ICE connection state:", pc.current.iceConnectionState);
+
+      if (pc.current.iceConnectionState === "connected") {
+        console.log("✅ ICE connection established (STUN or TURN)");
+      }
+
+      if (pc.current.iceConnectionState === "failed") {
+        console.error("❌ ICE connection failed (likely no viable candidate)");
+      }
+    };
 
     // Initialize the data channel
     dataChannel.current = pc.current.createDataChannel("dataChannel");
@@ -101,15 +118,15 @@ export const WebRtcProvider = ({ children }) => {
       };
     };
 
-    // if (pc.current.connectionState === 'failed') {
-    //   console.log("Connection state failed. Restarting ICE...");
-    //   pc.current.restartIce()
-    // }
+    if (pc.current.connectionState === 'failed') {
+      console.log("Connection state failed. Restarting ICE...");
+      pc.current.restartIce()
+    }
 
-    // if (pc.current.iceconnectionState === 'failed') {
-    //   console.log("ICE connection state failed. Restarting ICE...");
-    //   pc.current.restartIce()
-    // }
+    if (pc.current.iceconnectionState === 'failed') {
+      console.log("ICE connection state failed. Restarting ICE...");
+      pc.current.restartIce()
+    }
 
     return () => {
       console.log("Closing connection...");
@@ -122,13 +139,17 @@ export const WebRtcProvider = ({ children }) => {
     console.log("Creating stream...");
     const firestore = getFirestore();
     const callDoc = doc(collection(firestore, "calls"));
-    // const offerCandidates = collection(callDoc, "offerCandidates");
-    // const answerCandidates = collection(callDoc, "answerCandidates");
+    const offerCandidates = collection(callDoc, "offerCandidates");
+    const answerCandidates = collection(callDoc, "answerCandidates");
 
-    // pc.current.onicecandidate = (event) => {
-    //   console.log("New ICE candidate:", event.candidate);
-    //   event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
-    // };
+    pc.current.onicecandidate = (event) => {
+      console.log("New ICE candidate:", event.candidate);
+      if (event.candidate) {
+        addDoc(offerCandidates, event.candidate.toJSON());
+      } else {
+        updateDoc(callDoc, { iceGatheringComplete: true });
+      }
+    };
 
     const offerDescription = await pc.current.createOffer();
     await pc.current.setLocalDescription(offerDescription);
@@ -153,14 +174,14 @@ export const WebRtcProvider = ({ children }) => {
       }
     });
 
-    // onSnapshot(answerCandidates, (snapshot) => {
-    //   snapshot.docChanges().forEach((change) => {
-    //     if (change.type === "added") {
-    //       const candidate = new RTCIceCandidate(change.doc.data());
-    //       pc.current.addIceCandidate(candidate);
-    //     }
-    //   });
-    // });
+    onSnapshot(answerCandidates, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const candidate = new RTCIceCandidate(change.doc.data());
+          pc.current.addIceCandidate(candidate);
+        }
+      });
+    });
 
     return callDoc.id;
   };
@@ -180,13 +201,17 @@ export const WebRtcProvider = ({ children }) => {
         return;
     }
 
-    // const answerCandidates = collection(callDoc, "answerCandidates");
-    // const offerCandidates = collection(callDoc, "offerCandidates");
+    const answerCandidates = collection(callDoc, "answerCandidates");
+    const offerCandidates = collection(callDoc, "offerCandidates");
 
-    // pc.current.onicecandidate = (event) => {
-    //   console.log("New ICE candidate:", event.candidate);
-    //   event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
-    // };
+    pc.current.onicecandidate = (event) => {
+      console.log("New ICE candidate:", event.candidate);
+      if (event.candidate) {
+        addDoc(answerCandidates, event.candidate.toJSON());
+      } else {
+        updateDoc(callDoc, { iceGatheringComplete: true });
+      }
+    };
 
     const callData = (await getDoc(callDoc)).data();
     const offerDescription = callData.offer;
@@ -216,37 +241,37 @@ export const WebRtcProvider = ({ children }) => {
 
     await updateDoc(callDoc, { answer });
     
-    // // begin try something new ---
-    // // Use similar logic for ICE gathering state
-    // let candidatesComplete = false;
+    // begin try something new ---
+    // Use similar logic for ICE gathering state
+    let candidatesComplete = false;
 
-    // // Adding event listener for ICE gathering state change
-    // pc.current.onicegatheringstatechange = () => {
-    //   console.log('iceGatheringState:', pc.current.iceGatheringState);
-    //   if (pc.current.iceGatheringState === 'complete') {
-    //     console.log('ICE gathering complete.');
-    //     candidatesComplete = true;
-    //   }
-    // };
+    // Adding event listener for ICE gathering state change
+    pc.current.onicegatheringstatechange = () => {
+      console.log('iceGatheringState:', pc.current.iceGatheringState);
+      if (pc.current.iceGatheringState === 'complete') {
+        console.log('ICE gathering complete.');
+        candidatesComplete = true;
+      }
+    };
 
-    // // Add a timeout to force adding ICE candidates if not complete
-    // setTimeout(() => {
-    //   if (!candidatesComplete) {
-    //     console.log('Candidates processing not ended.');
-    //     candidatesComplete = true;
-    //   }
-    // }, 3000); // 3 seconds timeout
-    // // end try something new ---
+    // Add a timeout to force adding ICE candidates if not complete
+    setTimeout(() => {
+      if (!candidatesComplete) {
+        console.log('Candidates processing not ended.');
+        candidatesComplete = true;
+      }
+    }, 3000); // 3 seconds timeout
+    // end try something new ---
     
-    // onSnapshot(offerCandidates, (snapshot) => {
-    //   snapshot.docChanges().forEach((change) => {
-    //     if (change.type === "added") {
-    //       console.log("New ICE candidate:", change.doc.data());
-    //       const candidate = new RTCIceCandidate(change.doc.data());
-    //       pc.current.addIceCandidate(candidate);
-    //     }
-    //   });
-    // });
+    onSnapshot(offerCandidates, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          console.log("New ICE candidate:", change.doc.data());
+          const candidate = new RTCIceCandidate(change.doc.data());
+          pc.current.addIceCandidate(candidate);
+        }
+      });
+    });
 
     setPairId(callDoc.id);
     return callDoc.id;
