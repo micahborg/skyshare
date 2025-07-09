@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 //import { initializeApp } from "firebase/app";
 import { getFirestore, collection, doc, setDoc, updateDoc, addDoc, onSnapshot, getDoc, serverTimestamp } from "firebase/firestore";
-import { app } from '../lib/connectionDetails';
+import { app, iceServerConfig } from '../lib/connectionDetails';
 
 const WebRtcContext = createContext();
 
@@ -24,16 +24,7 @@ export const WebRtcProvider = ({ children }) => {
     console.log("Initializing WebRTC connection...");
     getFirestore(app);
 
-    pc.current  = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: [process.env.NEXT_PUBLIC_TURN_SERVER_URL],
-          username: process.env.NEXT_PUBLIC_TURN_SERVER_USERNAME,
-          credential: process.env.NEXT_PUBLIC_TURN_SERVER_CREDENTIAL,
-        }
-      ],
-      iceTransportPolicy: "relay"  // only allow TURN (no STUN or direct)
-    });
+    pc.current = new RTCPeerConnection(iceServerConfig);
 
     console.log("Peer connection created:", pc.current);
 
@@ -135,6 +126,7 @@ export const WebRtcProvider = ({ children }) => {
     };
   }, []);
 
+  //region Begin Pair
   const beginPair = async () => {
     console.log("Creating stream...");
     const firestore = getFirestore();
@@ -186,6 +178,7 @@ export const WebRtcProvider = ({ children }) => {
     return callDoc.id;
   };
 
+  //region Connect Device
   const connectDevice = async (pairId) => {
     if (!pairId) {
         console.error("Invalid pairId provided.");
@@ -205,7 +198,7 @@ export const WebRtcProvider = ({ children }) => {
     const offerCandidates = collection(callDoc, "offerCandidates");
 
     pc.current.onicecandidate = (event) => {
-      console.log("New ICE candidate:", event.candidate);
+      console.log("New ICE candidate:", event.candidate); // type srflx (STUN) or relay (TURN)
       if (event.candidate) {
         addDoc(answerCandidates, event.candidate.toJSON());
       } else {
@@ -241,7 +234,6 @@ export const WebRtcProvider = ({ children }) => {
 
     await updateDoc(callDoc, { answer });
     
-    // begin try something new ---
     // Use similar logic for ICE gathering state
     let candidatesComplete = false;
 
@@ -261,7 +253,6 @@ export const WebRtcProvider = ({ children }) => {
         candidatesComplete = true;
       }
     }, 3000); // 3 seconds timeout
-    // end try something new ---
     
     onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {

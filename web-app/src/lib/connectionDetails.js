@@ -1,5 +1,17 @@
 import { initializeApp } from "firebase/app";
 
+const iceServerConfig = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    {
+      urls: [process.env.NEXT_PUBLIC_TURN_SERVER_URL],
+      username: process.env.NEXT_PUBLIC_TURN_SERVER_USERNAME,
+      credential: process.env.NEXT_PUBLIC_TURN_SERVER_CREDENTIAL,
+    }
+  ],
+  iceTransportPolicy: "all"  // allow all (STUN, TURN, and direct)
+};
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,4 +23,4 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export { app };
+export { app, iceServerConfig };

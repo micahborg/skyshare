@@ -1,6 +1,18 @@
 "use client";
 import { initializeApp } from "firebase/app";
 
+const iceServerConfig = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    {
+      urls: [process.env.REACT_APP_TURN_SERVER_URL],
+      username: process.env.REACT_APP_TURN_SERVER_USERNAME,
+      credential: process.env.REACT_APP_TURN_SERVER_CREDENTIAL,
+    }
+  ],
+  iceTransportPolicy: "relay"  // allow all (STUN, TURN, and direct)
+};
+
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -12,4 +24,4 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export { app };
+export { app, iceServerConfig };

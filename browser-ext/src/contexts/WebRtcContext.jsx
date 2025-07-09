@@ -1,8 +1,8 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 //import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, getDoc } from "firebase/firestore";
-import { app } from '../lib/connectionDetails';
+import { getFirestore, collection, doc, setDoc, updateDoc, addDoc, onSnapshot, getDoc, serverTimestamp } from "firebase/firestore";
+import { app, iceServerConfig } from '../lib/connectionDetails';
 
 const WebRtcContext = createContext();
 
@@ -16,54 +16,40 @@ export const WebRtcProvider = ({ children }) => {
   const dataChannel = useRef(null);
 
   //region File Transfer -- Vars
-  const receivedFile = useRef({});
-  const receiveBuffer = useRef([]);
-  const receivedSize = useRef(0);
+  let receivedFile = {};
+  let receiveBuffer = [];
+  let receivedSize = 0;
 
   useEffect(() => {
     console.log("Initializing WebRTC connection...");
     getFirestore(app);
 
-    const servers = {
-      iceServers: [
-        { urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
-      ],
-      iceCandidatePoolSize: 10,
-    };
+    pc.current = new RTCPeerConnection(iceServerConfig);
 
-    function onReceiveFile(event) {
-    if (!receivedFile.current["name"]) {
-      const file = JSON.parse(event.data);
-      receivedFile.current = file; // store file metadata (name, size, type)
-      return;
-    }
-  
-    receiveBuffer.current.push(event.data);
-    receivedSize.current += event.data.byteLength;
-    setMessages([]);
-    console.log("WebRTC messages cleared.");
-  
-    if (receivedSize.current === receivedFile.current["size"]) {
-      const blob = new Blob(receiveBuffer.current, { type: receivedFile.current["type"] });
-      const file = new File([blob], receivedFile.current["name"], { type: receivedFile.current["type"] });
-  
-      // reset state
-      receiveBuffer.current = [];
-      receivedSize.current = 0;
-      receivedFile.current = {};
-  
-      setFiles((prev) => [...prev, file]);
-    }
-  }  
-
-    pc.current = new RTCPeerConnection(servers);
     console.log("Peer connection created:", pc.current);
+
+    // Set up ICE candidate handling
+    pc.current.oniceconnectionstatechange = () => {
+      console.log("ICE connection state:", pc.current.iceConnectionState);
+
+      if (pc.current.iceConnectionState === "connected") {
+        console.log("✅ ICE connection established (STUN or TURN)");
+      }
+
+      if (pc.current.iceConnectionState === "failed") {
+        console.error("❌ ICE connection failed (likely no viable candidate)");
+      }
+    };
 
     // Initialize the data channel
     dataChannel.current = pc.current.createDataChannel("dataChannel");
     console.log("Data channel created:", dataChannel.current);
+
+    // Set up data channel properties
     dataChannel.current.binaryType = "arraybuffer";
     dataChannel.current.bufferedAmountLowThreshold = 0;
+
+    // Set up event listeners for the data channel
     dataChannel.current.onmessage = (msg) => {
       console.log("Message received on data channel:", msg.data);
       if (typeof msg.data === "string") {
@@ -140,21 +126,21 @@ export const WebRtcProvider = ({ children }) => {
     };
   }, []);
 
+  //region Begin Pair
   const beginPair = async () => {
     console.log("Creating stream...");
-    if (!pc.current) {
-      console.error("PeerConnection has not been initialized yet.");
-      return;
-    }
-    
-    const firestore = getFirestore(app);
+    const firestore = getFirestore();
     const callDoc = doc(collection(firestore, "calls"));
     const offerCandidates = collection(callDoc, "offerCandidates");
     const answerCandidates = collection(callDoc, "answerCandidates");
 
     pc.current.onicecandidate = (event) => {
       console.log("New ICE candidate:", event.candidate);
-      event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
+      if (event.candidate) {
+        addDoc(offerCandidates, event.candidate.toJSON());
+      } else {
+        updateDoc(callDoc, { iceGatheringComplete: true });
+      }
     };
 
     const offerDescription = await pc.current.createOffer();
@@ -163,34 +149,14 @@ export const WebRtcProvider = ({ children }) => {
     const offer = {
       sdp: offerDescription.sdp,
       type: offerDescription.type,
-      // pubKey: "senders public key, testing for now",
-      // deviceInfo: userAgent,
     };
 
-    await setDoc(callDoc, { offer });
+    await setDoc(callDoc, { 
+      offer,
+      createdAt: serverTimestamp() // Store creation time for TTL 
+    });
     setPairId(callDoc.id);
     console.log("Pair ID:", callDoc.id);
-
-    // begin try something new ---
-    let candidatesComplete = false;
-
-    // Adding event listener for ICE gathering state change
-    pc.current.onicegatheringstatechange = () => {
-      console.log('iceGatheringState:', pc.current.iceGatheringState);
-      if (pc.current.iceGatheringState === 'complete') {
-        console.log('ICE gathering complete. Sending offer.');
-        candidatesComplete = true;
-      }
-    };
-
-    // Add a timeout to force sending the offer if candidates are not complete
-    setTimeout(() => {
-      if (!candidatesComplete) {
-        console.log('Candidates processing not ended. Ending it...');
-        candidatesComplete = true;
-      }
-    }, 3000); // 3 seconds timeout
-    // end try something new ---
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
@@ -212,17 +178,12 @@ export const WebRtcProvider = ({ children }) => {
     return callDoc.id;
   };
 
+  //region Connect Device
   const connectDevice = async (pairId) => {
     if (!pairId) {
         console.error("Invalid pairId provided.");
         return;
     }
-    if (!pc.current) {
-      console.error("PeerConnection has not been initialized yet.");
-      return;
-    }
-
-    
     const firestore = getFirestore();
     const callDoc = doc(firestore, "calls", pairId);
 
@@ -237,8 +198,12 @@ export const WebRtcProvider = ({ children }) => {
     const offerCandidates = collection(callDoc, "offerCandidates");
 
     pc.current.onicecandidate = (event) => {
-      console.log("New ICE candidate:", event.candidate);
-      event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
+      console.log("New ICE candidate:", event.candidate); // type srflx (STUN) or relay (TURN)
+      if (event.candidate) {
+        addDoc(answerCandidates, event.candidate.toJSON());
+      } else {
+        updateDoc(callDoc, { iceGatheringComplete: true });
+      }
     };
 
     const callData = (await getDoc(callDoc)).data();
@@ -265,13 +230,10 @@ export const WebRtcProvider = ({ children }) => {
     const answer = {
       type: answerDescription.type,
       sdp: answerDescription.sdp,
-      // pubKey: "receivers public key, testing for now",
-      // deviceInfo: userAgent,
     };
 
-    await setDoc(callDoc, { answer });
+    await updateDoc(callDoc, { answer });
     
-    // begin try something new ---
     // Use similar logic for ICE gathering state
     let candidatesComplete = false;
 
@@ -291,7 +253,6 @@ export const WebRtcProvider = ({ children }) => {
         candidatesComplete = true;
       }
     }, 3000); // 3 seconds timeout
-    // end try something new ---
     
     onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
@@ -351,6 +312,31 @@ export const WebRtcProvider = ({ children }) => {
       });
     });
   }
+
+  function onReceiveFile(event) {
+    if (!receivedFile["name"]) {
+      const file = JSON.parse(event.data);
+      receivedFile = file; // store file metadata (name, size, type)
+      return;
+    }
+  
+    receiveBuffer.push(event.data);
+    receivedSize += event.data.byteLength;
+    setMessages([]);
+    console.log("WebRTC messages cleared.");
+  
+    if (receivedSize === receivedFile["size"]) {
+      const blob = new Blob(receiveBuffer, { type: receivedFile["type"] });
+      const file = new File([blob], receivedFile["name"], { type: receivedFile["type"] });
+  
+      // reset state
+      receiveBuffer = [];
+      receivedSize = 0;
+      receivedFile = {};
+  
+      setFiles((prev) => [...prev, file]);
+    }
+  }  
 
   const sendMessage = (message) => {
     try {
