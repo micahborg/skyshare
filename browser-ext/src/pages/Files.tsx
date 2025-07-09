@@ -188,10 +188,7 @@ const Files = () => {
                   justifyContent="space-between"
                   bg="blue.100"
                 >
-                  <Box>
-                    <Text fontSize="xs">{file.fileName}</Text>
-                  </Box>
-                  <HStack spacing={2}>
+                  <HStack spacing={1}>
                     <IconButton
                       as="a"
                       href={file.fileUrl}
@@ -211,6 +208,11 @@ const Files = () => {
                       onClick={() => deleteReceivedFile(index)}
                     />
                   </HStack>
+                  <Box maxWidth="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+                    <Text fontSize="xs" isTruncated title={file.fileName}>
+                      {file.fileName}
+                    </Text>
+                  </Box>
                 </HStack>
               ))
             ) : (
@@ -236,9 +238,6 @@ const Files = () => {
                   onClick={() => setSelectedIndex(index)}
                   cursor="pointer"
                 >
-                  <Box>
-                    <Text fontSize="sm">{file.name}</Text>
-                  </Box>
                   <IconButton
                     aria-label="Delete"
                     icon={<DeleteIcon />}
@@ -250,6 +249,11 @@ const Files = () => {
                       deleteFile(index);
                     }}
                   />
+                  <Box maxWidth="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+                    <Text fontSize="xs" isTruncated title={file.name}>
+                      {file.name}
+                    </Text>
+                  </Box>
                 </HStack>
               ))
             ) : (
