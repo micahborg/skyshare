@@ -8,6 +8,12 @@ All notable changes to this project's [Chrome Web Extension](https://skyshare.te
 
 ---
 
+## v1.1.2 (07-8-2025)
+- Handling overflow on file names in UI 
+- Internal script changes
+
+---
+
 ## v1.1.1 (05-31-2025)
 - More minor fixes to jumping animations on game
 - Implemented workflows and config adjustments
