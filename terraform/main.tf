@@ -26,7 +26,7 @@ resource "google_compute_instance" "turn_server" {
   name         = "turn-server"
   machine_type = "e2-micro"
   zone         = var.zone
-  tags         = ["turn"]
+  tags         = ["turn", "webrtc-api"]
 
   boot_disk {
     auto_delete = true
@@ -101,18 +101,55 @@ resource "google_compute_instance" "turn_server" {
   }
 }
 
+# Firewall rules for WebRTC API service
+resource "google_compute_firewall" "webrtc_api_http" {
+  name    = "allow-webrtc-api-http"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80", "3000"]  # 80 for HTTP, 3000 for Express app
+  }
+
+  direction     = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["webrtc-api"]
+}
+
+# Enhanced TURN server firewall rules
+resource "google_compute_firewall" "webrtc_api_https" {
+  name    = "allow-webrtc-api-https"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]  # HTTPS
+  }
+
+  direction     = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["webrtc-api"]
+}
+
 resource "google_compute_firewall" "turn_ports" {
   name    = "allow-turn-traffic"
   network = "default"
 
+  # Standard TURN ports
   allow {
     protocol = "udp"
-    ports    = ["3478"]
+    ports    = ["3478", "5349"]
   }
 
   allow {
     protocol = "tcp"
-    ports    = ["3478"]
+    ports    = ["3478", "5349"] 
+  }
+
+  # TURN relay port range (for media traffic)
+  allow {
+    protocol = "udp"
+    ports    = ["49152-65535"]  # Standard TURN relay port range
   }
 
   direction     = "INGRESS"
