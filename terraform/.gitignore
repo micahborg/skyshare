@@ -3,4 +3,8 @@ terraform.tfvars
 *.tfstate
 *.tfstate.backup
 credentials.json
-turnserver.conf
+
+webrtc-service/node_modules/
+webrtc-service/.env
+webrtc-service/bin
+webrtc-service/turnserver.conf

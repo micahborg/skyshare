@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 //import { initializeApp } from "firebase/app";
 import { getFirestore, collection, doc, setDoc, updateDoc, addDoc, onSnapshot, getDoc, serverTimestamp } from "firebase/firestore";
-import { app, iceServerConfig } from '../lib/connectionDetails';
+import { app, getIceServerConfig } from '../lib/connectionDetails';
 
 const WebRtcContext = createContext();
 
@@ -12,6 +12,7 @@ export const WebRtcProvider = ({ children }) => {
   const [messages, setMessages] = useState([]); // Store chat messages
   const [chats, setChats] = useState([]); // Store chat messages
   const [files, setFiles] = useState([]); // received file blobs
+
   const pc = useRef(null);
   const dataChannel = useRef(null);
 
@@ -21,12 +22,30 @@ export const WebRtcProvider = ({ children }) => {
   let receivedSize = 0;
 
   useEffect(() => {
-    console.log("Initializing WebRTC connection...");
-    getFirestore(app);
+    const initializeWebRTC = async () => {
+      console.log("Initializing WebRTC connection...");
+      
+      // Fetch ICE server configuration
+      try {
+        const config = await getIceServerConfig("365");
+        
+        // Initialize peer connection with the fetched config
+        pc.current = new RTCPeerConnection(config);
+        console.log("Peer connection created:", pc.current);
+        
+        // Rest of your WebRTC initialization...
+        setupPeerConnection();
+        
+      } catch (error) {
+        console.error("Failed to initialize WebRTC:", error);
+      }
+    };
 
-    pc.current = new RTCPeerConnection(iceServerConfig);
+    initializeWebRTC();
+  }, []);
 
-    console.log("Peer connection created:", pc.current);
+  const setupPeerConnection = () => {
+    if (!pc.current) return;
 
     // Set up ICE candidate handling
     pc.current.oniceconnectionstatechange = () => {
@@ -124,7 +143,7 @@ export const WebRtcProvider = ({ children }) => {
       setIsConnected(false);
       pc.current.close();
     };
-  }, []);
+  };
 
   //region Begin Pair
   const beginPair = async () => {
