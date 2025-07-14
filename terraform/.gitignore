@@ -6,5 +6,4 @@ credentials.json
 
 webrtc-service/node_modules/
 webrtc-service/.env
-webrtc-service/bin
 webrtc-service/turnserver.conf
