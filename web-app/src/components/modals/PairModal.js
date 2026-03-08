@@ -1,4 +1,4 @@
-"use client"; // Ensures this component runs on the client side
+"use client";
 import { Button, Text, VStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react"; //importing different chakra components
 import { useWebRtc } from "@/contexts/WebRtcContext";
 import { useLoading } from "@/contexts/LoadingContext";
@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import QRCodeGenerator from "../QRCodeGenerator";
 
 const PairModal = ({ isOpen, onClose }) => { 
-  const size = useBreakpointValue({ base: "xs", md: "lg" }); //setting the size of the modal based on the screen size
+  const size = useBreakpointValue({ base: "xs", md: "lg" });
   const { beginPair, pairId } = useWebRtc();
   const { setLoading } = useLoading();
 

@@ -1,10 +1,3 @@
-/*Not found page for skyShare.
-Description: This page will appear when any page other than the home or about pages are accessed.   
-Programmers:Brynn Hare
-Date Created: 11/17/2024
-Edit Dates: 11/18 
-*/
-
 "use client";
 import React, { useEffect } from "react";
 import { Box, Heading, Card, Text, Flex } from "@chakra-ui/react";
@@ -31,9 +24,9 @@ export default function NotFound() {
   return (
     <Box>
       <NavBar />
-      {/* Main content */}
+      
       <Flex direction="column" align="center" justify="center" mt={margin} p={4}>
-        {/* Large Heading */}
+
         <Heading size="2xl" m={margin} mt={8} textAlign="center">
           Page Not Found!
         </Heading>
@@ -45,7 +38,7 @@ export default function NotFound() {
           bg="sunnyYellow.100"
           p={cardPadding}
           width={cardWidth}
-          minHeight="auto" // Flexible height based on content
+          minHeight="auto"
           mx="auto"
           mb={margin}
           textAlign="center"

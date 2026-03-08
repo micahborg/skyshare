@@ -35,7 +35,7 @@ resource "google_compute_instance" "turn_server" {
     initialize_params {
       image = "projects/debian-cloud/global/images/debian-12-bookworm-v20250610"
       size  = 10
-      type  = "pd-balanced"
+      type  = "pd-standard"
     }
 
     mode = "READ_WRITE"
