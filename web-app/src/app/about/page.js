@@ -1,16 +1,8 @@
-/*About page for skyShare.
-Description: This page has the about discription of our site as well as user testimonials.   
-Programmers: Micah Borghese, Katelyn Accola, Brynn Hare, Nora Manolescu, and Kyle Johnson
-Date Created: 10/29/2024
-Edit Dates: 11/17 (Testimonials), 11/20 (About content/mobile resizing)
-*/
-
 "use client";
 import React, { useEffect, useState } from "react";
 import { Link, Heading, Card, Box, useBreakpointValue, Flex, Image, Text } from "@chakra-ui/react";
 import { useLoading } from "@/contexts/LoadingContext";
 import NavBar from "@/components/NavBar";
-import { useDisclosure } from "@chakra-ui/react";
 
 function About() {
     const cardWidth = useBreakpointValue({ base: "100%", md: "85%" });
@@ -20,18 +12,18 @@ function About() {
 
     const testimonials = [
         {
-            name: "Madeleine Ryan",
-            image: "/images/testimonial2.jpg",
+            name: "Madeleine, DPT Candidate | University of Missouri Class of 2028",
+            image: "/images/about/madeleine_testimonial.jpg",
             text: "skyShare is a game changer. Submitting assignments and sharing photos no longer involves several steps, and all of my files upload just as high resolution as I sent them. It is a must for the non Apple user."
         },
         {
-            name: "Mara Manolescu",
-            image: "/images/testimonial1.jpg",
+            name: "Mara, PhD Candidate | University of Minnesota Class of 2030",
+            image: "/images/about/mara_testimonial.jpg",
             text: "What a great tool and innovative idea! I appreciate how easy this makes sharing files and how inclusive across devices it is!"
         },
         {
-            name: "Megan Schalley",
-            image: "/images/testimonial3.jpg",
+            name: "Megan, Undergraduate Student | University of Kansas Class of 2025",
+            image: "/images/about/megan_testimonial.jpg",
             text: "skyShare has made file sharing so much simpler. I love how fast and seamless it is to upload and share without worrying about compatibility. It is the perfect solution for anyone looking for an easy, reliable way to connect across devices!"
         }
     ];
@@ -85,9 +77,9 @@ function About() {
                         <Link 
                             href="https://www.linkedin.com/in/micah-borghese/" 
                             isExternal 
-                            color="blue.500" // Link color
-                            textDecoration="none" // Remove underline by default
-                            _hover={{ textDecoration: 'underline' }} // Add underline on hover
+                            color="blue.500"
+                            textDecoration="none"
+                            _hover={{ textDecoration: 'underline' }}
                         >
                             Micah Borghese
                         </Link>,{" "}
@@ -144,13 +136,13 @@ function About() {
                     width="100%"
                     mx="auto" 
                     mb={6}
-                    key={index} // Always include a unique `key` when mapping
+                    key={index}
                 >
                     <Flex direction={{ base: "column", md: "row" }} width="100%" align="center" height="auto">
                     {/* Left: Image */}
                     <Box flexShrink={0} mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
                         <Image 
-                        src={testimonial.image} // Use `testimonial.image`
+                        src={testimonial.image}
                         alt="Image of the person giving the testimonial" 
                         boxSize={{ base: "100px", md: "100px", lg: "150px" }} 
                         objectFit="cover" 
@@ -161,10 +153,10 @@ function About() {
                     {/* Right: Text */}
                     <Box textAlign="left">
                         <Heading as="h3" size="md" mb={2}>
-                        {testimonial.name} {/* Use `testimonial.name` */}
+                        {testimonial.name}
                         </Heading>
                         <Text fontSize="sm">
-                        {testimonial.text} {/* Use `testimonial.text` */}
+                        {testimonial.text}
                         </Text>
                     </Box>
                     </Flex>

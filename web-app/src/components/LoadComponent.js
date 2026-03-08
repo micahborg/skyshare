@@ -1,8 +1,3 @@
-/*Load Icon for skyShare.
-Description: This displays a moving giraffe anytime there is something on the site that needs to load.  
-Programmers: Brynn Hare, Micah Borghese
-Date Created: 10/29/2024
-*/
 "use client";
 import React from "react"; //import the react module
 import { Box, Flex, Image, Text } from "@chakra-ui/react"; //import the box, flex, image, and text components from chakra ui

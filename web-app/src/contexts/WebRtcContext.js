@@ -1,8 +1,8 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 //import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, getDoc } from "firebase/firestore";
-import { app } from '../lib/connectionDetails';
+import { getFirestore, collection, doc, setDoc, updateDoc, addDoc, onSnapshot, getDoc, serverTimestamp } from "firebase/firestore";
+import { app, getIceServerConfig } from '../lib/connectionDetails';
 
 const WebRtcContext = createContext();
 
@@ -12,6 +12,7 @@ export const WebRtcProvider = ({ children }) => {
   const [messages, setMessages] = useState([]); // Store chat messages
   const [chats, setChats] = useState([]); // Store chat messages
   const [files, setFiles] = useState([]); // received file blobs
+
   const pc = useRef(null);
   const dataChannel = useRef(null);
 
@@ -21,24 +22,53 @@ export const WebRtcProvider = ({ children }) => {
   let receivedSize = 0;
 
   useEffect(() => {
-    console.log("Initializing WebRTC connection...");
-    getFirestore(app);
-
-    const servers = {
-      iceServers: [
-        { urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
-      ],
-      iceCandidatePoolSize: 10,
+    const initializeWebRTC = async () => {
+      console.log("Initializing WebRTC connection...");
+      
+      // Fetch ICE server configuration
+      try {
+        const config = await getIceServerConfig("365");
+        
+        // Initialize peer connection with the fetched config
+        pc.current = new RTCPeerConnection(config);
+        console.log("Peer connection created:", pc.current);
+        
+        // Rest of your WebRTC initialization...
+        setupPeerConnection();
+        
+      } catch (error) {
+        console.error("Failed to initialize WebRTC:", error);
+      }
     };
 
-    pc.current = new RTCPeerConnection(servers);
-    console.log("Peer connection created:", pc.current);
+    initializeWebRTC();
+  }, []);
+
+  const setupPeerConnection = () => {
+    if (!pc.current) return;
+
+    // Set up ICE candidate handling
+    pc.current.oniceconnectionstatechange = () => {
+      console.log("ICE connection state:", pc.current.iceConnectionState);
+
+      if (pc.current.iceConnectionState === "connected") {
+        console.log("✅ ICE connection established (STUN or TURN)");
+      }
+
+      if (pc.current.iceConnectionState === "failed") {
+        console.error("❌ ICE connection failed (likely no viable candidate)");
+      }
+    };
 
     // Initialize the data channel
     dataChannel.current = pc.current.createDataChannel("dataChannel");
     console.log("Data channel created:", dataChannel.current);
+
+    // Set up data channel properties
     dataChannel.current.binaryType = "arraybuffer";
     dataChannel.current.bufferedAmountLowThreshold = 0;
+
+    // Set up event listeners for the data channel
     dataChannel.current.onmessage = (msg) => {
       console.log("Message received on data channel:", msg.data);
       if (typeof msg.data === "string") {
@@ -113,8 +143,9 @@ export const WebRtcProvider = ({ children }) => {
       setIsConnected(false);
       pc.current.close();
     };
-  }, []);
+  };
 
+  //region Begin Pair
   const beginPair = async () => {
     console.log("Creating stream...");
     const firestore = getFirestore();
@@ -124,7 +155,11 @@ export const WebRtcProvider = ({ children }) => {
 
     pc.current.onicecandidate = (event) => {
       console.log("New ICE candidate:", event.candidate);
-      event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
+      if (event.candidate) {
+        addDoc(offerCandidates, event.candidate.toJSON());
+      } else {
+        updateDoc(callDoc, { iceGatheringComplete: true });
+      }
     };
 
     const offerDescription = await pc.current.createOffer();
@@ -133,34 +168,14 @@ export const WebRtcProvider = ({ children }) => {
     const offer = {
       sdp: offerDescription.sdp,
       type: offerDescription.type,
-      // pubKey: "senders public key, testing for now",
-      // deviceInfo: userAgent,
     };
 
-    await setDoc(callDoc, { offer });
+    await setDoc(callDoc, { 
+      offer,
+      createdAt: serverTimestamp() // Store creation time for TTL 
+    });
     setPairId(callDoc.id);
     console.log("Pair ID:", callDoc.id);
-
-    // begin try something new ---
-    let candidatesComplete = false;
-
-    // Adding event listener for ICE gathering state change
-    pc.current.onicegatheringstatechange = () => {
-      console.log('iceGatheringState:', pc.current.iceGatheringState);
-      if (pc.current.iceGatheringState === 'complete') {
-        console.log('ICE gathering complete. Sending offer.');
-        candidatesComplete = true;
-      }
-    };
-
-    // Add a timeout to force sending the offer if candidates are not complete
-    setTimeout(() => {
-      if (!candidatesComplete) {
-        console.log('Candidates processing not ended. Ending it...');
-        candidatesComplete = true;
-      }
-    }, 3000); // 3 seconds timeout
-    // end try something new ---
 
     onSnapshot(callDoc, (snapshot) => {
       const data = snapshot.data();
@@ -182,6 +197,7 @@ export const WebRtcProvider = ({ children }) => {
     return callDoc.id;
   };
 
+  //region Connect Device
   const connectDevice = async (pairId) => {
     if (!pairId) {
         console.error("Invalid pairId provided.");
@@ -201,8 +217,12 @@ export const WebRtcProvider = ({ children }) => {
     const offerCandidates = collection(callDoc, "offerCandidates");
 
     pc.current.onicecandidate = (event) => {
-      console.log("New ICE candidate:", event.candidate);
-      event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
+      console.log("New ICE candidate:", event.candidate); // type srflx (STUN) or relay (TURN)
+      if (event.candidate) {
+        addDoc(answerCandidates, event.candidate.toJSON());
+      } else {
+        updateDoc(callDoc, { iceGatheringComplete: true });
+      }
     };
 
     const callData = (await getDoc(callDoc)).data();
@@ -229,13 +249,10 @@ export const WebRtcProvider = ({ children }) => {
     const answer = {
       type: answerDescription.type,
       sdp: answerDescription.sdp,
-      // pubKey: "receivers public key, testing for now",
-      // deviceInfo: userAgent,
     };
 
-    await setDoc(callDoc, { answer });
+    await updateDoc(callDoc, { answer });
     
-    // begin try something new ---
     // Use similar logic for ICE gathering state
     let candidatesComplete = false;
 
@@ -255,7 +272,6 @@ export const WebRtcProvider = ({ children }) => {
         candidatesComplete = true;
       }
     }, 3000); // 3 seconds timeout
-    // end try something new ---
     
     onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {

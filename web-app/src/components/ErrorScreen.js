@@ -1,9 +1,3 @@
-/*Error Screen for skyShare.
-Description: This displays an error message when something goes wrong.  
-Programmers: Brynn Hare
-Date Created: 11/3/2024
-*/
-
 "use client";
 import React from "react"; //import the react module
 const Errors = () => { //create the error component

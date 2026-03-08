@@ -1,0 +1,9 @@
+.terraform
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
+credentials.json
+
+webrtc-service/node_modules/
+webrtc-service/.env
+webrtc-service/turnserver.conf
