@@ -1,32 +1,15 @@
 import { initializeApp } from "firebase/app";
 
-// Function to fetch fresh TURN credentials
-const getIceServerConfig = async (pairId = null) => {
-  try {
-    const params = new URLSearchParams({ service: 'turn' });
-    if (pairId) {
-      params.append('pairId', pairId);
+const iceServerConfig = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    {
+      urls: [process.env.NEXT_PUBLIC_TURN_SERVER_URL],
+      username: process.env.NEXT_PUBLIC_TURN_SERVER_USERNAME,
+      credential: process.env.NEXT_PUBLIC_TURN_SERVER_CREDENTIAL,
     }
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_TURN_API_BASE_URL}/api/turn?${params}`);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch TURN credentials: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.iceServerConfig;
-  } catch (error) {
-    console.error('Error fetching TURN credentials:', error);
-    
-    // Fallback to STUN-only configuration
-    return {
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" }
-      ],
-      iceTransportPolicy: "all"
-    };
-  }
+  ],
+  iceTransportPolicy: "all"  // allow all (STUN, TURN, and direct)
 };
 
 const firebaseConfig = {
@@ -40,4 +23,4 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export { app, getIceServerConfig };
+export { app, iceServerConfig };
